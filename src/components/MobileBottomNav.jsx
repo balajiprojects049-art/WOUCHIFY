@@ -29,11 +29,11 @@ const navItems = [
     ),
   },
   {
-    label: 'Contact',
-    to: '/deals',
+    label: 'Loot',
+    to: '/loot-deals',
     icon: (
       <svg viewBox="0 0 20 20" className="h-4 w-4 fill-current" aria-hidden="true">
-        <path d="M3 5.5A2.5 2.5 0 0 1 5.5 3h9A2.5 2.5 0 0 1 17 5.5v9A2.5 2.5 0 0 1 14.5 17h-9A2.5 2.5 0 0 1 3 14.5v-9Zm2.2.7L10 9.7l4.8-3.5H5.2Zm9.3 1.9-4.1 3a.8.8 0 0 1-.9 0l-4.1-3v6.4h9.1V8.1Z" />
+        <path d="M4.2 4.5h11.6v2.2H4.2V4.5Zm1 4h9.6v2.2H5.2V8.5Zm1 4h7.6v2.2H6.2v-2.2Z" />
       </svg>
     ),
   },
@@ -46,16 +46,22 @@ function MobileBottomNav() {
     <div className="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-white/95 px-3 py-2 backdrop-blur-md md:hidden">
       <nav className="mx-auto flex max-w-md items-center justify-between gap-1 rounded-2xl bg-white p-2 shadow-sm">
         {navItems.map((item) => (
+          (() => {
+            const isActive = item.to === '/' ? location.pathname === '/' : location.pathname.startsWith(item.to)
+
+            return (
           <NavLink
             key={item.label}
             to={item.to}
             className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-xl px-1 py-2 text-[10px] font-semibold uppercase tracking-wide transition-all duration-300 ${
-              location.pathname === item.to ? 'bg-cream text-gold' : 'text-muted'
+              isActive ? 'bg-cream text-gold' : 'text-muted'
             }`}
           >
             <span>{item.icon}</span>
             <span>{item.label}</span>
           </NavLink>
+            )
+          })()
         ))}
       </nav>
     </div>

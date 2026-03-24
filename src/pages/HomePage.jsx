@@ -9,6 +9,7 @@ import JustInPromoSection from '../components/JustInPromoSection'
 import GiveawaySection from '../components/GiveawaySection'
 import TelegramBanner from '../components/TelegramBanner'
 import ExclusiveDealsSection from '../components/ExclusiveDealsSection'
+import AdvertiseWithUsSection from '../components/AdvertiseWithUsSection'
 
 function HomePage() {
   return (
@@ -28,6 +29,7 @@ function HomePage() {
       <main className="mx-auto max-w-6xl px-3 py-12 sm:px-6 sm:py-14 lg:px-8">
         <JustInPromoSection />
         <GiveawaySection />
+        <AdvertiseWithUsSection />
         <TelegramBanner />
       </main>
     </>
