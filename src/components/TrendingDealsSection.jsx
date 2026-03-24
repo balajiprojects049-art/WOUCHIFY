@@ -48,15 +48,15 @@ function TrendingCard({ item, elapsedSeconds }) {
   const remainingSeconds = item.expiresIn - elapsedSeconds
 
   return (
-    <article className="rounded-2xl bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-md">
+    <article className="min-w-[260px] rounded-2xl bg-white p-3 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-md sm:min-w-0 sm:p-4">
       <div className="overflow-hidden rounded-xl">
         <img
           src={item.image}
           alt={item.title}
-          className="h-48 w-full rounded-xl object-cover transition-all duration-300 hover:scale-105"
+          className="h-40 w-full rounded-xl object-cover transition-all duration-300 hover:scale-105 sm:h-48"
         />
       </div>
-      <h3 className="mt-5 text-sm font-semibold text-ink">{item.title}</h3>
+      <h3 className="mt-4 text-sm font-semibold text-ink sm:mt-5">{item.title}</h3>
       <div className="mt-3 flex items-center justify-between">
         <p className="text-base font-bold text-ink">{item.price}</p>
         <p className="rounded-full bg-goldsoft px-2 py-1 text-xs font-semibold text-navy">{item.discount}</p>
@@ -94,14 +94,14 @@ function TrendingDealsSection() {
   }, [])
 
   return (
-    <section className="mt-16">
+    <section className="mt-14 sm:mt-16">
       <div className="mb-6 flex items-end justify-between">
         <h2 className="text-2xl font-bold tracking-tight text-ink">Trending Deals</h2>
         <a href="#" className="text-sm font-semibold text-gold">
           View all
         </a>
       </div>
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="flex gap-4 overflow-x-auto pb-2 sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:pb-0 lg:grid-cols-4">
         {products.map((item) => (
           <TrendingCard key={item.title} item={item} elapsedSeconds={elapsedSeconds} />
         ))}

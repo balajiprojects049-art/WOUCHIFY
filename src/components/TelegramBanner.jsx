@@ -1,12 +1,12 @@
 function TelegramBanner() {
   return (
-    <section className="mt-20">
-      <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-r from-midnight via-[#262321] to-[#3A342B] p-8 text-white shadow-sm transition-all duration-300 hover:-translate-y-2 sm:p-14">
+    <section className="mt-16 sm:mt-20">
+      <div className="relative overflow-hidden rounded-[1.5rem] bg-gradient-to-r from-midnight via-[#262321] to-[#3A342B] p-6 text-white shadow-sm transition-all duration-300 hover:-translate-y-2 sm:rounded-[2rem] sm:p-14">
         <p className="inline-flex rounded-full bg-gold/20 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-gold">
           Real-Time Alerts
         </p>
 
-        <h3 className="mt-5 max-w-2xl text-4xl font-bold leading-[1.05] tracking-tight sm:text-6xl">
+        <h3 className="mt-4 max-w-2xl text-3xl font-bold leading-[1.08] tracking-tight sm:mt-5 sm:text-6xl">
           Join our <span className="text-goldsoft">Telegram</span>
           <br />
           <span className="text-goldsoft">Channel</span> for instant
@@ -14,12 +14,12 @@ function TelegramBanner() {
           alerts.
         </h3>
 
-        <p className="mt-6 max-w-lg text-sm leading-8 text-slate-200/80 sm:text-xl sm:leading-8">
+        <p className="mt-4 max-w-lg text-sm leading-7 text-slate-200/80 sm:mt-6 sm:text-xl sm:leading-8">
           Don&apos;t wait for emails. Get the absolute best loot deals and limited-time coupons pushed directly to your phone the second they go live.
         </p>
 
-        <div className="mt-9 flex flex-wrap items-center gap-6">
-          <button className="inline-flex items-center gap-2 rounded-lg bg-white px-8 py-4 text-base font-semibold text-midnight transition-all duration-300 hover:scale-105">
+        <div className="mt-7 flex flex-wrap items-center gap-4 sm:mt-9 sm:gap-6">
+          <button className="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-semibold text-midnight transition-all duration-300 hover:scale-105 sm:px-8 sm:py-4 sm:text-base">
             <span>Join Now</span>
             <span aria-hidden="true">→</span>
           </button>

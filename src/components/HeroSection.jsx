@@ -67,61 +67,70 @@ function HeroSection() {
   }, [])
 
   const currentSlide = heroSlides[activeSlide]
+  const mobileHighlights = heroPoints.slice(0, 3)
 
   return (
-    <section className="pb-16 pt-6 sm:pb-20 sm:pt-8">
-      <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-12">
-        <div className="text-center lg:text-left">
-          <p className="mb-5 text-xs font-semibold uppercase tracking-[0.24em] text-gold">Smart Savings</p>
-          <h1 className="text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl">
+    <section className="pb-12 pt-4 sm:pb-20 sm:pt-8">
+      <div className="grid items-start gap-7 lg:grid-cols-2 lg:gap-12">
+        <div className="text-left">
+          <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-gold sm:mb-5 sm:text-xs sm:tracking-[0.24em]">Smart Savings</p>
+          <h1 className="text-3xl font-bold leading-[1.08] tracking-tight sm:text-5xl">
             <span className="text-ink">Discover the best deals,</span>
             <br className="hidden sm:block" />
             <span className="text-gold">Coupons & Rewards</span> <span className="text-ink">in One place</span>
           </h1>
-          <p className="mx-auto mt-6 max-w-xl text-sm leading-7 sm:text-base lg:mx-0">
+          <p className="mt-4 max-w-xl text-sm leading-6 text-muted sm:mt-6 sm:leading-7 sm:text-base">
             <span className="font-semibold text-gold">WOUCHIFY</span>{' '}
-            <span className="text-ink">
+            <span className="text-muted">
               helps users find the best online deals, loot offers, coupon codes, giveaways, and reward opportunities from top brands.
             </span>
           </p>
 
-          <div className="mx-auto mt-6 grid max-w-2xl gap-2 text-left lg:mx-0">
+          <div className="mt-4 grid gap-2 sm:hidden">
+            {mobileHighlights.map((point) => (
+              <p key={point} className="rounded-xl border border-line bg-white px-3 py-2 text-xs font-semibold text-ink">
+                {point}
+              </p>
+            ))}
+          </div>
+
+          <div className="mt-5 hidden max-w-2xl gap-1.5 sm:grid">
             {heroPoints.map((point) => (
-              <p key={point} className="text-sm font-medium text-muted">
+              <p key={point} className="text-[13px] font-medium leading-5 text-muted sm:text-sm">
                 • {point}
               </p>
             ))}
           </div>
 
-          <div className="mx-auto mt-9 flex max-w-2xl flex-col gap-3 rounded-2xl border border-line bg-white p-3 shadow-sm sm:flex-row lg:mx-0">
+          <div className="mt-6 flex max-w-2xl items-center gap-2 rounded-2xl border border-line bg-white p-2 shadow-sm sm:mt-9 sm:gap-3 sm:p-3">
             <input
               type="text"
               placeholder="Search products, stores or promo codes"
-              className="h-12 flex-1 rounded-xl bg-cream px-4 text-sm text-ink placeholder:text-muted focus:outline-none"
+              className="h-12 flex-1 rounded-xl border border-line bg-cream px-4 text-sm text-ink placeholder:text-muted focus:outline-none"
             />
-            <button className="h-12 rounded-xl bg-navy px-6 text-sm font-semibold text-white transition-all duration-300 hover:scale-105">
-              Search Deals
+            <button className="h-12 shrink-0 rounded-xl bg-navy px-3.5 text-xs font-semibold text-white transition-all duration-300 hover:scale-105 sm:px-6 sm:text-sm">
+              Search
             </button>
           </div>
 
         </div>
 
-        <article className="rounded-2xl border border-line bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-2 sm:p-5">
+        <article className="rounded-2xl border border-line bg-white p-3 shadow-sm transition-all duration-300 hover:-translate-y-2 sm:p-5">
           <div className="relative overflow-hidden rounded-2xl">
             <img
               src={currentSlide.image}
               alt={currentSlide.title}
-              className="h-72 w-full rounded-2xl object-cover transition-all duration-300 hover:scale-105 sm:h-80"
+              className="h-56 w-full rounded-2xl object-cover transition-all duration-300 hover:scale-105 sm:h-80"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
-            <div className="absolute left-4 top-4 rounded-full bg-gold px-3 py-1 text-xs font-bold text-midnight">
+            <div className="absolute left-3 top-3 rounded-full bg-gold px-2.5 py-1 text-[11px] font-bold text-midnight sm:left-4 sm:top-4 sm:px-3 sm:text-xs">
               {currentSlide.discount}
             </div>
 
-            <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-xl bg-black/35 p-3 backdrop-blur-sm">
-              <p className="text-xs font-semibold uppercase tracking-widest text-white/90">{currentSlide.label}</p>
-              <button className="rounded-lg bg-white px-4 py-2 text-xs font-semibold text-midnight transition-all duration-300 hover:scale-105">
+            <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between rounded-xl bg-black/35 p-2.5 backdrop-blur-sm sm:bottom-4 sm:left-4 sm:right-4 sm:p-3">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-white/90 sm:text-xs">{currentSlide.label}</p>
+              <button className="rounded-lg bg-white px-3 py-1.5 text-[11px] font-semibold text-midnight transition-all duration-300 hover:scale-105 sm:px-4 sm:py-2 sm:text-xs">
                 Grab Deal
               </button>
             </div>

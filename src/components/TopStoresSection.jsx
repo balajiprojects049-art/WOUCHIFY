@@ -28,7 +28,7 @@ function TopStoresSection() {
   const otherStores = stores.filter((store) => !store.featured)
 
   return (
-    <section className="mt-16">
+    <section className="mt-14 sm:mt-16">
       <div className="mb-5 flex items-end justify-between">
         <h2 className="text-2xl font-bold tracking-tight text-ink">Top Stores</h2>
         <a href="#" className="text-sm font-semibold text-gold">
@@ -36,17 +36,17 @@ function TopStoresSection() {
         </a>
       </div>
 
-      <div className="rounded-2xl border border-line bg-white p-4 shadow-sm sm:p-5">
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+      <div className="rounded-2xl border border-line bg-white p-3 shadow-sm sm:p-5">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-5">
           {featuredStore && (
-            <article className="col-span-2 row-span-2 rounded-2xl border border-line bg-cream p-5 transition-all duration-300 hover:-translate-y-2">
+            <article className="col-span-2 row-span-2 rounded-2xl border border-line bg-cream p-4 transition-all duration-300 hover:-translate-y-2 sm:p-5">
               <div className="flex items-center justify-between">
                 <StoreBadge name={featuredStore.name} />
                 <p className="rounded-full bg-gold/20 px-2.5 py-1 text-[11px] font-semibold text-gold">Featured</p>
               </div>
-              <h3 className="mt-6 text-3xl font-bold tracking-tight text-ink">{featuredStore.name}</h3>
-              <p className="mt-3 text-lg font-semibold text-ink">{featuredStore.reward}</p>
-              <button className="mt-5 rounded-xl bg-navy px-4 py-2 text-sm font-semibold text-white transition-all duration-300 hover:scale-105">
+              <h3 className="mt-5 text-2xl font-bold tracking-tight text-ink sm:mt-6 sm:text-3xl">{featuredStore.name}</h3>
+              <p className="mt-2 text-base font-semibold text-ink sm:mt-3 sm:text-lg">{featuredStore.reward}</p>
+              <button className="mt-4 rounded-xl bg-navy px-4 py-2 text-xs font-semibold text-white transition-all duration-300 hover:scale-105 sm:mt-5 sm:text-sm">
                 Grab Deal
               </button>
             </article>
@@ -55,14 +55,14 @@ function TopStoresSection() {
           {otherStores.map((store) => (
             <article
               key={store.name}
-              className="rounded-xl border border-line bg-white p-4 transition-all duration-300 hover:-translate-y-2 hover:shadow-sm"
+              className="rounded-xl border border-line bg-white p-3 transition-all duration-300 hover:-translate-y-2 hover:shadow-sm sm:p-4"
             >
               <div className="flex items-start justify-between gap-3">
                 <StoreBadge name={store.name} />
-                <p className="text-sm font-semibold text-muted">Store</p>
+                <p className="text-xs font-semibold text-muted sm:text-sm">Store</p>
               </div>
-              <h3 className="mt-5 text-xl font-bold tracking-tight text-ink">{store.name}</h3>
-              <p className="mt-2 text-sm font-semibold text-ink">{store.reward}</p>
+              <h3 className="mt-4 text-lg font-bold tracking-tight text-ink sm:mt-5 sm:text-xl">{store.name}</h3>
+              <p className="mt-1.5 text-xs font-semibold text-ink sm:mt-2 sm:text-sm">{store.reward}</p>
             </article>
           ))}
         </div>

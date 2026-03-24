@@ -1,18 +1,18 @@
 function Footer() {
   return (
     <footer className="mt-20 border-t border-white/5 bg-midnight text-slate-300">
-      <div className="mx-auto max-w-6xl px-4 pb-8 pt-14 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl px-3 pb-8 pt-12 sm:px-6 sm:pt-14 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-12">
           <div className="lg:col-span-4">
-            <p className="text-2xl font-bold tracking-tight text-white">WOUCHIFY</p>
+            <p className="text-xl font-bold tracking-tight text-white sm:text-2xl">WOUCHIFY</p>
             <p className="mt-4 max-w-sm text-sm leading-7 text-slate-300">
               Premium deal discovery platform for coupons, price drops, rewards and credit card benefits  all in one place.
             </p>
 
             <div className="mt-6 flex flex-wrap gap-2">
-              <a href="#" className="rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-slate-200 transition-all duration-300 hover:border-gold hover:text-white">Teligram</a>
-              <a href="#" className="rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-slate-200 transition-all duration-300 hover:border-gold hover:text-white">Instagram</a>
-              <a href="#" className="rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-slate-200 transition-all duration-300 hover:border-gold hover:text-white">WhatsApp </a>
+              <a href="#" className="rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-slate-200 transition-all duration-300 hover:border-gold hover:text-white">Telegram</a>
+              <a href="#" className="rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-slate-200 transition-all duration-300 hover:border-gold hover:text-white">Telegram Group</a>
+              <a href="#" className="rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-slate-200 transition-all duration-300 hover:border-gold hover:text-white">WhatsApp</a>
             </div>
           </div>
 

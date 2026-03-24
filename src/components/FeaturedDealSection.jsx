@@ -60,16 +60,16 @@ function FeaturedDealSection() {
 
   return (
     <section className="mt-8 sm:mt-10">
-      <div className="grid items-center gap-8 rounded-2xl bg-white p-7 shadow-sm transition-all duration-300 hover:-translate-y-2 sm:p-10 lg:grid-cols-2">
+      <div className="grid items-center gap-6 rounded-2xl bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-2 sm:gap-8 sm:p-10 lg:grid-cols-2">
         <div>
           <p className="mb-3 inline-flex rounded-full bg-cream px-3 py-1 text-xs font-semibold text-muted">Featured Deal</p>
-          <h2 className="text-2xl font-bold tracking-tight text-ink sm:text-4xl">{currentSlide.title}</h2>
-          <p className="mt-5 max-w-md text-sm leading-7 text-muted sm:text-base">
+          <h2 className="text-xl font-bold tracking-tight text-ink sm:text-4xl">{currentSlide.title}</h2>
+          <p className="mt-4 max-w-md text-sm leading-6 text-muted sm:mt-5 sm:leading-7 sm:text-base">
             {currentSlide.description}
           </p>
-          <div className="mt-7 flex flex-wrap gap-3">
-            <button className="rounded-xl bg-navy px-5 py-3 text-sm font-semibold text-white transition-all duration-300 hover:scale-105">{currentSlide.primaryCta}</button>
-            <button className="rounded-xl border border-line bg-white px-5 py-3 text-sm font-semibold text-ink transition-all duration-300 hover:scale-105">{currentSlide.secondaryCta}</button>
+          <div className="mt-6 flex flex-wrap gap-2.5 sm:mt-7 sm:gap-3">
+            <button className="rounded-xl bg-navy px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:scale-105 sm:px-5 sm:py-3">{currentSlide.primaryCta}</button>
+            <button className="rounded-xl border border-line bg-white px-4 py-2.5 text-sm font-semibold text-ink transition-all duration-300 hover:scale-105 sm:px-5 sm:py-3">{currentSlide.secondaryCta}</button>
           </div>
 
           <div className="mt-5 flex items-center gap-2">
@@ -92,7 +92,7 @@ function FeaturedDealSection() {
           <img
             src={currentSlide.image}
             alt={currentSlide.title}
-            className="h-80 w-full rounded-2xl object-cover transition-all duration-300 hover:scale-105"
+            className="h-60 w-full rounded-2xl object-cover transition-all duration-300 hover:scale-105 sm:h-80"
           />
         </div>
       </div>
