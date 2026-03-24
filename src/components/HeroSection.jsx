@@ -49,9 +49,6 @@ const heroPoints = [
   'No Signup Required  Browse Deals Instantly',
   '100% Free Coupons No Hidden Charges',
   'Safe & Trusted Deals from Verified Stores',
-  'Grab Deals Without Creating an Account',
-  'Direct Access to Discounts  No Payment Needed',
-  'Use Coupons Instantly  No Registration Hassle',
   'Fast, Easy & Completely Free Deal Discovery',
 ]
 
@@ -94,10 +91,14 @@ function HeroSection() {
             ))}
           </div>
 
-          <div className="mt-5 hidden max-w-2xl gap-1.5 sm:grid">
+          <div className="mt-5 hidden max-w-2xl gap-2 sm:grid">
             {heroPoints.map((point) => (
-              <p key={point} className="text-[13px] font-medium leading-5 text-muted sm:text-sm">
-                • {point}
+              <p
+                key={point}
+                className="flex items-start gap-2.5 rounded-xl border border-line bg-white px-3 py-2 text-[13px] font-semibold leading-5 text-ink shadow-sm sm:text-sm"
+              >
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-gold" />
+                <span className="text-muted">{point}</span>
               </p>
             ))}
           </div>
