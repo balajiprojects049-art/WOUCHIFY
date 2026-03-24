@@ -1,0 +1,226 @@
+=== Wouchify_Developement_Document.pdf ===
+Wouchify  
+ 
+Website Development Documentatio n 
+ 
+ 
+1. Platform Overview  
+ 
+• Wouchify is a deals and coupon discovery platform where users can find 
+online offers such as Loot Deals, Promo Codes, Discount Vouchers, 
+Giveaways, and Crypto Rewards / Reward Opportunities.  
+• The platform collects promotional offers from different online brands 
+and organizes them so users can easily discover discounts and 
+promotional campaigns.  
+• Users should be able to browse deals without creating an account.  
+ 
+ 
+ 
+2. Website Navigation Structure  
+ 
+• Main Navigation (Navbar): Home, Deals, Stores, Categories, Top Deals, 
+Loot Deals, Promo Codes, Giveaways, Reward Opportunities, Submit 
+Coupon, Blog, Advertise With Us, About Us, Contact.  
+• Footer Navigation: About Us, Contact Us, Privacy Policy, Terms & 
+Conditions, Affiliate Disclosure, Disclaimer.  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+3. Home Page Structure  
+ 
+• Hero Section with headline: Discover Loot Deals, Promo Codes & 
+Rewards.  
+• Featured Deals Slider highlighting important offers.  
+• Trending Deals based on clicks, views, and engagement.  
+• Latest Deals showing newly added offers.  
+• Loot Deals Section for extreme discount deals.  
+• Promo Codes Section with copy code button.  
+• Giveaways Section for promotional reward campaigns.  
+• Crypto / Reward Opportunities for earning campaigns.  
+• Top Stores Section with stores like Amazon, Flipkart, Myntra, Ajio, 
+Swiggy.  
+• Telegram Integration encouraging users to join the Telegram channel for 
+instant updates.  
+ 
+ 
+ 
+4. Deals Page  
+ 
+• Displays all deals available on the platform.  
+• Each deal card includes deal title, store name, discount percentage, 
+price, expiry info, and Get Deal button.  
+ 
+ 
+5. Stores Page  
+ 
+• Lists all supported stores with logo, store name, description, and link to 
+store detail page.  
+ 
+ 
+ 
+ 
+ 
+6. Store Detail Page  
+ 
+• Each store has its own page such as /store/amazon.  
+• Page displays store logo, description, deals, promo codes, vouchers, and 
+optionally expired deals . 
+ 
+7. Categories Page  
+ 
+• Deals are organized by categories such as Electronics, Fashion, Food, 
+Travel, Digital Services, Beauty, and Mobile & Gadgets.  
+ 
+8. Top Deals Page  
+ 
+• Displays the best deals with highest discounts or special promotions.  
+ 
+9. Loot Deals Page  
+ 
+• Displays extreme discount offers attracting high user engagement.  
+ 
+10.   Promo Codes Page  
+ 
+• Displays all coupon codes with store name, coupon code, discount 
+details, and copy button.  
+ 
+ 
+ 
+11.  Giveaways Page  
+ 
+• Shows active promotional giveaways with reward details and 
+participation instructions . 
+ 
+12.   Crypto Rewards / Reward Opportunities  
+ 
+• Displays campaigns where users earn rewards such as signup bonuses, 
+referral rewards, or promotional tasks.  
+ 
+13.   Submit Coupon Page  
+ 
+• Users can submit deals using fields like Store Name, Deal Title, Coupon 
+Code, Discount Details, Deal Link, Expiry Date, and Description.  
+• Submitted deals go to admin review before publishing.  
+ 
+14.   Blog Page  
+ 
+• Contains articles about shopping tips, saving money online, and seasonal 
+deal guides to improve SEO traffic.  
+ 
+15.   Advertise With Us  
+ 
+• Allows brands to promote deals using featured placements, sponsored 
+listings, giveaway promotions, and campaigns.  
+ 
+ 
+16.   About Us  
+ 
+• Explains the mission of Wouchify as a platform helping users find verified 
+deals and discounts from multiple stores.  
+ 
+17.   Contact Page  
+ 
+• Includes contact form, email, and social media links for user or partner 
+communication.  
+ 
+18.   Core Website Features  
+ 
+• Copy Coupon Code Button for quick copying.  
+• Deal Expiry Timer showing countdown for limited deals.  
+• Featured Deals Slider on homepage.  
+• Telegram Integration for deal alerts.  
+• Advanced Search by store name, product name, or keywords.  
+• SEO Optimization including meta tags and SEO -friendly URLs.  
+• Mobile Responsive Design for phone, tablet, and desktop.  
+ 
+19.   Admin Panel Overview  
+ 
+• Admin can add stores, deals, coupons, edit deals, delete expired deals, 
+manage categories, and manage blog posts.  
+ 
+ 
+ 
+ 
+20.   Admin Workflow  
+ 
+• Admin logs into dashboard.  
+• Admin selects or creates store.  
+• Admin adds coupon details such as discount, code, and expiry.  
+• Admin publishes coupon.  
+• Coupon automatically appears on store and category pages.  
+• Admin periodically removes expired deals.  
+
+
+=== wouchify_website_content...pdf ===
+                                                   WOUCHIFY  
+                                           Website Content Documentation  
+ 
+1. Home Page  – Hero Secti on 
+Headline  : Discover the best deals, Cou pons & Rewards in O ne place  
+Description : WOUCHIFY  helps users find the best online deals, loot 
+offers, coupon codes,  giveaways, and reward opportunities from top 
+brands.  
+ 
+2. Featured  Deals Section  
+Title  : Featured Deals  
+Content  : Exploring the most trending and po pular dea ls selected by our 
+team . 
+ 
+3. Trending Deals Section  
+Title  : trending Deals  
+Content :  Discover the  best and hottest offers currently popular among 
+users.  
+ 
+4. Loot Deals Section  
+Title  : Loot Deals  
+Content  : Extremely discounted offers available for a limited time.  
+ 
+5. Coupon Codes Section  
+Title:  Give  aways  
+Content: Use verified coupon codes to unlock additional discounts.  
+ 
+ 
+6. Giveaways Section  
+Title:  Give  aways  
+Content:  Participate in campaigns to win exclusive rewards rewards like 
+(Gift cards, and prizes. ) 
+ 
+7. Reward Opportunities  
+Content:  Discover promotional campaigns where users can earn rewards  
+ 
+ 
+8. About Wouchify  
+WOUCHIFY   is a deals and coupon discovery platform where it helps  users 
+find discounts and promo codes.  
+WOUCHIFY   was started in 2023 with the goal of helping the users to save 
+money while shopping in online . 
+ 
+ 
+9. Advertise With Us  
+Brands can promote their offer s and discounts  using featured deals, 
+sponsored deals, giveaways, and  homepage promotions.  
+ 
+ 
+10. Submit a Deal  
+Users can submit  their  deals including store name, deal title, coupon 
+code, link, discount details,  expiry date, and description.  
+ 
+ 
+ 
+11. Stores Page  
+Users can explore the deals from stores like Amazon, Flipkart, Myntra, 
+Ajio, Swiggy, Zomato, and  Meesho.  
+ 
+ 
+12. Contact Page  
+Users can contact WOUCHIFY  for advertising, partnerships, deal 
+submissions, or support.  
+ 
+ 
+ 
+ 

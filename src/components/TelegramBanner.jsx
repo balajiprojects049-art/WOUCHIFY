@@ -23,7 +23,7 @@ function TelegramBanner() {
             href="https://t.me"
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-semibold text-midnight transition-all duration-300 hover:scale-105 sm:px-8 sm:py-4 sm:text-base"
+            className="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-semibold text-ink transition-all duration-300 hover:scale-105 sm:px-8 sm:py-4 sm:text-base"
           >
             <span>Join Now</span>
             <span aria-hidden="true">→</span>

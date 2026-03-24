@@ -72,7 +72,7 @@ function FeaturedDealSection() {
           <div className="mt-6 flex flex-wrap gap-2.5 sm:mt-7 sm:gap-3">
             <button
               onClick={() => navigate('/stores')}
-              className="rounded-xl bg-navy px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:scale-105 sm:px-5 sm:py-3"
+              className="rounded-xl bg-navy px-4 py-2.5 text-sm font-semibold text-cream transition-all duration-300 hover:scale-105 sm:px-5 sm:py-3"
             >
               {currentSlide.primaryCta}
             </button>
@@ -92,7 +92,7 @@ function FeaturedDealSection() {
                 onClick={() => setActiveSlide(index)}
                 aria-label={`Featured slide ${index + 1}`}
                 className={`h-1.5 rounded-full transition-all duration-300 ${
-                  activeSlide === index ? 'w-6 bg-navy' : 'w-3 bg-slate-300'
+                  activeSlide === index ? 'w-6 bg-gold' : 'w-3 bg-line'
                 }`}
               />
             ))}

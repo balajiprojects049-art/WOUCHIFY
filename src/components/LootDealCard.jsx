@@ -45,7 +45,7 @@ function LootDealCard({ deal }) {
 
       <Link
         to={`/loot-deal/${deal.slug}`}
-        className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-black py-2 text-sm font-semibold text-white transition-all duration-300 hover:scale-105"
+        className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-navy py-2 text-sm font-semibold text-cream transition-all duration-300 hover:scale-105"
       >
         Grab Deal
       </Link>

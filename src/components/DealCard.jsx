@@ -50,7 +50,7 @@ function DealCard({ deal, remainingSeconds }) {
 
       <Link
         to={`/deal/${deal.slug}`}
-        className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-navy px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:scale-105"
+        className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-navy px-4 py-2.5 text-sm font-semibold text-cream transition-all duration-300 hover:scale-105"
       >
         View Deal
       </Link>

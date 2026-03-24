@@ -71,7 +71,7 @@ function Stores() {
               key={letter}
               onClick={() => setSelectedLetter(letter)}
               className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-300 ${
-                selectedLetter === letter ? 'bg-navy text-white' : 'bg-cream text-ink hover:bg-gold/20'
+                selectedLetter === letter ? 'bg-navy text-cream' : 'bg-cream text-ink hover:bg-gold/20'
               }`}
             >
               {letter}

@@ -38,7 +38,7 @@ function StoreCard({ store, featured = false }) {
 
       <p className="mt-1 text-xs text-muted">{store.highlight}</p>
 
-      <span className="mt-4 inline-flex rounded-xl bg-navy px-4 py-2 text-xs font-semibold text-white transition-all duration-300 group-hover:scale-105">
+      <span className="mt-4 inline-flex rounded-xl bg-navy px-4 py-2 text-xs font-semibold text-cream transition-all duration-300 group-hover:scale-105">
         View Deals
       </span>
     </Link>

@@ -46,23 +46,9 @@ const heroSlides = [
   },
 ]
 
-const heroPoints = [
-  'No Signup Required  Browse Deals Instantly',
-  '100% Free Coupons No Hidden Charges',
-  'Safe & Trusted Deals from Verified Stores',
-  'Fast, Easy & Completely Free Deal Discovery',
-]
-
 function HeroSection() {
   const [activeSlide, setActiveSlide] = useState(0)
-  const [searchText, setSearchText] = useState('')
   const navigate = useNavigate()
-
-  const handleSearchSubmit = (event) => {
-    event.preventDefault()
-    const query = searchText.trim()
-    navigate(query ? `/deals?q=${encodeURIComponent(query)}` : '/deals')
-  }
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -73,7 +59,6 @@ function HeroSection() {
   }, [])
 
   const currentSlide = heroSlides[activeSlide]
-  const mobileHighlights = heroPoints.slice(0, 3)
 
   return (
     <section className="pb-12 pt-4 sm:pb-20 sm:pt-8">
@@ -91,40 +76,6 @@ function HeroSection() {
               helps users find the best online deals, loot offers, coupon codes, giveaways, and reward opportunities from top brands.
             </span>
           </p>
-
-          <div className="mt-4 grid gap-2 sm:hidden">
-            {mobileHighlights.map((point) => (
-              <p key={point} className="rounded-xl border border-line bg-white px-3 py-2 text-xs font-semibold text-ink">
-                {point}
-              </p>
-            ))}
-          </div>
-
-          <div className="mt-5 hidden max-w-2xl gap-2 sm:grid">
-            {heroPoints.map((point) => (
-              <p
-                key={point}
-                className="flex items-start gap-2.5 rounded-xl border border-line bg-white px-3 py-2 text-[13px] font-semibold leading-5 text-ink shadow-sm sm:text-sm"
-              >
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-gold" />
-                <span className="text-muted">{point}</span>
-              </p>
-            ))}
-          </div>
-
-          <form onSubmit={handleSearchSubmit} className="mt-6 flex max-w-2xl items-center gap-2 rounded-2xl border border-line bg-white p-2 shadow-sm sm:mt-9 sm:gap-3 sm:p-3">
-            <input
-              type="text"
-              placeholder="Search products, stores or promo codes"
-              value={searchText}
-              onChange={(event) => setSearchText(event.target.value)}
-              className="h-12 flex-1 rounded-xl border border-line bg-cream px-4 text-sm text-ink placeholder:text-muted focus:outline-none"
-            />
-            <button type="submit" className="h-12 shrink-0 rounded-xl bg-navy px-3.5 text-xs font-semibold text-white transition-all duration-300 hover:scale-105 sm:px-6 sm:text-sm">
-              Search
-            </button>
-          </form>
-
         </div>
 
         <article className="rounded-2xl border border-line bg-white p-3 shadow-sm transition-all duration-300 hover:-translate-y-2 sm:p-5">
@@ -144,7 +95,7 @@ function HeroSection() {
               <p className="text-[10px] font-semibold uppercase tracking-widest text-white/90 sm:text-xs">{currentSlide.label}</p>
               <button
                 onClick={() => navigate('/deals')}
-                className="rounded-lg bg-white px-3 py-1.5 text-[11px] font-semibold text-midnight transition-all duration-300 hover:scale-105 sm:px-4 sm:py-2 sm:text-xs"
+                className="rounded-lg bg-white px-3 py-1.5 text-[11px] font-semibold text-ink transition-all duration-300 hover:scale-105 sm:px-4 sm:py-2 sm:text-xs"
               >
                 Grab Deal
               </button>

@@ -42,7 +42,7 @@ function StoreDetail() {
         <div className="rounded-2xl border border-line bg-white p-8 text-center shadow-sm">
           <h1 className="text-2xl font-bold text-ink">Store not found</h1>
           <p className="mt-2 text-sm text-muted">This store page does not exist yet.</p>
-          <Link to="/stores" className="mt-4 inline-flex rounded-xl bg-navy px-4 py-2 text-sm font-semibold text-white">
+          <Link to="/stores" className="mt-4 inline-flex rounded-xl bg-navy px-4 py-2 text-sm font-semibold text-cream">
             Browse Stores
           </Link>
         </div>
@@ -69,7 +69,7 @@ function StoreDetail() {
             href={store.website}
             target="_blank"
             rel="noreferrer"
-            className="rounded-xl bg-navy px-5 py-3 text-sm font-semibold text-white transition-all duration-300 hover:scale-105"
+            className="rounded-xl bg-navy px-5 py-3 text-sm font-semibold text-cream transition-all duration-300 hover:scale-105"
           >
             Visit Store
           </a>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const initialForm = {
   fullName: '',
@@ -14,6 +14,18 @@ function AdvertiseWithUsSection() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [formData, setFormData] = useState(initialForm)
 
+  useEffect(() => {
+    const handleOpenForm = () => {
+      setIsFormVisible(true)
+      setIsSubmitted(false)
+      // Smoothly scroll the section directly into view
+      document.getElementById('advertise-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+
+    window.addEventListener('openAdvertiseForm', handleOpenForm)
+    return () => window.removeEventListener('openAdvertiseForm', handleOpenForm)
+  }, [])
+
   const handleChange = (event) => {
     const { name, value } = event.target
     setFormData((previous) => ({ ...previous, [name]: value }))
@@ -26,7 +38,7 @@ function AdvertiseWithUsSection() {
   }
 
   return (
-    <section className="mt-10 rounded-2xl border border-line bg-white p-5 shadow-sm sm:p-6">
+    <section id="advertise-section" className="mt-10 rounded-2xl border border-line bg-white p-5 shadow-sm sm:p-6 scroll-m-24">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">Partnerships</p>

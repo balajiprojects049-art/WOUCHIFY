@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  darkMode: 'class',
   theme: {
     extend: {
       keyframes: {
@@ -13,15 +14,17 @@ export default {
         marquee: 'marquee 32s linear infinite',
       },
       colors: {
-        cream: '#F7F4EE',
-        ink: '#121826',
-        muted: '#667085',
-        line: '#E6E2DA',
-        navy: '#1F1F22',
-        navysoft: '#2A2A2F',
-        midnight: '#141417',
-        gold: '#C89B1E',
-        goldsoft: '#E8D39A',
+        cream:      'var(--color-cream)',
+        ink:        'var(--color-ink)',
+        muted:      'var(--color-muted)',
+        line:       'var(--color-line)',
+        navy:       'var(--color-navy)',
+        navysoft:   'var(--color-navysoft)',
+        midnight:   'var(--color-midnight)',
+        gold:       'var(--color-gold)',
+        goldsoft:   'var(--color-goldsoft)',
+        surface:    'var(--color-surface)',
+        surfacealt: 'var(--color-surfacealt)',
       },
     },
   },

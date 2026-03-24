@@ -77,7 +77,7 @@ function TrendingCard({ item, elapsedSeconds, onViewDeal }) {
       <h3 className="mt-4 text-sm font-semibold text-ink sm:mt-5">{item.title}</h3>
       <div className="mt-3 flex items-center justify-between">
         <p className="text-base font-bold text-ink">{item.price}</p>
-        <p className="rounded-full bg-goldsoft px-2 py-1 text-xs font-semibold text-navy">{item.discount}</p>
+        <p className="rounded-full bg-gold/20 px-2 py-1 text-xs font-semibold text-gold">{item.discount}</p>
       </div>
 
       <div className="mt-3 flex items-center justify-between rounded-lg bg-cream px-2.5 py-2">
@@ -93,7 +93,7 @@ function TrendingCard({ item, elapsedSeconds, onViewDeal }) {
         </p>
       </div>
 
-      <button onClick={() => onViewDeal(item.title)} className="mt-4 w-full rounded-xl bg-navy px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:scale-105">
+      <button onClick={() => onViewDeal(item.title)} className="mt-4 w-full rounded-xl bg-navy px-4 py-2.5 text-sm font-semibold text-cream transition-all duration-300 hover:scale-105">
         View Deal
       </button>
     </article>

@@ -29,52 +29,66 @@ function ExclusiveDealsSection() {
   const navigate = useNavigate()
 
   return (
-    <section className="relative mt-16 overflow-hidden bg-navy py-14 sm:mt-20 sm:py-20">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-16 top-10 h-44 w-44 rounded-full bg-gold/10 blur-3xl sm:h-64 sm:w-64" />
-        <div className="absolute -right-20 bottom-8 h-56 w-56 rounded-full bg-white/5 blur-3xl sm:h-72 sm:w-72" />
-        <div className="absolute left-1/4 top-16 h-24 w-24 rounded-full border border-white/10 sm:h-36 sm:w-36" />
-        <div className="absolute bottom-12 right-1/4 h-16 w-16 rounded-full border border-gold/20 sm:h-24 sm:w-24" />
-        <div className="absolute left-10 bottom-10 h-px w-28 bg-gradient-to-r from-transparent via-gold/25 to-transparent sm:w-40" />
+    <section className="relative mt-16 overflow-hidden border-y border-line bg-gradient-to-br from-cream via-surface to-gold/5 py-14 shadow-sm sm:mt-20 sm:py-20">
+      {/* ── Animated Falling / Floating Glass Effects ── */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        {/* Animated Background Orbs that float and slowly spin - highly visible for glassmorphism */}
+        <div className="absolute -left-[10%] -top-[20%] h-[70%] w-[60%] origin-center animate-[spin_20s_linear_infinite] rounded-full bg-gold/30 blur-[80px]" />
+        <div className="absolute -bottom-[20%] -right-[10%] h-[80%] w-[70%] origin-center animate-[spin_30s_linear_infinite_reverse] rounded-full bg-goldsoft/40 blur-[100px]" />
+        
+        {/* Mirror/Glass falling reflection lines */}
+        <div className="absolute inset-0 -rotate-12 transform bg-gradient-to-b from-transparent via-white/50 to-transparent opacity-60 blur-[2px]" style={{ animation: 'pulse 6s ease-in-out infinite' }} />
       </div>
 
       <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="mb-7 flex items-center justify-between sm:mb-10">
-          <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">Exclusive Loot Deals</h2>
+          <div>
+            <p className="mb-2 text-sm font-bold uppercase tracking-[0.2em] text-gold">Members Only</p>
+            <h2 className="text-3xl font-extrabold tracking-tight text-ink drop-shadow-sm sm:text-5xl">Exclusive Loot Deals</h2>
+          </div>
           <button
             onClick={() => navigate('/loot-deals')}
-            className="rounded-xl bg-gold px-3 py-2 text-xs font-semibold text-slate-900 transition-all duration-300 hover:scale-105 sm:px-4 sm:text-sm"
+            className="rounded-xl border border-line bg-white/40 px-4 py-2 text-xs font-semibold text-ink backdrop-blur-lg transition-all duration-300 hover:scale-105 hover:bg-gold hover:text-midnight hover:border-gold sm:px-5 sm:py-2.5 sm:text-sm"
           >
-            Explore
+            Explore Options
           </button>
         </div>
 
-        <div className="grid gap-5 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-3">
           {exclusiveDeals.map((item) => (
             <article
               key={item.title}
-              className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-md transition-all duration-300 hover:-translate-y-2"
+              className="group relative rounded-3xl border border-white/40 bg-white/20 p-6 shadow-[0_15px_40px_rgba(0,0,0,0.06)] backdrop-blur-2xl transition-all duration-500 hover:-translate-y-3 hover:border-gold/50 hover:bg-white/30 hover:shadow-[0_25px_50px_rgba(212,168,32,0.15)]"
             >
-              <div className="overflow-hidden rounded-xl">
+              <div className="relative overflow-hidden rounded-2xl">
+                <div className="absolute inset-0 z-10 bg-gradient-to-t from-black/60 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                 <img
                   src={item.image}
                   alt={item.title}
-                  className="h-44 w-full rounded-xl object-cover transition-all duration-300 hover:scale-105"
+                  className="h-48 w-full rounded-2xl object-cover transition-transform duration-700 ease-out group-hover:scale-110"
                 />
+                <span className="absolute left-3 top-3 z-20 rounded-lg bg-white/80 px-3 py-1 text-[11px] font-bold tracking-wider text-ink backdrop-blur-md">
+                  {item.tag}
+                </span>
+                <span className="absolute right-3 top-3 z-20 rounded-lg bg-gold px-3 py-1 text-[11px] font-bold tracking-wider text-midnight shadow-[0_4px_10px_rgba(212,168,32,0.3)]">
+                  {item.badge}
+                </span>
               </div>
-              <div className="mt-4 flex items-center justify-between">
-                <p className="text-xs font-semibold uppercase tracking-wide text-gold">{item.tag}</p>
-                <p className="rounded-full bg-gold/20 px-2 py-1 text-xs font-semibold text-gold">{item.badge}</p>
-              </div>
-              <h3 className="mt-2 text-lg font-semibold text-white">{item.title}</h3>
-              <div className="mt-4 flex items-center justify-between">
-                <p className="text-lg font-bold text-white">{item.price}</p>
-                <button
-                  onClick={() => navigate(getDealPathByTitle(item.title))}
-                  className="rounded-lg bg-white px-3 py-2 text-xs font-semibold text-navy transition-all duration-300 hover:scale-105"
-                >
-                  Grab Deal
-                </button>
+              
+              <div className="mt-6 flex flex-col gap-1">
+                <h3 className="text-xl font-bold tracking-tight text-ink transition-colors duration-300 group-hover:text-gold">{item.title}</h3>
+                <div className="mt-4 flex items-end justify-between">
+                  <div>
+                    <p className="text-xs font-semibold text-muted">Exclusive Price</p>
+                    <p className="text-2xl font-extrabold text-ink">{item.price}</p>
+                  </div>
+                  <button
+                    onClick={() => navigate(getDealPathByTitle(item.title))}
+                    className="rounded-xl border border-white/60 bg-white/40 px-5 py-2.5 text-xs font-bold text-ink backdrop-blur-xl transition-all duration-300 group-hover:bg-gold group-hover:text-midnight group-hover:border-gold sm:text-sm"
+                  >
+                    Grab Deal
+                  </button>
+                </div>
               </div>
             </article>
           ))}

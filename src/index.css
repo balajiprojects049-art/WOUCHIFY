@@ -2,6 +2,196 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Light theme (default) ─────────────────────────────── */
+:root {
+  --color-cream: #F7F4EE;
+  --color-ink: #121826;
+  --color-muted: #667085;
+  --color-line: #E6E2DA;
+  --color-navy: #1F1F22;
+  --color-navysoft: #2A2A2F;
+  --color-midnight: #141417;
+  --color-gold: #C89B1E;
+  --color-goldsoft: #E8D39A;
+  --color-surface: #FFFFFF;
+  --color-surfacealt: #F0EDE7;
+  /* Button tokens */
+  --color-btn-bg: #1F1F22;
+  --color-btn-text: #FFFFFF;
+}
+
+/* ── Dark theme ─────────────────────────────────────────── */
+html.dark {
+  --color-cream: #0F1117;
+  --color-ink: #EEE9DF;
+  --color-muted: #8A95A8;
+  --color-line: #272B36;
+  --color-navy: #1F1F22;
+  /* keep dark so bg-navy buttons stay dark */
+  --color-navysoft: #2A2A2F;
+  --color-midnight: #141417;
+  --color-gold: #D4A820;
+  --color-goldsoft: #5A4208;
+  --color-surface: #181C25;
+  --color-surfacealt: #12151C;
+  /* Button tokens */
+  --color-btn-bg: #D4A820;
+  /* gold tinted CTA in dark */
+  --color-btn-text: #12151C;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 body {
-  @apply bg-cream text-ink antialiased;
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+  @apply antialiased;
+  transition: background-color 0.35s ease, color 0.35s ease;
+}
+
+/* ══════════════════════════════════════════════════════════
+   GLOBAL DARK-MODE OVERRIDES
+   ══════════════════════════════════════════════════════════ */
+
+/* 1. White surfaces → dark surface colour */
+html.dark .bg-white {
+  background-color: var(--color-surface) !important;
+}
+
+html.dark .bg-white\/80 {
+  background-color: rgba(24, 28, 37, 0.82) !important;
+}
+
+html.dark .bg-white\/95 {
+  background-color: rgba(24, 28, 37, 0.95) !important;
+}
+
+html.dark .bg-white\/5 {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* 2. Cream tinted surfaces */
+html.dark .bg-cream {
+  background-color: var(--color-cream) !important;
+}
+
+html.dark .bg-cream\/50,
+html.dark .bg-cream\/60,
+html.dark .bg-cream\/80 {
+  background-color: rgba(15, 17, 23, 0.7) !important;
+}
+
+/* 3. Inputs & selects */
+html.dark input:not([type="submit"]),
+html.dark select,
+html.dark textarea {
+  background-color: var(--color-surfacealt) !important;
+  color: var(--color-ink) !important;
+  border-color: var(--color-line) !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: var(--color-muted) !important;
+}
+
+/* 4. MAKE PRIMARY BUTTONS GOLD IN DARK MODE */
+html.dark button[class*="bg-navy"],
+html.dark button[class*="bg-black"],
+html.dark a[class*="bg-navy"],
+html.dark a[class*="bg-black"],
+html.dark span[class*="bg-navy"],
+html.dark span[class*="bg-black"] {
+  background-color: var(--color-gold) !important;
+  color: #12151C !important; /* highly legible dark color */
+  border-color: var(--color-gold) !important;
+  opacity: 1 !important;
+}
+
+html.dark button[class*="bg-navy"]:hover,
+html.dark button[class*="bg-black"]:hover,
+html.dark a[class*="bg-navy"]:hover,
+html.dark a[class*="bg-black"]:hover,
+html.dark span[class*="bg-navy"]:hover {
+  background-color: #E6B828 !important; /* brighter gold on hover */
+}
+
+/* Secondary bg-white buttons to gold (only target items with px padding, NOT p- padding to avoid hitting cards) */
+html.dark button.bg-white[class*="px-"]:not([class*="p-3"]):not([class*="p-4"]):not([class*="p-5"]),
+html.dark a.bg-white[class*="px-"]:not([class*="p-3"]):not([class*="p-4"]):not([class*="p-5"]) {
+  background-color: var(--color-gold) !important;
+  color: #12151C !important;
+  border: none !important;
+}
+
+/* 7. Mobile bottom nav active pill */
+html.dark .bg-cream.text-gold {
+  background-color: rgba(212, 168, 32, 0.18) !important;
+  color: var(--color-gold) !important;
+}
+
+/* 8. Shadow softening in dark mode */
+html.dark [class*="shadow"] {
+  --tw-shadow-color: rgba(0, 0, 0, 0.4);
+}
+
+/* 9. Smooth colour transitions everywhere */
+*,
+*::before,
+*::after {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 0.3s;
+  transition-timing-function: ease;
+}
+
+/* 10. Scrollbar in dark mode */
+html.dark ::-webkit-scrollbar {
+  background: #0F1117;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: #272B36;
+  border-radius: 8px;
+}
+
+/* 7. Mobile bottom nav active pill */
+html.dark .bg-cream.text-gold {
+  background-color: rgba(212, 168, 32, 0.15) !important;
+  color: var(--color-gold) !important;
+}
+
+/* 8. Shadow softening & borders in dark mode */
+html.dark [class*="shadow"] {
+  --tw-shadow-color: rgba(0, 0, 0, 0.5);
+}
+
+html.dark .border-line {
+  border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* 9. Smooth colour transitions everywhere */
+*,
+*::before,
+*::after {
+  transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+  transition-duration: 0.3s;
+  transition-timing-function: ease;
+}
+
+/* 10. Scrollbar in dark mode */
+html.dark ::-webkit-scrollbar {
+  background: #0F1117;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: #272B36;
+  border-radius: 8px;
 }

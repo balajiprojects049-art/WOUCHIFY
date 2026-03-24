@@ -23,7 +23,7 @@ function GiveawaySection() {
         <p className="mt-3 max-w-sm text-sm text-ink/80">Collect points from every purchase and redeem exclusive discounts instantly.</p>
         <button
           onClick={() => navigate('/deals')}
-          className="mt-5 rounded-xl bg-navy px-4 py-2 text-sm font-semibold text-white transition-all duration-300 hover:scale-105"
+          className="mt-5 rounded-xl bg-navy px-4 py-2 text-sm font-semibold text-cream transition-all duration-300 hover:scale-105"
         >
           Get Started
         </button>

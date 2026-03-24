@@ -10,7 +10,7 @@ const shoppingCards = [
     cashback: 'Up to 7.5% Cashback',
     partners: 'Flipkart • Myntra • Uber • Cleartrip',
     rewards: 'Flat ₹1,400 Rewards',
-    wrapper: 'from-cream via-white to-cream',
+    wrapper: 'from-cream via-surface to-cream',
     cardImage: '/axis-bank-cashback-credit-card.jpg',
   },
   {
@@ -19,7 +19,7 @@ const shoppingCards = [
     cashback: 'Up to 7.5% Cashback',
     partners: 'Flipkart • Myntra • Cleartrip • Uber',
     rewards: 'Flat ₹1,400 Rewards',
-    wrapper: 'from-cream via-white to-cream',
+    wrapper: 'from-cream via-surface to-cream',
     cardImage: '/axis-bank-cashback-credit-card.jpg',
   },
   {
@@ -28,7 +28,7 @@ const shoppingCards = [
     cashback: '5% Cashback on all online spends',
     partners: 'Amazon • Flipkart • Myntra • 1000+ stores',
     rewards: 'Flat ₹1,500 Rewards',
-    wrapper: 'from-cream via-white to-cream',
+    wrapper: 'from-cream via-surface to-cream',
     cardImage: 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?auto=format&fit=crop&w=900&q=80',
   },
   {
@@ -37,7 +37,7 @@ const shoppingCards = [
     cashback: '5% Cashback on top merchants',
     partners: 'Amazon • Myntra • Flipkart and more',
     rewards: 'Flat ₹1,100 Rewards',
-    wrapper: 'from-cream via-white to-cream',
+    wrapper: 'from-cream via-surface to-cream',
     cardImage: 'https://images.unsplash.com/photo-1601597111158-2fceff292cdc?auto=format&fit=crop&w=900&q=80',
   },
 ]
@@ -102,7 +102,7 @@ function CreditCardTile({ item, lightText = false, slideIndex = 0, onApplyNow })
           <p className={`text-xl font-extrabold sm:text-2xl ${lightText ? 'text-white' : 'text-ink'}`}>{item.rewards}</p>
         </div>
 
-        <button onClick={onApplyNow} className="mt-3 rounded-xl bg-white px-4 py-2 text-xs font-semibold text-navy transition-all duration-300 hover:scale-105 sm:mt-4 sm:px-5 sm:text-sm">
+        <button onClick={onApplyNow} className="mt-3 rounded-xl bg-white px-4 py-2 text-xs font-semibold text-ink transition-all duration-300 hover:scale-105 sm:mt-4 sm:px-5 sm:text-sm">
           Apply Now
         </button>
       </div>

@@ -75,7 +75,7 @@ function DealDetail() {
 
             <div className="mt-6 flex flex-wrap gap-3">
               <button
-                className="rounded-xl bg-navy px-5 py-3 text-sm font-semibold text-white transition-all duration-300 hover:scale-105"
+                className="rounded-xl bg-navy px-5 py-3 text-sm font-semibold text-cream transition-all duration-300 hover:scale-105"
               >
                 Get Deal
               </button>

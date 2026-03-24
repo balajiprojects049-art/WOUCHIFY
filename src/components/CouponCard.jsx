@@ -58,7 +58,7 @@ function CouponCard({ store, offer }) {
 
         <button
           onClick={() => setShowDetailsCard((previous) => !previous)}
-          className="mt-5 inline-flex h-12 w-full items-center justify-center rounded-xl bg-navy text-base font-semibold text-white transition-all duration-300 hover:scale-[1.01]"
+          className="mt-5 inline-flex h-12 w-full items-center justify-center rounded-xl bg-navy text-base font-semibold text-cream transition-all duration-300 hover:scale-[1.01]"
         >
           {showDetailsCard ? 'Hide Deal Details' : isCoupon ? 'Get This Coupon' : 'Get This Deal'}
         </button>
@@ -82,7 +82,7 @@ function CouponCard({ store, offer }) {
               {isCoupon && offer.code && (
                 <button
                   onClick={handleCopy}
-                  className="rounded-lg bg-navy px-2.5 py-1.5 text-[11px] font-semibold text-white transition-all duration-300 hover:scale-105"
+                  className="rounded-lg bg-navy px-2.5 py-1.5 text-[11px] font-semibold text-cream transition-all duration-300 hover:scale-105"
                 >
                   {isCopied ? 'Copied' : 'Copy'}
                 </button>
