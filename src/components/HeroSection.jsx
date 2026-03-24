@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const heroSlides = [
   {
@@ -54,6 +55,14 @@ const heroPoints = [
 
 function HeroSection() {
   const [activeSlide, setActiveSlide] = useState(0)
+  const [searchText, setSearchText] = useState('')
+  const navigate = useNavigate()
+
+  const handleSearchSubmit = (event) => {
+    event.preventDefault()
+    const query = searchText.trim()
+    navigate(query ? `/deals?q=${encodeURIComponent(query)}` : '/deals')
+  }
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -103,16 +112,18 @@ function HeroSection() {
             ))}
           </div>
 
-          <div className="mt-6 flex max-w-2xl items-center gap-2 rounded-2xl border border-line bg-white p-2 shadow-sm sm:mt-9 sm:gap-3 sm:p-3">
+          <form onSubmit={handleSearchSubmit} className="mt-6 flex max-w-2xl items-center gap-2 rounded-2xl border border-line bg-white p-2 shadow-sm sm:mt-9 sm:gap-3 sm:p-3">
             <input
               type="text"
               placeholder="Search products, stores or promo codes"
+              value={searchText}
+              onChange={(event) => setSearchText(event.target.value)}
               className="h-12 flex-1 rounded-xl border border-line bg-cream px-4 text-sm text-ink placeholder:text-muted focus:outline-none"
             />
-            <button className="h-12 shrink-0 rounded-xl bg-navy px-3.5 text-xs font-semibold text-white transition-all duration-300 hover:scale-105 sm:px-6 sm:text-sm">
+            <button type="submit" className="h-12 shrink-0 rounded-xl bg-navy px-3.5 text-xs font-semibold text-white transition-all duration-300 hover:scale-105 sm:px-6 sm:text-sm">
               Search
             </button>
-          </div>
+          </form>
 
         </div>
 
@@ -131,7 +142,10 @@ function HeroSection() {
 
             <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between rounded-xl bg-black/35 p-2.5 backdrop-blur-sm sm:bottom-4 sm:left-4 sm:right-4 sm:p-3">
               <p className="text-[10px] font-semibold uppercase tracking-widest text-white/90 sm:text-xs">{currentSlide.label}</p>
-              <button className="rounded-lg bg-white px-3 py-1.5 text-[11px] font-semibold text-midnight transition-all duration-300 hover:scale-105 sm:px-4 sm:py-2 sm:text-xs">
+              <button
+                onClick={() => navigate('/deals')}
+                className="rounded-lg bg-white px-3 py-1.5 text-[11px] font-semibold text-midnight transition-all duration-300 hover:scale-105 sm:px-4 sm:py-2 sm:text-xs"
+              >
                 Grab Deal
               </button>
             </div>

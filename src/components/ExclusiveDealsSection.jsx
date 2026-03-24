@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom'
+
 const exclusiveDeals = [
   {
     title: 'MacBook Air M3',
@@ -23,6 +25,8 @@ const exclusiveDeals = [
 ]
 
 function ExclusiveDealsSection() {
+  const navigate = useNavigate()
+
   return (
     <section className="relative mt-16 overflow-hidden bg-navy py-14 sm:mt-20 sm:py-20">
       <div className="pointer-events-none absolute inset-0">
@@ -36,7 +40,10 @@ function ExclusiveDealsSection() {
       <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="mb-7 flex items-center justify-between sm:mb-10">
           <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">Exclusive Loot Deals</h2>
-          <button className="rounded-xl bg-gold px-3 py-2 text-xs font-semibold text-slate-900 transition-all duration-300 hover:scale-105 sm:px-4 sm:text-sm">
+          <button
+            onClick={() => navigate('/deals')}
+            className="rounded-xl bg-gold px-3 py-2 text-xs font-semibold text-slate-900 transition-all duration-300 hover:scale-105 sm:px-4 sm:text-sm"
+          >
             Explore
           </button>
         </div>
@@ -61,7 +68,10 @@ function ExclusiveDealsSection() {
               <h3 className="mt-2 text-lg font-semibold text-white">{item.title}</h3>
               <div className="mt-4 flex items-center justify-between">
                 <p className="text-lg font-bold text-white">{item.price}</p>
-                <button className="rounded-lg bg-white px-3 py-2 text-xs font-semibold text-navy transition-all duration-300 hover:scale-105">
+                <button
+                  onClick={() => navigate(`/deals?q=${encodeURIComponent(item.title)}`)}
+                  className="rounded-lg bg-white px-3 py-2 text-xs font-semibold text-navy transition-all duration-300 hover:scale-105"
+                >
                   Grab Deal
                 </button>
               </div>

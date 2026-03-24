@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 
 const products = [
   {
@@ -44,7 +45,7 @@ function formatCountdown(totalSeconds) {
   return [hours, minutes, seconds].map((time) => String(time).padStart(2, '0')).join(':')
 }
 
-function TrendingCard({ item, elapsedSeconds }) {
+function TrendingCard({ item, elapsedSeconds, onViewDeal }) {
   const remainingSeconds = item.expiresIn - elapsedSeconds
 
   return (
@@ -75,7 +76,7 @@ function TrendingCard({ item, elapsedSeconds }) {
         </p>
       </div>
 
-      <button className="mt-4 w-full rounded-xl bg-navy px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:scale-105">
+      <button onClick={() => onViewDeal(item.title)} className="mt-4 w-full rounded-xl bg-navy px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:scale-105">
         View Deal
       </button>
     </article>
@@ -84,6 +85,11 @@ function TrendingCard({ item, elapsedSeconds }) {
 
 function TrendingDealsSection() {
   const [elapsedSeconds, setElapsedSeconds] = useState(0)
+  const navigate = useNavigate()
+
+  const handleViewDeal = (title) => {
+    navigate(`/deals?q=${encodeURIComponent(title)}`)
+  }
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -97,13 +103,13 @@ function TrendingDealsSection() {
     <section className="mt-14 sm:mt-16">
       <div className="mb-6 flex items-end justify-between">
         <h2 className="text-2xl font-bold tracking-tight text-ink">Trending Deals</h2>
-        <a href="#" className="text-sm font-semibold text-gold">
+        <Link to="/deals" className="text-sm font-semibold text-gold">
           View all
-        </a>
+        </Link>
       </div>
       <div className="flex gap-4 overflow-x-auto pb-2 sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:pb-0 lg:grid-cols-4">
         {products.map((item) => (
-          <TrendingCard key={item.title} item={item} elapsedSeconds={elapsedSeconds} />
+          <TrendingCard key={item.title} item={item} elapsedSeconds={elapsedSeconds} onViewDeal={handleViewDeal} />
         ))}
       </div>
     </section>

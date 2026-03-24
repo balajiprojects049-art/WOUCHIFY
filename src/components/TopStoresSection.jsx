@@ -1,3 +1,5 @@
+import { Link, useNavigate } from 'react-router-dom'
+
 const stores = [
   { name: 'Amazon', reward: 'Up to 6.2% rewards', featured: true },
   { name: 'Flipkart', reward: 'Up to 7% cashback' },
@@ -24,6 +26,7 @@ function StoreBadge({ name }) {
 }
 
 function TopStoresSection() {
+  const navigate = useNavigate()
   const featuredStore = stores.find((store) => store.featured)
   const otherStores = stores.filter((store) => !store.featured)
 
@@ -31,9 +34,9 @@ function TopStoresSection() {
     <section className="mt-14 sm:mt-16">
       <div className="mb-5 flex items-end justify-between">
         <h2 className="text-2xl font-bold tracking-tight text-ink">Top Stores</h2>
-        <a href="#" className="text-sm font-semibold text-gold">
+        <Link to="/deals" className="text-sm font-semibold text-gold">
           View all
-        </a>
+        </Link>
       </div>
 
       <div className="rounded-2xl border border-line bg-white p-3 shadow-sm sm:p-5">
@@ -46,7 +49,10 @@ function TopStoresSection() {
               </div>
               <h3 className="mt-5 text-2xl font-bold tracking-tight text-ink sm:mt-6 sm:text-3xl">{featuredStore.name}</h3>
               <p className="mt-2 text-base font-semibold text-ink sm:mt-3 sm:text-lg">{featuredStore.reward}</p>
-              <button className="mt-4 rounded-xl bg-navy px-4 py-2 text-xs font-semibold text-white transition-all duration-300 hover:scale-105 sm:mt-5 sm:text-sm">
+              <button
+                onClick={() => navigate('/deals')}
+                className="mt-4 rounded-xl bg-navy px-4 py-2 text-xs font-semibold text-white transition-all duration-300 hover:scale-105 sm:mt-5 sm:text-sm"
+              >
                 Grab Deal
               </button>
             </article>

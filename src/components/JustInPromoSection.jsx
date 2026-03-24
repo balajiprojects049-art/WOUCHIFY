@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const altCardImage = 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&w=900&q=80'
 
@@ -80,7 +81,7 @@ const lifetimeCards = [
   },
 ]
 
-function CreditCardTile({ item, lightText = false, slideIndex = 0 }) {
+function CreditCardTile({ item, lightText = false, slideIndex = 0, onApplyNow }) {
   const imageSlides = [item.cardImage, altCardImage]
 
   return (
@@ -101,7 +102,7 @@ function CreditCardTile({ item, lightText = false, slideIndex = 0 }) {
           <p className={`text-xl font-extrabold sm:text-2xl ${lightText ? 'text-white' : 'text-ink'}`}>{item.rewards}</p>
         </div>
 
-        <button className="mt-3 rounded-xl bg-white px-4 py-2 text-xs font-semibold text-navy transition-all duration-300 hover:scale-105 sm:mt-4 sm:px-5 sm:text-sm">
+        <button onClick={onApplyNow} className="mt-3 rounded-xl bg-white px-4 py-2 text-xs font-semibold text-navy transition-all duration-300 hover:scale-105 sm:mt-4 sm:px-5 sm:text-sm">
           Apply Now
         </button>
       </div>
@@ -117,17 +118,17 @@ function CreditCardTile({ item, lightText = false, slideIndex = 0 }) {
   )
 }
 
-function CardRow({ title, items, lifetime = false, slideIndex = 0 }) {
+function CardRow({ title, items, lifetime = false, slideIndex = 0, onApplyNow, onViewAll }) {
   return (
     <div>
       <div className="mb-4 flex items-center justify-between sm:mb-5">
         <h3 className="text-xl font-bold tracking-tight text-ink sm:text-3xl">{title}</h3>
-        <button className="text-sm font-semibold text-gold">View All →</button>
+        <button onClick={onViewAll} className="text-sm font-semibold text-gold">View All →</button>
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {items.slice(0, 2).map((item) => (
-          <CreditCardTile key={`${title}-${item.bank}-${item.card}`} item={item} lightText={lifetime} slideIndex={slideIndex} />
+          <CreditCardTile key={`${title}-${item.bank}-${item.card}`} item={item} lightText={lifetime} slideIndex={slideIndex} onApplyNow={onApplyNow} />
         ))}
       </div>
     </div>
@@ -136,6 +137,7 @@ function CardRow({ title, items, lifetime = false, slideIndex = 0 }) {
 
 function JustInPromoSection() {
   const [slideIndex, setSlideIndex] = useState(0)
+  const navigate = useNavigate()
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -147,8 +149,21 @@ function JustInPromoSection() {
 
   return (
     <section className="mt-16 space-y-10 sm:mt-20 sm:space-y-14">
-      <CardRow title="Best Cards for Shopping" items={shoppingCards} slideIndex={slideIndex} />
-      <CardRow title="Best Lifetime Free Credit Cards" items={lifetimeCards} lifetime slideIndex={slideIndex} />
+      <CardRow
+        title="Best Cards for Shopping"
+        items={shoppingCards}
+        slideIndex={slideIndex}
+        onApplyNow={() => navigate('/deals')}
+        onViewAll={() => navigate('/deals')}
+      />
+      <CardRow
+        title="Best Lifetime Free Credit Cards"
+        items={lifetimeCards}
+        lifetime
+        slideIndex={slideIndex}
+        onApplyNow={() => navigate('/deals')}
+        onViewAll={() => navigate('/deals')}
+      />
     </section>
   )
 }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const featuredSlides = [
   {
@@ -47,6 +48,7 @@ const featuredSlides = [
 
 function FeaturedDealSection() {
   const [activeSlide, setActiveSlide] = useState(0)
+  const navigate = useNavigate()
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -68,8 +70,18 @@ function FeaturedDealSection() {
             {currentSlide.description}
           </p>
           <div className="mt-6 flex flex-wrap gap-2.5 sm:mt-7 sm:gap-3">
-            <button className="rounded-xl bg-navy px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:scale-105 sm:px-5 sm:py-3">{currentSlide.primaryCta}</button>
-            <button className="rounded-xl border border-line bg-white px-4 py-2.5 text-sm font-semibold text-ink transition-all duration-300 hover:scale-105 sm:px-5 sm:py-3">{currentSlide.secondaryCta}</button>
+            <button
+              onClick={() => navigate(`/deals?q=${encodeURIComponent(currentSlide.title)}`)}
+              className="rounded-xl bg-navy px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:scale-105 sm:px-5 sm:py-3"
+            >
+              {currentSlide.primaryCta}
+            </button>
+            <button
+              onClick={() => navigate('/deals')}
+              className="rounded-xl border border-line bg-white px-4 py-2.5 text-sm font-semibold text-ink transition-all duration-300 hover:scale-105 sm:px-5 sm:py-3"
+            >
+              {currentSlide.secondaryCta}
+            </button>
           </div>
 
           <div className="mt-5 flex items-center gap-2">

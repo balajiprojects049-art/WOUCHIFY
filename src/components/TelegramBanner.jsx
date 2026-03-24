@@ -19,10 +19,15 @@ function TelegramBanner() {
         </p>
 
         <div className="mt-7 flex flex-wrap items-center gap-4 sm:mt-9 sm:gap-6">
-          <button className="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-semibold text-midnight transition-all duration-300 hover:scale-105 sm:px-8 sm:py-4 sm:text-base">
+          <a
+            href="https://t.me"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-semibold text-midnight transition-all duration-300 hover:scale-105 sm:px-8 sm:py-4 sm:text-base"
+          >
             <span>Join Now</span>
             <span aria-hidden="true">→</span>
-          </button>
+          </a>
 
           <div className="flex items-center gap-3 text-sm text-slate-200/75">
             <p className="font-medium">45k+ active members</p>
