@@ -28,7 +28,7 @@ function CategoryTabs() {
   const reverseLoopItems = [...partners].reverse().concat([...partners].reverse())
 
   return (
-    <section className="relative left-1/2 right-1/2 mt-16 box-border w-screen max-w-[100vw] -translate-x-1/2 overflow-x-clip px-3 sm:px-6 lg:px-8">
+    <section className="mt-16 -mx-3 overflow-x-clip sm:-mx-6 lg:-mx-8">
       <div className="relative overflow-hidden rounded-3xl border border-line bg-gradient-to-r from-navy via-[#0f2b4f] to-navy p-5 shadow-sm sm:p-7">
         <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
           <div>
