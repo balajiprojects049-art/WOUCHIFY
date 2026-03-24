@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom'
 import CountdownTimer from './CountdownTimer'
 
 function LootDealCard({ deal }) {
+  const logoText = (deal.category || '').slice(0, 2).toUpperCase()
+
   return (
     <article className="group rounded-2xl bg-white p-4 shadow-[0_10px_30px_rgba(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_25px_60px_rgba(0,0,0,0.2)]">
       <Link to={`/loot-deal/${deal.slug}`} className="block">
@@ -10,6 +12,17 @@ function LootDealCard({ deal }) {
           <span className="absolute right-3 top-3 rounded-full bg-red-500 px-3 py-1 text-xs font-bold text-white">
             {deal.discountPercent}% OFF
           </span>
+        </div>
+
+        <div className="mt-4 flex items-start justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gold/15 text-xs font-bold text-gold">{logoText}</div>
+            <div>
+              <p className="text-sm font-bold text-ink">{deal.category}</p>
+              <p className="text-xs text-muted">Loot Pick</p>
+            </div>
+          </div>
+          <span className="rounded-full bg-red-500/10 px-3 py-1 text-[11px] font-semibold text-red-500">HOT</span>
         </div>
 
         <h3 className="mt-4 text-base font-bold text-ink">{deal.title}</h3>

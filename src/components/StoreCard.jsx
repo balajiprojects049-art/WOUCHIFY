@@ -1,6 +1,18 @@
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 function StoreCard({ store, featured = false }) {
+  const [logoBroken, setLogoBroken] = useState(false)
+
+  const logoUrl = useMemo(() => {
+    try {
+      const hostname = new URL(store.website).hostname.replace('www.', '')
+      return `https://logo.clearbit.com/${hostname}`
+    } catch {
+      return ''
+    }
+  }, [store.website])
+
   return (
     <Link
       to={`/store/${store.slug}`}
@@ -8,15 +20,22 @@ function StoreCard({ store, featured = false }) {
         featured ? 'sm:p-6' : ''
       }`}
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gold/15 text-xs font-bold text-gold">
-          {store.logoText}
-        </div>
-        <span className="text-xs font-semibold uppercase tracking-wide text-muted">Store</span>
+      <div className="mx-auto flex h-20 w-44 items-center justify-center overflow-hidden rounded-lg border border-line bg-cream/60">
+        {!logoBroken && logoUrl ? (
+          <img src={logoUrl} alt={`${store.name} logo`} className="h-full w-full object-contain p-3" onError={() => setLogoBroken(true)} />
+        ) : (
+          <p className="text-2xl font-bold tracking-[0.2em] text-ink">{store.logoText}</p>
+        )}
       </div>
 
-      <h3 className={`mt-5 font-bold tracking-tight text-ink ${featured ? 'text-3xl' : 'text-2xl'}`}>{store.name}</h3>
-      <p className="mt-2 text-sm font-semibold text-ink">{store.cashback}</p>
+      <div className="mt-4 flex items-start justify-between gap-3">
+        <div>
+          <h3 className={`font-bold tracking-tight text-ink ${featured ? 'text-3xl' : 'text-2xl'}`}>{store.name}</h3>
+          <p className="mt-2 text-sm font-semibold text-ink">{store.cashback}</p>
+        </div>
+        <span className="text-xs font-semibold uppercase tracking-wide text-muted">{store.category}</span>
+      </div>
+
       <p className="mt-1 text-xs text-muted">{store.highlight}</p>
 
       <span className="mt-4 inline-flex rounded-xl bg-navy px-4 py-2 text-xs font-semibold text-white transition-all duration-300 group-hover:scale-105">

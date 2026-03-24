@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import PageBanner from '../components/PageBanner'
 import StoreCard from '../components/StoreCard'
 import SearchBar from '../components/SearchBar'
 import { storeCategories, storesData } from '../data/storesData'
@@ -42,12 +43,13 @@ function Stores() {
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-16">
-      <section className="rounded-2xl bg-white p-6 shadow-sm sm:p-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">All Stores</p>
-        <h1 className="mt-3 text-4xl font-bold tracking-tight text-ink">Browse Top Cashback & Coupon Stores</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
-          Search stores, filter by category, and explore high-converting deals with premium user experience.
-        </p>
+      <PageBanner
+        image="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1200&q=80"
+        alt="Stores banner"
+        href="https://www.myntra.com"
+      />
+
+      <section className="mt-8 rounded-2xl bg-white p-6 shadow-sm sm:p-8">
 
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <SearchBar value={query} onChange={handleQueryChange} placeholder="Search store name" className="min-w-[260px] flex-1" />

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import FilterBar from '../components/FilterBar'
 import LootDealCard from '../components/LootDealCard'
+import PageBanner from '../components/PageBanner'
 import { lootDealsData } from '../data/lootDealsData'
 
 function parseDiscount(value) {
@@ -38,12 +39,12 @@ function LootDeals() {
 
   return (
     <main>
-      <section className="mx-auto mt-6 max-w-7xl rounded-b-3xl bg-gradient-to-r from-[#0B1F3A] to-[#1E3A8A] px-6 py-16 text-center text-white">
-        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">🔥 Loot Deals – Grab Before They&apos;re Gone!</h1>
-        <p className="mx-auto mt-4 max-w-2xl text-sm text-slate-200 sm:text-base">
-          Ultra high-discount deals with limited time availability.
-        </p>
-        <p className="mt-2 text-sm font-semibold text-red-200">Deals disappear fast. Act quickly.</p>
+      <section className="mx-auto mt-6 max-w-7xl px-6">
+        <PageBanner
+          image="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1200&q=80"
+          alt="Loot deals banner"
+          href="https://www.flipkart.com/offers-store"
+        />
       </section>
 
       <section className="mx-auto max-w-7xl px-6 py-12">

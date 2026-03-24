@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import DealGrid from '../components/DealGrid'
 import FilterBar from '../components/FilterBar'
+import PageBanner from '../components/PageBanner'
 import { dealsData } from '../data/dealsData'
 
 function parseDiscount(value) {
@@ -77,12 +78,11 @@ function Deals() {
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-16">
-      <section className="rounded-2xl bg-white p-6 shadow-sm sm:p-8">
-        <h1 className="text-4xl font-bold tracking-tight text-ink">All Deals</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-muted sm:text-base">
-          Discover premium trending deals, time-limited offers, and high-conversion discounts curated for smarter shopping.
-        </p>
-      </section>
+      <PageBanner
+        image="https://images.unsplash.com/photo-1517336714739-489689fd1ca8?auto=format&fit=crop&w=1200&q=80"
+        alt="Deals banner"
+        href="https://www.amazon.in/gp/goldbox"
+      />
 
       <FilterBar
         searchText={searchText}
