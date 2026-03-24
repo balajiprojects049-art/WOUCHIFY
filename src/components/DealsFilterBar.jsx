@@ -1,12 +1,27 @@
-import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 
 function DealsFilterBar() {
-  const [category, setCategory] = useState('All Categories')
-  const [store, setStore] = useState('Popular Stores')
-  const [discount, setDiscount] = useState('50%+')
-  const [dealType, setDealType] = useState('Loot Deals')
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const category = searchParams.get('category') || 'All Categories'
+  const store = searchParams.get('store') || 'Popular Stores'
+  const discount = searchParams.get('minDiscount') || '50%+'
+  const dealType = searchParams.get('dealType') || 'Loot Deals'
 
   const discounts = ['30%+', '50%+', '70%+']
+  const categories = ['All Categories', 'Electronics', 'Fashion', 'Travel', 'Grocery']
+  const stores = ['Popular Stores', 'Amazon', 'Flipkart', 'Myntra', 'Croma', 'Ajio']
+  const dealTypes = ['Loot Deals', 'Coupon Deals', 'Flash Deals']
+
+  const updateFilter = (key, value, defaultValue) => {
+    const nextParams = new URLSearchParams(searchParams)
+    if (!value || value === defaultValue) {
+      nextParams.delete(key)
+    } else {
+      nextParams.set(key, value)
+    }
+    setSearchParams(nextParams, { replace: true })
+  }
 
   return (
     <section className="mt-8">
@@ -16,14 +31,12 @@ function DealsFilterBar() {
             <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted">Category</p>
             <select
               value={category}
-              onChange={(event) => setCategory(event.target.value)}
+              onChange={(event) => updateFilter('category', event.target.value, 'All Categories')}
               className="h-11 w-full rounded-xl border border-line bg-cream px-4 text-sm font-medium text-ink focus:outline-none"
             >
-              <option>All Categories</option>
-              <option>Electronics</option>
-              <option>Fashion</option>
-              <option>Travel</option>
-              <option>Grocery</option>
+              {categories.map((item) => (
+                <option key={item}>{item}</option>
+              ))}
             </select>
           </div>
 
@@ -31,14 +44,12 @@ function DealsFilterBar() {
             <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted">Store</p>
             <select
               value={store}
-              onChange={(event) => setStore(event.target.value)}
+              onChange={(event) => updateFilter('store', event.target.value, 'Popular Stores')}
               className="h-11 w-full rounded-xl border border-line bg-cream px-4 text-sm font-medium text-ink focus:outline-none"
             >
-              <option>Popular Stores</option>
-              <option>Amazon</option>
-              <option>Flipkart</option>
-              <option>Myntra</option>
-              <option>Croma</option>
+              {stores.map((item) => (
+                <option key={item}>{item}</option>
+              ))}
             </select>
           </div>
 
@@ -48,7 +59,7 @@ function DealsFilterBar() {
               {discounts.map((value) => (
                 <button
                   key={value}
-                  onClick={() => setDiscount(value)}
+                  onClick={() => updateFilter('minDiscount', value, '50%+')}
                   className={`rounded-lg px-2.5 py-1.5 text-[11px] font-semibold transition-all duration-300 hover:scale-105 sm:px-3 sm:text-xs ${
                     discount === value ? 'bg-gold/20 text-gold' : 'text-ink'
                   }`}
@@ -63,12 +74,12 @@ function DealsFilterBar() {
             <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted">Deal Type</p>
             <select
               value={dealType}
-              onChange={(event) => setDealType(event.target.value)}
+              onChange={(event) => updateFilter('dealType', event.target.value, 'Loot Deals')}
               className="h-11 w-full rounded-xl border border-line bg-cream px-4 text-sm font-medium text-ink focus:outline-none"
             >
-              <option>Loot Deals</option>
-              <option>Coupon Deals</option>
-              <option>Flash Deals</option>
+              {dealTypes.map((item) => (
+                <option key={item}>{item}</option>
+              ))}
             </select>
           </div>
         </div>

@@ -4,7 +4,8 @@ import { NavLink, useNavigate } from 'react-router-dom'
 const navLinks = [
   { label: 'Home', to: '/' },
   { label: 'Deals', to: '/deals' },
-  { label: 'Categories', to: '/deals' },
+  { label: 'Loot Deals', to: '/loot-deals' },
+  { label: 'Stores', to: '/stores' },
   { label: 'Contact', to: '/deals' },
 ]
 
@@ -15,7 +16,8 @@ function Navbar() {
   const handleSearchSubmit = (event) => {
     event.preventDefault()
     const query = searchText.trim()
-    navigate(query ? `/deals?q=${encodeURIComponent(query)}` : '/deals')
+    const route = query.toLowerCase().includes('loot') ? '/loot-deals' : '/deals'
+    navigate(query ? `${route}?q=${encodeURIComponent(query)}` : route)
   }
 
   return (

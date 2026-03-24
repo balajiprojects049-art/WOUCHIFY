@@ -23,13 +23,13 @@ function HomePage() {
         <TrendingDealsSection />
       </main>
 
+      <ExclusiveDealsSection />
+
       <main className="mx-auto max-w-6xl px-3 py-12 sm:px-6 sm:py-14 lg:px-8">
         <JustInPromoSection />
         <GiveawaySection />
         <TelegramBanner />
       </main>
-
-      <ExclusiveDealsSection />
     </>
   )
 }

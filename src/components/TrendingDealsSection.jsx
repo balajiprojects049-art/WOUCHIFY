@@ -1,11 +1,16 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { getDealPathByTitle } from '../data/dealsData'
 
 const products = [
   {
     title: 'Nike Air Zoom Pegasus',
     price: '$89.99',
     discount: '32% OFF',
+    discountValue: 32,
+    store: 'Myntra',
+    category: 'Fashion',
+    dealType: 'Loot Deals',
     expiresIn: 7265,
     viewers: '2.4k',
     image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80',
@@ -14,6 +19,10 @@ const products = [
     title: 'Minimal Desk Clock',
     price: '$39.99',
     discount: '20% OFF',
+    discountValue: 20,
+    store: 'Amazon',
+    category: 'Lifestyle',
+    dealType: 'Coupon Deals',
     expiresIn: 4980,
     viewers: '1.6k',
     image: 'https://images.unsplash.com/photo-1508962914676-134849a727f0?auto=format&fit=crop&w=800&q=80',
@@ -22,6 +31,10 @@ const products = [
     title: 'Pro Gaming Headset',
     price: '$119.99',
     discount: '41% OFF',
+    discountValue: 41,
+    store: 'Croma',
+    category: 'Electronics',
+    dealType: 'Flash Deals',
     expiresIn: 9540,
     viewers: '3.1k',
     image: 'https://images.unsplash.com/photo-1599669454699-248893623440?auto=format&fit=crop&w=800&q=80',
@@ -30,6 +43,10 @@ const products = [
     title: 'Performance Laptop Sleeve',
     price: '$29.99',
     discount: '18% OFF',
+    discountValue: 18,
+    store: 'Flipkart',
+    category: 'Electronics',
+    dealType: 'Loot Deals',
     expiresIn: 3720,
     viewers: '1.1k',
     image: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&w=800&q=80',
@@ -86,9 +103,26 @@ function TrendingCard({ item, elapsedSeconds, onViewDeal }) {
 function TrendingDealsSection() {
   const [elapsedSeconds, setElapsedSeconds] = useState(0)
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+
+  const selectedCategory = searchParams.get('category')
+  const selectedStore = searchParams.get('store')
+  const selectedDealType = searchParams.get('dealType')
+  const selectedMinDiscount = Number.parseInt((searchParams.get('minDiscount') || '').replace('%+', ''), 10)
+  const selectedQuery = (searchParams.get('q') || '').trim().toLowerCase()
+
+  const filteredProducts = products.filter((item) => {
+    const matchesCategory = !selectedCategory || item.category === selectedCategory
+    const matchesStore = !selectedStore || item.store === selectedStore
+    const matchesDealType = !selectedDealType || item.dealType === selectedDealType
+    const matchesDiscount = Number.isNaN(selectedMinDiscount) || item.discountValue >= selectedMinDiscount
+    const matchesQuery = !selectedQuery || item.title.toLowerCase().includes(selectedQuery)
+
+    return matchesCategory && matchesStore && matchesDealType && matchesDiscount && matchesQuery
+  })
 
   const handleViewDeal = (title) => {
-    navigate(`/deals?q=${encodeURIComponent(title)}`)
+    navigate(getDealPathByTitle(title))
   }
 
   useEffect(() => {
@@ -108,9 +142,15 @@ function TrendingDealsSection() {
         </Link>
       </div>
       <div className="flex gap-4 overflow-x-auto pb-2 sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:pb-0 lg:grid-cols-4">
-        {products.map((item) => (
+        {filteredProducts.map((item) => (
           <TrendingCard key={item.title} item={item} elapsedSeconds={elapsedSeconds} onViewDeal={handleViewDeal} />
         ))}
+
+        {filteredProducts.length === 0 && (
+          <article className="w-full rounded-2xl border border-line bg-white p-6 text-center text-sm font-medium text-muted sm:col-span-2 lg:col-span-4">
+            No trending deals found for this filter selection.
+          </article>
+        )}
       </div>
     </section>
   )

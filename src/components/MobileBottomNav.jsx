@@ -20,8 +20,8 @@ const navItems = [
     ),
   },
   {
-    label: 'Categories',
-    to: '/deals',
+    label: 'Stores',
+    to: '/stores',
     icon: (
       <svg viewBox="0 0 20 20" className="h-4 w-4 fill-current" aria-hidden="true">
         <path d="M3 3h6v6H3V3Zm8 0h6v6h-6V3ZM3 11h6v6H3v-6Zm8 0h6v6h-6v-6Z" />

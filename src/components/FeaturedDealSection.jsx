@@ -71,13 +71,13 @@ function FeaturedDealSection() {
           </p>
           <div className="mt-6 flex flex-wrap gap-2.5 sm:mt-7 sm:gap-3">
             <button
-              onClick={() => navigate(`/deals?q=${encodeURIComponent(currentSlide.title)}`)}
+              onClick={() => navigate('/stores')}
               className="rounded-xl bg-navy px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:scale-105 sm:px-5 sm:py-3"
             >
               {currentSlide.primaryCta}
             </button>
             <button
-              onClick={() => navigate('/deals')}
+              onClick={() => navigate('/stores')}
               className="rounded-xl border border-line bg-white px-4 py-2.5 text-sm font-semibold text-ink transition-all duration-300 hover:scale-105 sm:px-5 sm:py-3"
             >
               {currentSlide.secondaryCta}
