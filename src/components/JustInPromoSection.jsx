@@ -153,16 +153,16 @@ function JustInPromoSection() {
         title="Best Cards for Shopping"
         items={shoppingCards}
         slideIndex={slideIndex}
-        onApplyNow={() => navigate('/deals')}
-        onViewAll={() => navigate('/deals')}
+        onApplyNow={() => navigate('/credit-cards')}
+        onViewAll={() => navigate('/credit-cards')}
       />
       <CardRow
         title="Best Lifetime Free Credit Cards"
         items={lifetimeCards}
         lifetime
         slideIndex={slideIndex}
-        onApplyNow={() => navigate('/deals')}
-        onViewAll={() => navigate('/deals')}
+        onApplyNow={() => navigate('/credit-cards')}
+        onViewAll={() => navigate('/credit-cards')}
       />
     </section>
   )

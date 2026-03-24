@@ -32,26 +32,33 @@ function CouponsSection() {
         <h2 className="mt-2 text-2xl font-bold tracking-tight text-ink sm:text-3xl">Coupon Codes You Can Use Now</h2>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {coupons.map((coupon) => (
           <article
             key={coupon.code}
-            className="rounded-2xl border border-dashed border-line bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-1"
+            className="group relative rounded-2xl border border-dashed border-line bg-white p-5 shadow-sm transition-all duration-500 hover:-translate-y-2 hover:border-gold/50 hover:shadow-xl"
           >
             <div className="flex items-center justify-between gap-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-gold">{coupon.store}</p>
-              <p className="text-xs font-medium text-muted">{coupon.expiry}</p>
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gold/10 p-2 font-bold text-gold">
+                {coupon.store[0]}
+              </div>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-muted">{coupon.expiry}</p>
             </div>
 
-            <p className="mt-3 text-sm text-muted">{coupon.benefit}</p>
+            <p className="mt-4 text-xs font-bold uppercase tracking-widest text-gold">{coupon.store}</p>
+            <p className="mt-1 h-10 text-sm font-semibold leading-5 text-ink line-clamp-2">{coupon.benefit}</p>
 
-            <div className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-line bg-cream px-3 py-2">
-              <p className="text-sm font-bold tracking-[0.12em] text-ink">{coupon.code}</p>
+            <div className="mt-5 flex items-center justify-between gap-2 overflow-hidden rounded-xl border border-line bg-cream p-1">
+              <span className="px-3 text-xs font-bold tracking-[0.14em] text-ink">{coupon.code}</span>
               <button
                 onClick={() => handleCopyCode(coupon.code)}
-                className="rounded-lg bg-navy px-3 py-1.5 text-xs font-semibold text-white transition-all duration-300 hover:scale-105"
+                className={`rounded-lg px-4 py-2 text-[11px] font-bold transition-all duration-300 ${
+                  copiedCode === coupon.code 
+                    ? 'bg-emerald-500 text-white' 
+                    : 'bg-navy text-cream hover:bg-black'
+                }`}
               >
-                {copiedCode === coupon.code ? 'Copied' : 'Copy Code'}
+                {copiedCode === coupon.code ? '✓ COPIED' : 'COPY'}
               </button>
             </div>
           </article>

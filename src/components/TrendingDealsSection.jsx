@@ -5,7 +5,7 @@ import { getDealPathByTitle } from '../data/dealsData'
 const products = [
   {
     title: 'Nike Air Zoom Pegasus',
-    price: '$89.99',
+    price: '₹89.99',
     discount: '32% OFF',
     discountValue: 32,
     store: 'Myntra',
@@ -17,7 +17,7 @@ const products = [
   },
   {
     title: 'Minimal Desk Clock',
-    price: '$39.99',
+    price: '₹39.99',
     discount: '20% OFF',
     discountValue: 20,
     store: 'Amazon',
@@ -29,7 +29,7 @@ const products = [
   },
   {
     title: 'Pro Gaming Headset',
-    price: '$119.99',
+    price: '₹119.99',
     discount: '41% OFF',
     discountValue: 41,
     store: 'Croma',
@@ -41,7 +41,7 @@ const products = [
   },
   {
     title: 'Performance Laptop Sleeve',
-    price: '$29.99',
+    price: '₹29.99',
     discount: '18% OFF',
     discountValue: 18,
     store: 'Flipkart',

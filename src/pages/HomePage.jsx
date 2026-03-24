@@ -10,6 +10,7 @@ import GiveawaySection from '../components/GiveawaySection'
 import TelegramBanner from '../components/TelegramBanner'
 import ExclusiveDealsSection from '../components/ExclusiveDealsSection'
 import AdvertiseWithUsSection from '../components/AdvertiseWithUsSection'
+import LatestDealsSection from '../components/LatestDealsSection'
 
 function HomePage() {
   return (
@@ -22,6 +23,7 @@ function HomePage() {
         <DealsFilterBar />
         <CategoryTabs />
         <TrendingDealsSection />
+        <LatestDealsSection />
       </main>
 
       <ExclusiveDealsSection />

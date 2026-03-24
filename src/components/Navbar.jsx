@@ -7,7 +7,7 @@ const navLinks = [
   { label: 'Deals', to: '/deals' },
   { label: 'Loot Deals', to: '/loot-deals' },
   { label: 'Stores', to: '/stores' },
-  { label: 'Contact', to: '/deals' },
+  { label: 'About & Contact', to: '/about-contact' },
 ]
 
 function SunIcon() {
@@ -49,9 +49,9 @@ function Navbar() {
   return (
     <>
       {/* ── Top Advertisement Bar ── */}
-      <div className="relative flex h-10 sm:h-11 items-center justify-center gap-3 bg-gradient-to-r from-[#D4A820] via-[#E8D39A] to-[#D4A820] px-4">
-        <p className="hidden text-[11px] font-bold tracking-wider text-[#12151C] sm:block sm:text-xs">
-          🌟 PROMOTE YOUR BRAND TO OUR AMAZING DEAL SEEKING AUDIENCE
+      <div className="relative flex h-10 sm:h-11 items-center justify-center gap-2 bg-gradient-to-r from-[#D4A820] via-[#E8D39A] to-[#D4A820] px-3 sm:gap-3 sm:px-4">
+        <p className="text-[9px] font-bold tracking-tight text-[#12151C] sm:text-xs sm:tracking-wider">
+          🌟 PROMOTE YOUR BRAND TO OUR AUDIENCE
         </p>
         <button
           onClick={() => {
@@ -60,7 +60,7 @@ function Navbar() {
               window.dispatchEvent(new Event('openAdvertiseForm'))
             }, 100)
           }}
-          className="rounded-lg bg-[#12151C] px-3.5 py-1.5 text-[11px] font-bold text-white shadow-sm transition-all duration-300 hover:scale-105 hover:bg-black hover:shadow-md sm:text-xs"
+          className="shrink-0 rounded-lg bg-[#12151C] px-2.5 py-1.5 text-[10px] font-bold text-white shadow-sm transition-all duration-300 hover:scale-105 hover:bg-black hover:shadow-md sm:px-3.5 sm:text-xs"
         >
           Advertise With Us
         </button>

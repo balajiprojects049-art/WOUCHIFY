@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import DealGrid from '../components/DealGrid'
 import FilterBar from '../components/FilterBar'
 import PageBanner from '../components/PageBanner'
+import TopDealsSection from '../components/TopDealsSection'
 import { dealsData } from '../data/dealsData'
 
 function parseDiscount(value) {
@@ -100,6 +101,7 @@ function Deals() {
       />
 
       <DealGrid deals={filteredDeals} elapsedSeconds={elapsedSeconds} />
+      <TopDealsSection />
     </main>
   )
 }

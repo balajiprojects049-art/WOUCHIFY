@@ -9,7 +9,7 @@ const topDeals = [
     discountValue: 18,
     category: 'Electronics',
     dealType: 'Loot Deals',
-    price: '$1,049',
+    price: '₹1,049',
     image: 'https://images.unsplash.com/photo-1517336714739-489689fd1ca8?auto=format&fit=crop&w=900&q=80',
   },
   {
@@ -19,7 +19,7 @@ const topDeals = [
     discountValue: 22,
     category: 'Electronics',
     dealType: 'Flash Deals',
-    price: '$899',
+    price: '₹899',
     image: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?auto=format&fit=crop&w=900&q=80',
   },
   {
@@ -29,7 +29,7 @@ const topDeals = [
     discountValue: 31,
     category: 'Electronics',
     dealType: 'Coupon Deals',
-    price: '$299',
+    price: '₹299',
     image: 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=900&q=80',
   },
 ]

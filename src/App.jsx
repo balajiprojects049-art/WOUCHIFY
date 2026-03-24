@@ -10,6 +10,12 @@ import DealDetail from './pages/DealDetail'
 import LootDeals from './pages/LootDeals'
 import LootDealDetail from './pages/LootDealDetail'
 import MobileBottomNav from './components/MobileBottomNav'
+import AboutContact from './pages/AboutContact'
+import CreditCards from './pages/CreditCards'
+import PrivacyPolicy from './pages/PrivacyPolicy'
+import TermsOfUse from './pages/TermsOfUse'
+import Giveaways from './pages/Giveaways'
+import Coupons from './pages/Coupons'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -35,6 +41,12 @@ function App() {
         <Route path="/loot-deal/:lootDealId" element={<LootDealDetail />} />
         <Route path="/stores" element={<Stores />} />
         <Route path="/store/:storeName" element={<StoreDetail />} />
+        <Route path="/about-contact" element={<AboutContact />} />
+        <Route path="/credit-cards" element={<CreditCards />} />
+        <Route path="/giveaways" element={<Giveaways />} />
+        <Route path="/coupons" element={<Coupons />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsOfUse />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <Footer />

@@ -29,7 +29,7 @@ function Footer() {
 
             <div className="mt-6 flex flex-wrap gap-2">
               <a href="https://t.me" target="_blank" rel="noreferrer" className="rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-slate-200 transition-all duration-300 hover:border-gold hover:text-white">Telegram</a>
-              <a href="https://t.me" target="_blank" rel="noreferrer" className="rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-slate-200 transition-all duration-300 hover:border-gold hover:text-white">Telegram Group</a>
+              <a href="https://instagram.com" target="_blank" rel="noreferrer" className="rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-slate-200 transition-all duration-300 hover:border-gold hover:text-white">Instagram</a>
               <a href="https://wa.me" target="_blank" rel="noreferrer" className="rounded-full border border-white/15 px-3 py-1.5 text-xs font-semibold text-slate-200 transition-all duration-300 hover:border-gold hover:text-white">WhatsApp</a>
             </div>
           </div>
@@ -38,7 +38,7 @@ function Footer() {
             <div>
               <p className="text-sm font-semibold uppercase tracking-wide text-white">Company</p>
               <ul className="mt-4 space-y-2.5 text-sm text-slate-300">
-                <li><Link to="/" className="transition-colors duration-300 hover:text-white">About Us</Link></li>
+                <li><Link to="/about-contact" className="transition-colors duration-300 hover:text-white">About Us</Link></li>
                 <li><Link to="/deals" className="transition-colors duration-300 hover:text-white">Careers</Link></li>
                 <li><Link to="/deals" className="transition-colors duration-300 hover:text-white">Press</Link></li>
                 <li><Link to="/deals" className="transition-colors duration-300 hover:text-white">Affiliates</Link></li>
@@ -49,9 +49,10 @@ function Footer() {
               <p className="text-sm font-semibold uppercase tracking-wide text-white">Explore</p>
               <ul className="mt-4 space-y-2.5 text-sm text-slate-300">
                 <li><Link to="/deals" className="transition-colors duration-300 hover:text-white">Top Deals</Link></li>
-                <li><Link to="/deals" className="transition-colors duration-300 hover:text-white">Coupon Codes</Link></li>
-                <li><Link to="/deals" className="transition-colors duration-300 hover:text-white">Top Stores</Link></li>
-                <li><Link to="/deals" className="transition-colors duration-300 hover:text-white">Credit Cards</Link></li>
+                <li><Link to="/coupons" className="transition-colors duration-300 hover:text-white">Coupon Codes</Link></li>
+                <li><Link to="/stores" className="transition-colors duration-300 hover:text-white">Top Stores</Link></li>
+                <li><Link to="/credit-cards" className="transition-colors duration-300 hover:text-white">Credit Cards</Link></li>
+                <li><Link to="/giveaways" className="transition-colors duration-300 hover:text-white">Giveaways</Link></li>
               </ul>
             </div>
 
@@ -59,7 +60,7 @@ function Footer() {
               <p className="text-sm font-semibold uppercase tracking-wide text-white">Support</p>
               <ul className="mt-4 space-y-2.5 text-sm text-slate-300">
                 <li><Link to="/deals" className="transition-colors duration-300 hover:text-white">Help Center</Link></li>
-                <li><Link to="/deals" className="transition-colors duration-300 hover:text-white">Contact Us</Link></li>
+                <li><Link to="/about-contact" className="transition-colors duration-300 hover:text-white">Contact Us</Link></li>
                 <li><Link to="/deals" className="transition-colors duration-300 hover:text-white">Safety Guide</Link></li>
                 <li><Link to="/deals" className="transition-colors duration-300 hover:text-white">Community</Link></li>
               </ul>
@@ -93,8 +94,8 @@ function Footer() {
         <div className="mt-10 flex flex-col gap-4 border-t border-white/10 pt-6 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} WOUCHIFY. All rights reserved.</p>
           <div className="flex flex-wrap items-center gap-4">
-            <Link to="/deals" className="transition-colors duration-300 hover:text-white">Privacy Policy</Link>
-            <Link to="/deals" className="transition-colors duration-300 hover:text-white">Terms of Use</Link>
+            <Link to="/privacy-policy" className="transition-colors duration-300 hover:text-white">Privacy Policy</Link>
+            <Link to="/terms" className="transition-colors duration-300 hover:text-white">Terms of Use</Link>
             <Link to="/deals" className="transition-colors duration-300 hover:text-white">Cookie Policy</Link>
             <Link to="/deals" className="transition-colors duration-300 hover:text-white">Sitemap</Link>
           </div>

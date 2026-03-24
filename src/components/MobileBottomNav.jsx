@@ -37,6 +37,15 @@ const navItems = [
       </svg>
     ),
   },
+  {
+    label: 'About',
+    to: '/about-contact',
+    icon: (
+      <svg viewBox="0 0 20 20" className="h-4 w-4 fill-current" aria-hidden="true">
+        <path d="M10 2a8 8 0 1 0 0 16 8 8 0 0 0 0-16Zm1 11H9v-4h2v4Zm0-6H9V5h2v2Z" />
+      </svg>
+    ),
+  },
 ]
 
 function MobileBottomNav() {

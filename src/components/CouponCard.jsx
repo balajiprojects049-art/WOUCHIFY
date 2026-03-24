@@ -82,9 +82,9 @@ function CouponCard({ store, offer }) {
               {isCoupon && offer.code && (
                 <button
                   onClick={handleCopy}
-                  className="rounded-lg bg-navy px-2.5 py-1.5 text-[11px] font-semibold text-cream transition-all duration-300 hover:scale-105"
+                  className={`rounded-lg px-3 py-1.5 text-[11px] font-bold transition-all duration-300 ${isCopied ? 'bg-emerald-500 text-white' : 'bg-navy text-cream hover:bg-black'}`}
                 >
-                  {isCopied ? 'Copied' : 'Copy'}
+                  {isCopied ? '✓ COPIED' : 'COPY'}
                 </button>
               )}
             </div>

@@ -10,7 +10,7 @@ const dealCards = [
     category: 'Electronics',
     dealType: 'Loot Deals',
     code: 'APPLE22',
-    price: '$899',
+    price: '₹899',
     image: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?auto=format&fit=crop&w=900&q=80',
   },
   {
@@ -21,7 +21,7 @@ const dealCards = [
     category: 'Electronics',
     dealType: 'Coupon Deals',
     code: 'SOUND31',
-    price: '$119',
+    price: '₹119',
     image: 'https://images.unsplash.com/photo-1589003077984-894e133dabab?auto=format&fit=crop&w=900&q=80',
   },
   {
@@ -32,7 +32,7 @@ const dealCards = [
     category: 'Electronics',
     dealType: 'Flash Deals',
     code: 'TUF18',
-    price: '$1,049',
+    price: '₹1,049',
     image: 'https://images.unsplash.com/photo-1517336714739-489689fd1ca8?auto=format&fit=crop&w=900&q=80',
   },
   {
@@ -43,7 +43,7 @@ const dealCards = [
     category: 'Fashion',
     dealType: 'Loot Deals',
     code: 'AIRMAX28',
-    price: '$139',
+    price: '₹139',
     image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=80',
   },
   {
@@ -54,7 +54,7 @@ const dealCards = [
     category: 'Electronics',
     dealType: 'Coupon Deals',
     code: 'BRAVIA24',
-    price: '$699',
+    price: '₹699',
     image: 'https://images.unsplash.com/photo-1593305841991-05c297ba4575?auto=format&fit=crop&w=900&q=80',
   },
   {
@@ -65,7 +65,7 @@ const dealCards = [
     category: 'Lifestyle',
     dealType: 'Flash Deals',
     code: 'BOAT35',
-    price: '$59',
+    price: '₹59',
     image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=900&q=80',
   },
 ]
