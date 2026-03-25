@@ -135,6 +135,53 @@ export function DataProvider({ children }) {
   const [auditLog, setAuditLog] = useState(() => loadFromStorage('wouchify_audit_log', []))
   const [analytics, setAnalytics] = useState(() => loadFromStorage('wouchify_analytics', defaultAnalytics))
 
+  const [dbConnected, setDbConnected] = useState(false)
+
+  // ── 1) Connect to Neon Backend on Mount ──
+  useEffect(() => {
+    fetch('/api/data').then(r => r.json()).then(res => {
+      if (res.isConnected) {
+        setDbConnected(true)
+        if (res.hasData) {
+          // Merge db data over local defaults
+          if (res.data.deals) setDeals(res.data.deals)
+          if (res.data.lootDeals) setLootDeals(res.data.lootDeals)
+          if (res.data.stores) setStores(res.data.stores)
+          if (res.data.coupons) setCoupons(res.data.coupons)
+          if (res.data.giveaways) setGiveaways(res.data.giveaways)
+          if (res.data.creditCards) setCreditCards(res.data.creditCards)
+          if (res.data.banners) setBanners(res.data.banners)
+          if (res.data.adminSettings) setAdminSettings(res.data.adminSettings)
+          if (res.data.adminMembers) setAdminMembers(res.data.adminMembers)
+          if (res.data.analytics) setAnalytics(res.data.analytics)
+        }
+      }
+    }).catch(() => console.log('⚠️ No DB connected, falling back to pure localStorage mode.'))
+  }, [])
+
+  // ── 2) Sync functionality (exposes to Admin Setup) ──
+  const syncDataToDb = async () => {
+    const payload = {
+      deals, lootDeals, stores, coupons, giveaways, creditCards, banners, adminSettings, adminMembers, analytics
+    }
+    const res = await fetch('/api/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    return await res.json()
+  }
+
+  // ── Database single-item persistence bridge ──
+  const persist = (collection, item) => {
+    if (dbConnected) {
+      fetch(`/api/${collection}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(item) })
+    }
+  }
+  const removeDb = (collection, id) => {
+    if (dbConnected) fetch(`/api/${collection}/${id}`, { method: 'DELETE' })
+  }
+
   const addAuditLog = (action, entity, detail) => {
     const entry = buildLog(action, entity, detail)
     setAuditLog(prev => [entry, ...prev].slice(0, 500)) // keep last 500
@@ -159,123 +206,210 @@ export function DataProvider({ children }) {
   useEffect(() => { saveToStorage('wouchify_analytics', analytics) }, [analytics])
 
   // ── BANNERS CRUD ─────────────────────────────────────────────────────────
-  const addBanner = (page, banner) => setBanners(prev => ({ ...prev, [page]: [...(prev[page] || []), { ...banner, id: generateId(), active: true }] }))
-  const updateBanner = (page, id, updates) => setBanners(prev => ({ ...prev, [page]: prev[page].map(b => b.id === id ? { ...b, ...updates } : b) }))
-  const deleteBanner = (page, id) => setBanners(prev => ({ ...prev, [page]: prev[page].filter(b => b.id !== id) }))
-  const reorderBanners = (page, newList) => setBanners(prev => ({ ...prev, [page]: newList }))
+  const addBanner = (page, banner) => {
+    const newBanner = { ...banner, id: generateId(), active: true }
+    setBanners(prev => ({ ...prev, [page]: [...(prev[page] || []), newBanner] }))
+    persist('banners', { ...banners, [page]: [...(banners[page] || []), newBanner] })
+  }
+  const updateBanner = (page, id, updates) => {
+    setBanners(prev => {
+      const updatedBanners = { ...prev, [page]: prev[page].map(b => b.id === id ? { ...b, ...updates } : b) }
+      persist('banners', updatedBanners)
+      return updatedBanners
+    })
+  }
+  const deleteBanner = (page, id) => {
+    setBanners(prev => {
+      const updatedBanners = { ...prev, [page]: prev[page].filter(b => b.id !== id) }
+      persist('banners', updatedBanners)
+      return updatedBanners
+    })
+  }
+  const reorderBanners = (page, newList) => {
+    setBanners(prev => ({ ...prev, [page]: newList }))
+    persist('banners', { ...banners, [page]: newList })
+  }
 
   // ── DEALS CRUD ───────────────────────────────────────────────────────────
   const addDeal = (deal) => {
     const d = { ...deal, slug: deal.slug || generateId(), createdAt: new Date().toISOString() }
     setDeals((prev) => [d, ...prev])
+    persist('deals', d)
     addAuditLog('CREATE', 'Deal', `Created deal "${deal.title}"`)
   }
   const updateDeal = (slug, updates) => {
-    setDeals((prev) => prev.map((d) => d.slug === slug ? { ...d, ...updates } : d))
+    setDeals((prev) => {
+      const draft = prev.map((d) => d.slug === slug ? { ...d, ...updates } : d)
+      persist('deals', draft.find(x => x.slug === slug))
+      return draft
+    })
     addAuditLog('UPDATE', 'Deal', `Updated deal "${updates.title || slug}"`)
   }
   const deleteDeal = (slug) => {
     const d = deals.find(x => x.slug === slug)
     setDeals((prev) => prev.filter((d) => d.slug !== slug))
+    removeDb('deals', slug)
     addAuditLog('DELETE', 'Deal', `Deleted deal "${d?.title || slug}"`)
   }
   const getDealBySlug = (slug) => deals.find((d) => d.slug === slug)
 
   // ── LOOT DEALS CRUD ─────────────────────────────────────────────────────
   const addLootDeal = (deal) => {
-    setLootDeals((prev) => [{ ...deal, id: generateId(), slug: deal.slug || generateId() }, ...prev])
+    const d = { ...deal, id: generateId(), slug: deal.slug || generateId() }
+    setLootDeals((prev) => [d, ...prev])
+    persist('lootDeals', d)
     addAuditLog('CREATE', 'Loot Deal', `Created loot deal "${deal.title}"`)
   }
   const updateLootDeal = (slug, updates) => {
-    setLootDeals((prev) => prev.map((d) => d.slug === slug ? { ...d, ...updates } : d))
+    setLootDeals((prev) => {
+      const draft = prev.map((d) => d.slug === slug ? { ...d, ...updates } : d)
+      persist('lootDeals', draft.find(x => x.slug === slug))
+      return draft
+    })
     addAuditLog('UPDATE', 'Loot Deal', `Updated loot deal "${updates.title || slug}"`)
   }
   const deleteLootDeal = (slug) => {
     const d = lootDeals.find(x => x.slug === slug)
     setLootDeals((prev) => prev.filter((d) => d.slug !== slug))
+    removeDb('lootDeals', slug)
     addAuditLog('DELETE', 'Loot Deal', `Deleted loot deal "${d?.title || slug}"`)
   }
   const getLootDealBySlug = (slug) => lootDeals.find((d) => d.slug === slug)
 
   // ── STORES CRUD ──────────────────────────────────────────────────────────
   const addStore = (store) => {
-    setStores((prev) => [{ ...store, slug: store.slug || generateId(), offers: store.offers || [] }, ...prev])
+    const s = { ...store, slug: store.slug || generateId(), offers: store.offers || [] }
+    setStores((prev) => [s, ...prev])
+    persist('stores', s)
     addAuditLog('CREATE', 'Store', `Created store "${store.name}"`)
   }
   const updateStore = (slug, updates) => {
-    setStores((prev) => prev.map((s) => s.slug === slug ? { ...s, ...updates } : s))
+    setStores((prev) => {
+      const draft = prev.map((s) => s.slug === slug ? { ...s, ...updates } : s)
+      persist('stores', draft.find(x => x.slug === slug))
+      return draft
+    })
     addAuditLog('UPDATE', 'Store', `Updated store "${updates.name || slug}"`)
   }
   const deleteStore = (slug) => {
     const s = stores.find(x => x.slug === slug)
     setStores((prev) => prev.filter((s) => s.slug !== slug))
+    removeDb('stores', slug)
     addAuditLog('DELETE', 'Store', `Deleted store "${s?.name || slug}"`)
   }
   const getStoreBySlug = (slug) => stores.find((s) => s.slug === slug)
 
   // ── COUPONS CRUD ─────────────────────────────────────────────────────────
   const addCoupon = (coupon) => {
-    setCoupons((prev) => [{ ...coupon, id: generateId(), active: true }, ...prev])
+    const c = { ...coupon, id: generateId(), active: true }
+    setCoupons((prev) => [c, ...prev])
+    persist('coupons', c)
     addAuditLog('CREATE', 'Coupon', `Created coupon "${coupon.code}" for ${coupon.store}`)
   }
   const updateCoupon = (id, updates) => {
-    setCoupons((prev) => prev.map((c) => c.id === id ? { ...c, ...updates } : c))
+    setCoupons((prev) => {
+      const draft = prev.map((c) => c.id === id ? { ...c, ...updates } : c)
+      persist('coupons', draft.find(x => x.id === id))
+      return draft
+    })
     if (!updates.active === false && Object.keys(updates).length > 1)
       addAuditLog('UPDATE', 'Coupon', `Updated coupon ID ${id}`)
   }
   const deleteCoupon = (id) => {
     const c = coupons.find(x => x.id === id)
     setCoupons((prev) => prev.filter((c) => c.id !== id))
+    removeDb('coupons', id)
     addAuditLog('DELETE', 'Coupon', `Deleted coupon "${c?.code}" (${c?.store})`)
   }
 
   // ── GIVEAWAYS CRUD ───────────────────────────────────────────────────────
-  const addGiveaway = (giveaway) => setGiveaways((prev) => [{ ...giveaway, id: generateId(), active: true }, ...prev])
-  const updateGiveaway = (id, updates) => setGiveaways((prev) => prev.map((g) => g.id === id ? { ...g, ...updates } : g))
-  const deleteGiveaway = (id) => setGiveaways((prev) => prev.filter((g) => g.id !== id))
+  const addGiveaway = (giveaway) => {
+    const g = { ...giveaway, id: generateId(), active: true }
+    setGiveaways((prev) => [g, ...prev])
+    persist('giveaways', g)
+  }
+  const updateGiveaway = (id, updates) => {
+    setGiveaways((prev) => {
+      const draft = prev.map((g) => g.id === id ? { ...g, ...updates } : g)
+      persist('giveaways', draft.find(x => x.id === id))
+      return draft
+    })
+  }
+  const deleteGiveaway = (id) => {
+    setGiveaways((prev) => prev.filter((g) => g.id !== id))
+    removeDb('giveaways', id)
+  }
 
   // ── CREDIT CARDS CRUD ────────────────────────────────────────────────────
   const addCreditCard = (card) => {
     const newCard = { ...card, id: generateId(), active: true }
-    setCreditCards((prev) => ({
-      ...prev,
-      [card.type === 'lifetime' ? 'lifetime' : 'shopping']: [newCard, ...(prev[card.type === 'lifetime' ? 'lifetime' : 'shopping'] || [])],
-    }))
+    setCreditCards((prev) => {
+      const typeKey = card.type === 'lifetime' ? 'lifetime' : 'shopping'
+      const updatedCards = {
+        ...prev,
+        [typeKey]: [newCard, ...(prev[typeKey] || [])],
+      }
+      persist('creditCards', updatedCards)
+      return updatedCards
+    })
   }
   const updateCreditCard = (id, updates) => {
-    setCreditCards((prev) => ({
-      shopping: prev.shopping.map((c) => c.id === id ? { ...c, ...updates } : c),
-      lifetime: prev.lifetime.map((c) => c.id === id ? { ...c, ...updates } : c),
-    }))
+    setCreditCards((prev) => {
+      const updatedCards = {
+        shopping: prev.shopping.map((c) => c.id === id ? { ...c, ...updates } : c),
+        lifetime: prev.lifetime.map((c) => c.id === id ? { ...c, ...updates } : c),
+      }
+      persist('creditCards', updatedCards)
+      return updatedCards
+    })
   }
   const deleteCreditCard = (id) => {
-    setCreditCards((prev) => ({
-      shopping: prev.shopping.filter((c) => c.id !== id),
-      lifetime: prev.lifetime.filter((c) => c.id !== id),
-    }))
+    setCreditCards((prev) => {
+      const updatedCards = {
+        shopping: prev.shopping.filter((c) => c.id !== id),
+        lifetime: prev.lifetime.filter((c) => c.id !== id),
+      }
+      persist('creditCards', updatedCards)
+      return updatedCards
+    })
   }
 
-  // ── ADMIN SETTINGS / MEMBERS ────────────────────────────────────────────
+  // ── ADMIN SETTINGS / MEMBERS / DATA ───────────────────────────────────────────
   const updateAdminSettings = (updates) => {
-    setAdminSettings((prev) => ({ ...prev, ...updates }))
+    setAdminSettings((prev) => {
+      const draft = { ...prev, ...updates }
+      persist('adminSettings', draft)
+      return draft
+    })
   }
-
+  
   const addAdminMember = (member) => {
-    setAdminMembers((prev) => [{ ...member, id: generateId(), active: true }, ...prev])
+    const m = { ...member, id: generateId(), active: true }
+    setAdminMembers((prev) => {
+      const updatedMembers = [m, ...prev]
+      persist('adminMembers', updatedMembers)
+      return updatedMembers
+    })
   }
-
   const updateAdminMember = (id, updates) => {
-    setAdminMembers((prev) => prev.map((member) => member.id === id ? { ...member, ...updates } : member))
+    setAdminMembers((prev) => {
+      const draft = prev.map((member) => member.id === id ? { ...member, ...updates } : member)
+      persist('adminMembers', draft)
+      return draft
+    })
   }
-
   const deleteAdminMember = (id) => {
-    setAdminMembers((prev) => prev.filter((member) => member.id !== id))
+    setAdminMembers((prev) => {
+      const draft = prev.filter((member) => member.id !== id)
+      persist('adminMembers', draft)
+      return draft
+    })
   }
 
   return (
     <DataContext.Provider value={{
       // Data
-      deals, lootDeals, stores, coupons, giveaways, creditCards, banners, adminSettings, adminMembers,
+      deals, lootDeals, stores, coupons, giveaways, creditCards, banners, adminSettings, adminMembers, dbConnected, syncDataToDb,
       // Deals
       addDeal, updateDeal, deleteDeal, getDealBySlug,
       // Loot Deals
