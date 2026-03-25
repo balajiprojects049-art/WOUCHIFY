@@ -1,17 +1,18 @@
 import { Navigate, useParams } from 'react-router-dom'
 import CountdownTimer from '../components/CountdownTimer'
 import LootDealCard from '../components/LootDealCard'
-import { getLootDealBySlug, lootDealsData } from '../data/lootDealsData'
+import { useData } from '../context/DataContext'
 
 function LootDealDetail() {
   const { lootDealId } = useParams()
-  const deal = getLootDealBySlug((lootDealId || '').toLowerCase())
+  const { lootDeals } = useData()
+  const deal = lootDeals.find(d => d.slug === (lootDealId || '').toLowerCase() || d.id === lootDealId)
 
   if (!deal) {
     return <Navigate to="/loot-deals" replace />
   }
 
-  const relatedDeals = lootDealsData
+  const relatedDeals = lootDeals
     .filter((item) => item.id !== deal.id && item.category === deal.category)
     .slice(0, 4)
 
@@ -53,14 +54,18 @@ function LootDealDetail() {
         <h2 className="text-2xl font-bold tracking-tight text-ink">Deal Details</h2>
         <p className="mt-4 text-sm leading-7 text-muted">{deal.description}</p>
 
-        <h3 className="mt-6 text-lg font-semibold text-ink">Steps to Claim</h3>
-        <ul className="mt-3 space-y-2 text-sm text-muted">
-          {deal.steps.map((step) => (
-            <li key={step}>• {step}</li>
-          ))}
-        </ul>
+        {Array.isArray(deal.steps) && deal.steps.length > 0 && (
+          <>
+            <h3 className="mt-6 text-lg font-semibold text-ink">Steps to Claim</h3>
+            <ul className="mt-3 space-y-2 text-sm text-muted">
+              {deal.steps.map((step) => (
+                <li key={step}>• {step}</li>
+              ))}
+            </ul>
+          </>
+        )}
 
-        <h3 className="mt-6 text-lg font-semibold text-ink">Terms & Conditions</h3>
+        <h3 className="mt-6 text-lg font-semibold text-ink">Terms &amp; Conditions</h3>
         <p className="mt-2 text-sm leading-7 text-muted">{deal.terms}</p>
       </section>
 

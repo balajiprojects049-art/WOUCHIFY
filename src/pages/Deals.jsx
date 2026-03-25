@@ -4,7 +4,7 @@ import DealGrid from '../components/DealGrid'
 import FilterBar from '../components/FilterBar'
 import PageBanner from '../components/PageBanner'
 import TopDealsSection from '../components/TopDealsSection'
-import { dealsData } from '../data/dealsData'
+import { useData } from '../context/DataContext'
 
 function parseDiscount(value) {
   return Number.parseInt((value || '').replace('%+', ''), 10)
@@ -19,6 +19,7 @@ function parseUsageCount(value) {
 }
 
 function Deals() {
+  const { deals: allDeals, banners } = useData()
   const [searchParams] = useSearchParams()
   const [elapsedSeconds, setElapsedSeconds] = useState(0)
 
@@ -42,10 +43,14 @@ function Deals() {
     return () => clearInterval(timerId)
   }, [])
 
+  // Use admin-configured banner or fallback
+  const dealsBanners = (banners.deals || []).filter(b => b.active !== false)
+  const bannerImage = dealsBanners[0]?.image || 'https://images.unsplash.com/photo-1517336714739-489689fd1ca8?auto=format&fit=crop&w=1200&q=80'
+
   const filteredDeals = useMemo(() => {
     const minDiscountValue = parseDiscount(minDiscount)
 
-    const filtered = dealsData.filter((deal) => {
+    const filtered = allDeals.filter((deal) => {
       const remainingSeconds = deal.expiresInSeconds - elapsedSeconds
       const query = searchText.trim().toLowerCase()
       const matchesSearch = !query || deal.title.toLowerCase().includes(query) || deal.store.toLowerCase().includes(query)
@@ -75,12 +80,12 @@ function Deals() {
       }
       return parseUsageCount(second.usageCount) - parseUsageCount(first.usageCount)
     })
-  }, [category, elapsedSeconds, minDiscount, onlyActive, priceRange, searchText, sortBy])
+  }, [category, elapsedSeconds, minDiscount, onlyActive, priceRange, searchText, sortBy, allDeals])
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-16">
       <PageBanner
-        image="https://images.unsplash.com/photo-1517336714739-489689fd1ca8?auto=format&fit=crop&w=1200&q=80"
+        image={bannerImage}
         alt="Deals banner"
         href="https://www.amazon.in/gp/goldbox"
       />

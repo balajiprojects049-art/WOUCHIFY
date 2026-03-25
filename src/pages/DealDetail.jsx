@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import DealGrid from '../components/DealGrid'
-import { dealsData, getDealBySlug } from '../data/dealsData'
-import { getStorePathByName } from '../data/storesData'
+import { useData } from '../context/DataContext'
 
 function formatCountdown(totalSeconds) {
   const safeSeconds = Math.max(totalSeconds, 0)
@@ -15,7 +14,8 @@ function formatCountdown(totalSeconds) {
 
 function DealDetail() {
   const { dealSlug } = useParams()
-  const deal = getDealBySlug((dealSlug || '').toLowerCase())
+  const { deals, getStoreBySlug } = useData()
+  const deal = deals.find(d => d.slug === (dealSlug || '').toLowerCase())
   const [elapsedSeconds, setElapsedSeconds] = useState(0)
   const [saved, setSaved] = useState(false)
 
@@ -24,11 +24,11 @@ function DealDetail() {
   }
 
   const relatedDeals = useMemo(() => {
-    const sameCategory = dealsData.filter((item) => item.slug !== deal.slug && item.category === deal.category)
-    const fallback = dealsData.filter((item) => item.slug !== deal.slug)
+    const sameCategory = deals.filter((item) => item.slug !== deal.slug && item.category === deal.category)
+    const fallback = deals.filter((item) => item.slug !== deal.slug)
 
     return [...sameCategory, ...fallback].slice(0, 4)
-  }, [deal.category, deal.slug])
+  }, [deal.category, deal.slug, deals])
 
   useEffect(() => {
     const timerId = setInterval(() => {
@@ -39,6 +39,11 @@ function DealDetail() {
   }, [])
 
   const remainingSeconds = deal.expiresInSeconds - elapsedSeconds
+
+  // Build store path
+  const storeSlug = deal.store ? deal.store.toLowerCase().replace(/[^a-z0-9]+/g, '-') : ''
+  const storeData = getStoreBySlug(storeSlug)
+  const storePath = storeData ? `/store/${storeData.slug}` : '/stores'
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-16">
@@ -85,7 +90,7 @@ function DealDetail() {
               >
                 {saved ? 'Saved' : 'Save Deal'}
               </button>
-              <Link to={getStorePathByName(deal.store)} className="rounded-xl border border-line bg-white px-5 py-3 text-sm font-semibold text-ink transition-all duration-300 hover:scale-105">
+              <Link to={storePath} className="rounded-xl border border-line bg-white px-5 py-3 text-sm font-semibold text-ink transition-all duration-300 hover:scale-105">
                 Visit Store
               </Link>
             </div>
@@ -104,19 +109,27 @@ function DealDetail() {
         <h2 className="text-2xl font-bold tracking-tight text-ink">Offer Details</h2>
         <p className="mt-4 text-sm leading-7 text-muted">{deal.terms}</p>
 
-        <h3 className="mt-6 text-lg font-semibold text-ink">Highlights</h3>
-        <ul className="mt-3 space-y-2 text-sm text-muted">
-          {deal.highlights.map((point) => (
-            <li key={point}>• {point}</li>
-          ))}
-        </ul>
+        {Array.isArray(deal.highlights) && deal.highlights.length > 0 && (
+          <>
+            <h3 className="mt-6 text-lg font-semibold text-ink">Highlights</h3>
+            <ul className="mt-3 space-y-2 text-sm text-muted">
+              {deal.highlights.map((point) => (
+                <li key={point}>• {point}</li>
+              ))}
+            </ul>
+          </>
+        )}
 
-        <h3 className="mt-6 text-lg font-semibold text-ink">How to Redeem</h3>
-        <ul className="mt-3 space-y-2 text-sm text-muted">
-          {deal.steps.map((step) => (
-            <li key={step}>• {step}</li>
-          ))}
-        </ul>
+        {Array.isArray(deal.steps) && deal.steps.length > 0 && (
+          <>
+            <h3 className="mt-6 text-lg font-semibold text-ink">How to Redeem</h3>
+            <ul className="mt-3 space-y-2 text-sm text-muted">
+              {deal.steps.map((step) => (
+                <li key={step}>• {step}</li>
+              ))}
+            </ul>
+          </>
+        )}
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-xl border border-line bg-cream p-3">

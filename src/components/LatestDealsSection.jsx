@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { dealsData, getDealPathByTitle } from '../data/dealsData'
+import { useData } from '../context/DataContext'
 
 function formatCountdown(totalSeconds) {
   const safeSeconds = Math.max(totalSeconds, 0)
@@ -11,7 +11,8 @@ function formatCountdown(totalSeconds) {
   return [hours, minutes, seconds].map((time) => String(time).padStart(2, '0')).join(':')
 }
 
-function LatestCard({ item, elapsedSeconds, onViewDeal }) {
+function LatestCard({ item, elapsedSeconds }) {
+  const navigate = useNavigate()
   const remainingSeconds = item.expiresInSeconds - elapsedSeconds
 
   return (
@@ -21,11 +22,12 @@ function LatestCard({ item, elapsedSeconds, onViewDeal }) {
           src={item.image}
           alt={item.title}
           className="h-40 w-full rounded-xl object-cover transition-all duration-300 hover:scale-105 sm:h-48"
+          onError={e => e.target.style.display='none'}
         />
       </div>
       <div className="mt-4 flex items-center justify-between">
         <span className="text-[10px] font-bold uppercase tracking-wider text-gold">{item.store}</span>
-        <span className="rounded-md bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold text-emerald-600 dark:bg-emerald-900/20">NEW</span>
+        <span className="rounded-md bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold text-emerald-600">NEW</span>
       </div>
       <h3 className="mt-2 text-sm font-semibold text-ink line-clamp-1">{item.title}</h3>
       <div className="mt-3 flex items-center justify-between">
@@ -46,7 +48,10 @@ function LatestCard({ item, elapsedSeconds, onViewDeal }) {
         </p>
       </div>
 
-      <button onClick={() => onViewDeal(item.title)} className="mt-4 w-full rounded-xl bg-navy px-4 py-2.5 text-sm font-semibold text-cream transition-all duration-300 hover:scale-105">
+      <button
+        onClick={() => navigate(`/deal/${item.slug}`)}
+        className="mt-4 w-full rounded-xl bg-navy px-4 py-2.5 text-sm font-semibold text-cream transition-all duration-300 hover:scale-105"
+      >
         View Deal
       </button>
     </article>
@@ -54,16 +59,12 @@ function LatestCard({ item, elapsedSeconds, onViewDeal }) {
 }
 
 function LatestDealsSection() {
+  const { deals } = useData()
   const [elapsedSeconds, setElapsedSeconds] = useState(0)
-  const navigate = useNavigate()
 
-  const latestDeals = [...dealsData]
+  const latestDeals = [...deals]
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 4)
-
-  const handleViewDeal = (title) => {
-    navigate(getDealPathByTitle(title))
-  }
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -73,6 +74,8 @@ function LatestDealsSection() {
     return () => clearInterval(intervalId)
   }, [])
 
+  if (latestDeals.length === 0) return null
+
   return (
     <section className="mt-14 sm:mt-16">
       <div className="mb-6 flex items-end justify-between">
@@ -80,13 +83,13 @@ function LatestDealsSection() {
           <h2 className="text-2xl font-bold tracking-tight text-ink">Latest Deals</h2>
           <p className="mt-1 text-sm text-muted">Freshly added offers just for you</p>
         </div>
-        <Link to="/deals?sortBy=Latest" className="text-sm font-semibold text-gold">
+        <Link to="/deals" className="text-sm font-semibold text-gold">
           View all
         </Link>
       </div>
       <div className="flex gap-4 overflow-x-auto pb-2 sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:pb-0 lg:grid-cols-4">
         {latestDeals.map((item) => (
-          <LatestCard key={item.slug} item={item} elapsedSeconds={elapsedSeconds} onViewDeal={handleViewDeal} />
+          <LatestCard key={item.slug} item={item} elapsedSeconds={elapsedSeconds} />
         ))}
       </div>
     </section>

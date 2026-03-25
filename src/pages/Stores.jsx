@@ -3,15 +3,22 @@ import { useSearchParams } from 'react-router-dom'
 import PageBanner from '../components/PageBanner'
 import StoreCard from '../components/StoreCard'
 import SearchBar from '../components/SearchBar'
-import { storeCategories, storesData } from '../data/storesData'
+import { useData } from '../context/DataContext'
 
 const alphabet = ['All', ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')]
 
 function Stores() {
+  const { stores, banners } = useData()
   const [searchParams, setSearchParams] = useSearchParams()
   const [query, setQuery] = useState('')
   const [selectedLetter, setSelectedLetter] = useState('All')
   const [selectedCategory, setSelectedCategory] = useState('All')
+
+  // Get store categories dynamically from context data
+  const storeCategories = useMemo(() => {
+    const cats = ['All', ...new Set(stores.map(s => s.category).filter(Boolean))]
+    return cats
+  }, [stores])
 
   useEffect(() => {
     const queryParam = searchParams.get('q') || ''
@@ -31,20 +38,24 @@ function Stores() {
     setSearchParams(next, { replace: true })
   }
 
+  // Use admin-configured banner or fallback
+  const storesBanners = (banners.stores || []).filter(b => b.active !== false)
+  const bannerImage = storesBanners[0]?.image || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1200&q=80'
+
   const filteredStores = useMemo(() => {
-    return storesData.filter((store) => {
+    return stores.filter((store) => {
       const matchesSearch = !query.trim() || store.name.toLowerCase().includes(query.trim().toLowerCase())
       const matchesLetter = selectedLetter === 'All' || store.name.toUpperCase().startsWith(selectedLetter)
       const matchesCategory = selectedCategory === 'All' || store.category === selectedCategory
 
       return matchesSearch && matchesLetter && matchesCategory
     })
-  }, [query, selectedLetter, selectedCategory])
+  }, [query, selectedLetter, selectedCategory, stores])
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-16">
       <PageBanner
-        image="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1200&q=80"
+        image={bannerImage}
         alt="Stores banner"
         href="https://www.myntra.com"
       />

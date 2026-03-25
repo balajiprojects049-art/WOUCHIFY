@@ -2,11 +2,12 @@ import { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import CouponCard from '../components/CouponCard'
 import StoreFilterBar from '../components/StoreFilterBar'
-import { getStoreBySlug } from '../data/storesData'
+import { useData } from '../context/DataContext'
 
 function StoreDetail() {
   const { storeName } = useParams()
-  const store = getStoreBySlug((storeName || '').toLowerCase())
+  const { stores } = useData()
+  const store = stores.find(s => s.slug === (storeName || '').toLowerCase())
 
   const [searchText, setSearchText] = useState('')
   const [offerType, setOfferType] = useState('All')
@@ -18,7 +19,7 @@ function StoreDetail() {
 
     const threshold = Number.parseInt(minDiscount.replace('%+', ''), 10)
 
-    const filtered = store.offers.filter((offer) => {
+    const filtered = (store.offers || []).filter((offer) => {
       const isExpired = offer.expiryDays < 0
       const normalizedType = isExpired ? 'Expired' : offer.type === 'coupon' ? 'Coupons' : 'Deals'
       const matchesType = offerType === 'All' || normalizedType === offerType
@@ -55,9 +56,13 @@ function StoreDetail() {
       <section className="rounded-2xl bg-white p-6 shadow-md">
         <div className="flex flex-wrap items-center justify-between gap-5">
           <div className="flex items-start gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gold/15 text-sm font-bold text-gold">
-              {store.logoText}
-            </div>
+            {store.logo ? (
+              <img src={store.logo} alt={store.name} className="h-14 w-14 rounded-full object-cover" onError={e => e.target.style.display='none'} />
+            ) : (
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gold/15 text-sm font-bold text-gold">
+                {store.logoText || (store.name || '').slice(0, 2).toUpperCase()}
+              </div>
+            )}
             <div>
               <h1 className="text-3xl font-bold tracking-tight text-ink">{store.name}</h1>
               <p className="mt-1 text-sm font-semibold text-gold">{store.cashback}</p>
@@ -65,14 +70,16 @@ function StoreDetail() {
             </div>
           </div>
 
-          <a
-            href={store.website}
-            target="_blank"
-            rel="noreferrer"
-            className="rounded-xl bg-navy px-5 py-3 text-sm font-semibold text-cream transition-all duration-300 hover:scale-105"
-          >
-            Visit Store
-          </a>
+          {store.website && (
+            <a
+              href={store.website}
+              target="_blank"
+              rel="noreferrer"
+              className="rounded-xl bg-navy px-5 py-3 text-sm font-semibold text-cream transition-all duration-300 hover:scale-105"
+            >
+              Visit Store
+            </a>
+          )}
         </div>
       </section>
 
@@ -94,7 +101,9 @@ function StoreDetail() {
 
         {filteredOffers.length === 0 && (
           <article className="rounded-2xl border border-line bg-white p-8 text-center text-sm font-medium text-muted md:col-span-2">
-            No offers found. Try changing the filters.
+            {(store.offers || []).length === 0
+              ? 'No offers have been added to this store yet.'
+              : 'No offers found. Try changing the filters.'}
           </article>
         )}
       </section>

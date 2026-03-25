@@ -2,22 +2,27 @@ import { useMemo, useState } from 'react'
 import FilterBar from '../components/FilterBar'
 import LootDealCard from '../components/LootDealCard'
 import PageBanner from '../components/PageBanner'
-import { lootDealsData } from '../data/lootDealsData'
+import { useData } from '../context/DataContext'
 
 function parseDiscount(value) {
   return Number.parseInt((value || '').replace('%+', ''), 10)
 }
 
 function LootDeals() {
+  const { lootDeals, banners } = useData()
   const [searchText, setSearchText] = useState('')
   const [category, setCategory] = useState('All')
   const [minDiscount, setMinDiscount] = useState('50%+')
   const [sortBy, setSortBy] = useState('Most Popular')
 
+  // Use admin-configured banner or fallback
+  const lootBanners = (banners.lootDeals || []).filter(b => b.active !== false)
+  const bannerImage = lootBanners[0]?.image || 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1200&q=80'
+
   const filteredDeals = useMemo(() => {
     const minDiscountValue = parseDiscount(minDiscount)
 
-    const filtered = lootDealsData.filter((deal) => {
+    const filtered = lootDeals.filter((deal) => {
       const query = searchText.trim().toLowerCase()
       const matchesSearch = !query || deal.title.toLowerCase().includes(query) || deal.category.toLowerCase().includes(query)
       const matchesCategory = category === 'All' || deal.category === category
@@ -35,13 +40,13 @@ function LootDeals() {
       }
       return second.popularity - first.popularity
     })
-  }, [category, minDiscount, searchText, sortBy])
+  }, [category, minDiscount, searchText, sortBy, lootDeals])
 
   return (
     <main>
       <section className="mx-auto mt-6 max-w-7xl px-6">
         <PageBanner
-          image="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1200&q=80"
+          image={bannerImage}
           alt="Loot deals banner"
           href="https://www.flipkart.com/offers-store"
         />

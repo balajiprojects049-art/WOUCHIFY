@@ -1,34 +1,6 @@
 import { useState } from 'react'
 import ScrollingPageBanner from '../components/ScrollingPageBanner'
-
-const banners = [
-  {
-    image: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=1200&q=80',
-    label: 'Exclusive Coupons',
-    title: 'Save Big With Verified Codes',
-    description: 'Hand-picked coupon codes from hundreds of top Indian stores — all verified and ready to use.',
-    link: '/coupons',
-  },
-  {
-    image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1200&q=80',
-    label: 'Fresh Drops',
-    title: 'New Coupons Added Daily',
-    description: 'Our team verifies fresh discounts every morning so you always get working codes.',
-    link: '/coupons',
-  },
-]
-
-const coupons = [
-  { store: 'Amazon India', code: 'AMAZON10', discount: '10% OFF', category: 'All Categories', expiry: 'Expires in 3 days', minOrder: '₹499', success: '96%', color: 'from-orange-50 to-white', badge: 'HOT' },
-  { store: 'Flipkart', code: 'FLIP15', discount: '15% OFF', category: 'Electronics', expiry: 'Expires in 2 days', minOrder: '₹999', success: '91%', color: 'from-blue-50 to-white', badge: 'POPULAR' },
-  { store: 'Myntra', code: 'MYNTRA20', discount: '20% OFF', category: 'Fashion & Lifestyle', expiry: 'Expires in 5 days', minOrder: '₹799', success: '89%', color: 'from-pink-50 to-white', badge: 'NEW' },
-  { store: 'Swiggy', code: 'SWIGGY100', discount: '₹100 OFF', category: 'Food Delivery', expiry: 'Expires today', minOrder: '₹299', success: '93%', color: 'from-orange-50 to-white', badge: 'ENDING SOON' },
-  { store: 'Zomato', code: 'ZOMATO50', discount: '₹50 OFF', category: 'Food Delivery', expiry: 'Expires in 4 days', minOrder: '₹199', success: '88%', color: 'from-red-50 to-white', badge: 'TRENDING' },
-  { store: 'Nykaa', code: 'NYKAA25', discount: '25% OFF', category: 'Beauty & Health', expiry: 'Expires in 6 days', minOrder: '₹599', success: '87%', color: 'from-rose-50 to-white', badge: 'EXCLUSIVE' },
-  { store: 'Ajio', code: 'AJIO30', discount: '30% OFF', category: 'Fashion', expiry: 'Expires in 1 day', minOrder: '₹999', success: '84%', color: 'from-indigo-50 to-white', badge: 'FLASH' },
-  { store: 'Meesho', code: 'MEESHO12', discount: '12% OFF', category: 'Shopping', expiry: 'Expires in 7 days', minOrder: '₹299', success: '82%', color: 'from-purple-50 to-white', badge: 'NEW' },
-  { store: 'MakeMyTrip', code: 'MMT500', discount: '₹500 OFF', category: 'Travel', expiry: 'Expires in 2 days', minOrder: '₹3,999', success: '79%', color: 'from-sky-50 to-white', badge: 'TRAVEL' },
-]
+import { useData } from '../context/DataContext'
 
 const categories = ['All', 'Electronics', 'Fashion', 'Food Delivery', 'Travel', 'Beauty & Health', 'Shopping']
 
@@ -81,19 +53,24 @@ function CouponCard({ item }) {
 }
 
 function Coupons() {
+  const { coupons: allCoupons, banners } = useData()
+  const activeCoupons = allCoupons.filter(c => c.active !== false)
+  const activeBanners = (banners.coupons || []).filter(b => b.active !== false)
   const [activeCategory, setActiveCategory] = useState('All')
   const [search, setSearch] = useState('')
 
-  const filtered = coupons.filter((c) => {
-    const matchCat = activeCategory === 'All' || c.category === activeCategory
+  const CARD_COLORS = ['from-orange-50 to-white', 'from-blue-50 to-white', 'from-pink-50 to-white', 'from-red-50 to-white', 'from-rose-50 to-white', 'from-indigo-50 to-white', 'from-purple-50 to-white', 'from-sky-50 to-white']
+
+  const filtered = activeCoupons.filter((c) => {
+    const matchCat = activeCategory === 'All' || c.category === activeCategory || c.category.includes(activeCategory)
     const matchSearch = !search.trim() || c.store.toLowerCase().includes(search.toLowerCase()) || c.code.toLowerCase().includes(search.toLowerCase())
     return matchCat && matchSearch
-  })
+  }).map((c, i) => ({ ...c, color: c.color || CARD_COLORS[i % CARD_COLORS.length] }))
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
       <section className="mb-14">
-        <ScrollingPageBanner banners={banners} />
+        <ScrollingPageBanner banners={activeBanners} />
       </section>
 
       {/* Search & Filter */}

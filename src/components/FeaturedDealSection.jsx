@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useData } from '../context/DataContext'
 
-const featuredSlides = [
+const fallbackSlides = [
   {
     title: 'Exclusive 50% Off Apple Accessories',
     description: 'Grab curated accessories with limited-time pricing. Includes chargers, watch straps and premium desk kits.',
     image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=1200&q=80',
     primaryCta: 'Shop Now',
     secondaryCta: 'View Collection',
+    link: '/deals',
   },
   {
     title: 'Up to 40% Off Premium Audio Gear',
@@ -15,6 +17,7 @@ const featuredSlides = [
     image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=80',
     primaryCta: 'Get Audio Deal',
     secondaryCta: 'See Top Brands',
+    link: '/deals',
   },
   {
     title: 'Designer Watch Deals Starting at 30% Off',
@@ -22,43 +25,43 @@ const featuredSlides = [
     image: 'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?auto=format&fit=crop&w=1200&q=80',
     primaryCta: 'Shop Watches',
     secondaryCta: 'View Offers',
-  },
-  {
-    title: 'Home Office Essentials Mega Sale',
-    description: 'Upgrade your setup with ergonomic desks, chairs, and productivity tools at special prices.',
-    image: 'https://images.unsplash.com/photo-1593642531955-b62e17bdaa9c?auto=format&fit=crop&w=1200&q=80',
-    primaryCta: 'Upgrade Setup',
-    secondaryCta: 'Browse Picks',
-  },
-  {
-    title: 'Top Camera & Creator Kits at Best Prices',
-    description: 'Find cameras, tripods, and content creation accessories with instant coupons.',
-    image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=1200&q=80',
-    primaryCta: 'Explore Cameras',
-    secondaryCta: 'See Creator Gear',
-  },
-  {
-    title: 'Gaming Must-Haves with Exclusive Discounts',
-    description: 'Get gaming mice, keyboards, and accessories with high-value promo deals.',
-    image: 'https://images.unsplash.com/photo-1603481546579-65d935ba9cdd?auto=format&fit=crop&w=1200&q=80',
-    primaryCta: 'Grab Gaming Deal',
-    secondaryCta: 'View All Gaming',
+    link: '/deals',
   },
 ]
 
 function FeaturedDealSection() {
   const [activeSlide, setActiveSlide] = useState(0)
   const navigate = useNavigate()
+  const { banners } = useData()
+
+  // Use admin home banners or fallback slides
+  const adminBanners = (banners.home || []).filter(b => b.active !== false)
+  const featuredSlides = adminBanners.length > 0
+    ? adminBanners.map(b => ({
+        title: b.title,
+        description: b.description,
+        image: b.image,
+        primaryCta: 'Shop Now',
+        secondaryCta: 'View Collection',
+        link: b.link || '/deals',
+      }))
+    : fallbackSlides
 
   useEffect(() => {
+    setActiveSlide(0)
+  }, [featuredSlides.length])
+
+  useEffect(() => {
+    if (featuredSlides.length <= 1) return
     const intervalId = setInterval(() => {
       setActiveSlide((previous) => (previous + 1) % featuredSlides.length)
     }, 4000)
 
     return () => clearInterval(intervalId)
-  }, [])
+  }, [featuredSlides.length])
 
-  const currentSlide = featuredSlides[activeSlide]
+  const currentSlide = featuredSlides[Math.min(activeSlide, featuredSlides.length - 1)]
+  if (!currentSlide) return null
 
   return (
     <section className="mt-8 sm:mt-10">
@@ -71,13 +74,13 @@ function FeaturedDealSection() {
           </p>
           <div className="mt-6 flex flex-wrap gap-2.5 sm:mt-7 sm:gap-3">
             <button
-              onClick={() => navigate('/stores')}
+              onClick={() => navigate(currentSlide.link || '/stores')}
               className="rounded-xl bg-navy px-4 py-2.5 text-sm font-semibold text-cream transition-all duration-300 hover:scale-105 sm:px-5 sm:py-3"
             >
               {currentSlide.primaryCta}
             </button>
             <button
-              onClick={() => navigate('/stores')}
+              onClick={() => navigate(currentSlide.link || '/stores')}
               className="rounded-xl border border-line bg-white px-4 py-2.5 text-sm font-semibold text-ink transition-all duration-300 hover:scale-105 sm:px-5 sm:py-3"
             >
               {currentSlide.secondaryCta}
@@ -87,7 +90,7 @@ function FeaturedDealSection() {
           <div className="mt-5 flex items-center gap-2">
             {featuredSlides.map((slide, index) => (
               <button
-                key={slide.title}
+                key={index}
                 type="button"
                 onClick={() => setActiveSlide(index)}
                 aria-label={`Featured slide ${index + 1}`}
@@ -105,6 +108,7 @@ function FeaturedDealSection() {
             src={currentSlide.image}
             alt={currentSlide.title}
             className="h-60 w-full rounded-2xl object-cover transition-all duration-300 hover:scale-105 sm:h-80"
+            onError={e => e.target.style.display='none'}
           />
         </div>
       </div>

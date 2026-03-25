@@ -1,91 +1,7 @@
 import { useState } from 'react'
 import ScrollingPageBanner from '../components/ScrollingPageBanner'
+import { useData } from '../context/DataContext'
 
-const banners = [
-  {
-    image: 'https://images.unsplash.com/photo-1630450202872-e0829c9d6172?auto=format&fit=crop&w=1200&q=80',
-    label: '🏆 Weekly Giveaway',
-    title: 'Win Premium Gadgets Worth ₹50,000',
-    description: 'Enter our weekly draw for a chance to win the latest smartphones, earbuds, and more.',
-    link: '/giveaways',
-  },
-  {
-    image: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=1200&q=80',
-    label: '🎁 Points Rewards',
-    title: 'Claim Your Reward Points Today',
-    description: 'Earn points on every deal you grab and redeem them for exclusive discounts.',
-    link: '/giveaways',
-  },
-]
-
-const activeGiveaways = [
-  {
-    id: 1,
-    prize: 'Apple iPhone 15 Pro Max',
-    value: '₹1,59,900',
-    entries: '12,450',
-    endsIn: '2 days',
-    image: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?auto=format&fit=crop&w=800&q=80',
-    tag: 'MEGA',
-    color: 'from-midnight to-navy',
-    tagColor: 'bg-gold text-midnight',
-  },
-  {
-    id: 2,
-    prize: 'Sony WH-1000XM5 Headphones',
-    value: '₹29,990',
-    entries: '8,320',
-    endsIn: '4 days',
-    image: 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=800&q=80',
-    tag: 'HOT',
-    color: 'from-gold to-[#c9940a]',
-    tagColor: 'bg-midnight text-white',
-  },
-  {
-    id: 3,
-    prize: 'Samsung Galaxy Watch 6',
-    value: '₹34,999',
-    entries: '6,100',
-    endsIn: '5 days',
-    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80',
-    tag: 'NEW',
-    color: 'from-slate-800 to-slate-700',
-    tagColor: 'bg-emerald-500 text-white',
-  },
-  {
-    id: 4,
-    prize: 'ASUS ROG Gaming Laptop',
-    value: '₹89,990',
-    entries: '4,800',
-    endsIn: '7 days',
-    image: 'https://images.unsplash.com/photo-1593642531955-b62e17bdaa9c?auto=format&fit=crop&w=800&q=80',
-    tag: 'JACKPOT',
-    color: 'from-red-900 to-red-800',
-    tagColor: 'bg-white text-red-600',
-  },
-  {
-    id: 5,
-    prize: 'Nike Air Jordan Bundle',
-    value: '₹18,500',
-    entries: '9,700',
-    endsIn: '3 days',
-    image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&q=80',
-    tag: 'TRENDING',
-    color: 'from-orange-800 to-orange-700',
-    tagColor: 'bg-white text-orange-600',
-  },
-  {
-    id: 6,
-    prize: 'Boat Airdopes + Smartwatch',
-    value: '₹8,998',
-    entries: '14,200',
-    endsIn: '1 day',
-    image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=80',
-    tag: 'ENDING SOON',
-    color: 'from-purple-900 to-purple-800',
-    tagColor: 'bg-gold text-midnight',
-  },
-]
 
 function GiveawayCard({ item }) {
   const [entered, setEntered] = useState(false)
@@ -134,16 +50,19 @@ function GiveawayCard({ item }) {
 }
 
 function Giveaways() {
+  const { giveaways, banners } = useData()
+  const activeGiveaways = giveaways.filter(g => g.active !== false)
+  const activeBanners = (banners.giveaways || []).filter(b => b.active !== false)
   return (
     <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
       <section className="mb-14">
-        <ScrollingPageBanner banners={banners} />
+        <ScrollingPageBanner banners={activeBanners} />
       </section>
 
       {/* Stats Bar */}
       <div className="mb-14 grid grid-cols-2 gap-4 sm:grid-cols-4">
         {[
-          { label: 'Active Giveaways', value: '6' },
+          { label: 'Active Giveaways', value: activeGiveaways.length },
           { label: 'Total Winners', value: '1,240+' },
           { label: 'Prize Value Given', value: '₹12L+' },
           { label: 'Active Participants', value: '55,570' },

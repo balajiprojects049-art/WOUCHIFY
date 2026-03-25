@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import { DataProvider } from './context/DataContext'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import HomePage from './pages/HomePage'
@@ -16,6 +17,17 @@ import PrivacyPolicy from './pages/PrivacyPolicy'
 import TermsOfUse from './pages/TermsOfUse'
 import Giveaways from './pages/Giveaways'
 import Coupons from './pages/Coupons'
+import AdminLogin from './admin/pages/AdminLogin'
+import AdminDashboard from './admin/pages/AdminDashboard'
+import AdminDeals from './admin/pages/AdminDeals'
+import AdminLootDeals from './admin/pages/AdminLootDeals'
+import AdminStores from './admin/pages/AdminStores'
+import AdminCoupons from './admin/pages/AdminCoupons'
+import AdminCreditCards from './admin/pages/AdminCreditCards'
+import AdminGiveaways from './admin/pages/AdminGiveaways'
+import AdminBanners from './admin/pages/AdminBanners'
+import AdminMembers from './admin/pages/AdminMembers'
+import AdminSettings from './admin/pages/AdminSettings'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -27,31 +39,69 @@ function ScrollToTop() {
   return null
 }
 
-function App() {
+function PublicLayout({ children }) {
   return (
     <div className="min-h-screen bg-cream pb-20 md:pb-0">
-      <ScrollToTop />
       <Navbar />
-
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/deals" element={<Deals />} />
-        <Route path="/deal/:dealSlug" element={<DealDetail />} />
-        <Route path="/loot-deals" element={<LootDeals />} />
-        <Route path="/loot-deal/:lootDealId" element={<LootDealDetail />} />
-        <Route path="/stores" element={<Stores />} />
-        <Route path="/store/:storeName" element={<StoreDetail />} />
-        <Route path="/about-contact" element={<AboutContact />} />
-        <Route path="/credit-cards" element={<CreditCards />} />
-        <Route path="/giveaways" element={<Giveaways />} />
-        <Route path="/coupons" element={<Coupons />} />
-        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="/terms" element={<TermsOfUse />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      {children}
       <Footer />
       <MobileBottomNav />
     </div>
+  )
+}
+
+function AppRoutes() {
+  const { pathname } = useLocation()
+  const isAdmin = pathname.startsWith('/admin')
+
+  return (
+    <>
+      <ScrollToTop />
+      {isAdmin ? (
+        <Routes>
+          <Route path="/admin" element={<AdminLogin />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/deals" element={<AdminDeals />} />
+          <Route path="/admin/loot-deals" element={<AdminLootDeals />} />
+          <Route path="/admin/stores" element={<AdminStores />} />
+          <Route path="/admin/coupons" element={<AdminCoupons />} />
+          <Route path="/admin/credit-cards" element={<AdminCreditCards />} />
+          <Route path="/admin/giveaways" element={<AdminGiveaways />} />
+          <Route path="/admin/banners" element={<AdminBanners />} />
+          <Route path="/admin/members" element={<AdminMembers />} />
+          <Route path="/admin/settings" element={<AdminSettings />} />
+          <Route path="/admin/*" element={<Navigate to="/admin" replace />} />
+        </Routes>
+      ) : (
+        <PublicLayout>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/deals" element={<Deals />} />
+            <Route path="/deal/:dealSlug" element={<DealDetail />} />
+            <Route path="/loot-deals" element={<LootDeals />} />
+            <Route path="/loot-deal/:lootDealId" element={<LootDealDetail />} />
+            <Route path="/stores" element={<Stores />} />
+            <Route path="/store/:storeName" element={<StoreDetail />} />
+            <Route path="/about-contact" element={<AboutContact />} />
+            <Route path="/credit-cards" element={<CreditCards />} />
+            <Route path="/giveaways" element={<Giveaways />} />
+            <Route path="/coupons" element={<Coupons />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsOfUse />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </PublicLayout>
+      )}
+    </>
+  )
+}
+
+function App() {
+  return (
+    <DataProvider>
+      <AppRoutes />
+    </DataProvider>
   )
 }
 

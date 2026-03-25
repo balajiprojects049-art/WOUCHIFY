@@ -1,92 +1,15 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useData } from '../context/DataContext'
 
 const altCardImage = 'https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&w=900&q=80'
 
-const shoppingCards = [
-  {
-    bank: 'AXIS BANK',
-    card: 'Flipkart Card',
-    cashback: 'Up to 7.5% Cashback',
-    partners: 'Flipkart • Myntra • Uber • Cleartrip',
-    rewards: 'Flat ₹1,400 Rewards',
-    wrapper: 'from-cream via-surface to-cream',
-    cardImage: '/axis-bank-cashback-credit-card.jpg',
-  },
-  {
-    bank: 'SBI CARD',
-    card: 'Flipkart Card',
-    cashback: 'Up to 7.5% Cashback',
-    partners: 'Flipkart • Myntra • Cleartrip • Uber',
-    rewards: 'Flat ₹1,400 Rewards',
-    wrapper: 'from-cream via-surface to-cream',
-    cardImage: '/axis-bank-cashback-credit-card.jpg',
-  },
-  {
-    bank: 'SBI CARD',
-    card: 'Cashback Card',
-    cashback: '5% Cashback on all online spends',
-    partners: 'Amazon • Flipkart • Myntra • 1000+ stores',
-    rewards: 'Flat ₹1,500 Rewards',
-    wrapper: 'from-cream via-surface to-cream',
-    cardImage: 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?auto=format&fit=crop&w=900&q=80',
-  },
-  {
-    bank: 'HDFC BANK',
-    card: 'Millennia Card',
-    cashback: '5% Cashback on top merchants',
-    partners: 'Amazon • Myntra • Flipkart and more',
-    rewards: 'Flat ₹1,100 Rewards',
-    wrapper: 'from-cream via-surface to-cream',
-    cardImage: 'https://images.unsplash.com/photo-1601597111158-2fceff292cdc?auto=format&fit=crop&w=900&q=80',
-  },
-]
-
-const lifetimeCards = [
-  {
-    bank: 'AXIS BANK',
-    card: 'MyZone Card',
-    cashback: 'Save ₹2,800 On welcome benefits',
-    partners: 'Movies • Dining • Shopping offers',
-    rewards: 'Lifetime Free',
-    wrapper: 'from-midnight via-navysoft to-navy',
-    cardImage: '/axis-bank-cashback-credit-card.jpg',
-  },
-  {
-    bank: 'SCAPIA',
-    card: 'Travel Card',
-    cashback: 'No Forex Fee on international spends',
-    partners: 'Flights • Hotels • Global merchants',
-    rewards: 'Lifetime Free',
-    wrapper: 'from-midnight via-navysoft to-navy',
-    cardImage: '/axis-bank-cashback-credit-card.jpg',
-  },
-  {
-    bank: 'BOB CARD',
-    card: 'Eterna Card',
-    cashback: 'Premium lifestyle privileges',
-    partners: 'Dining • Travel • Shopping',
-    rewards: 'Lifetime Free',
-    wrapper: 'from-midnight via-navysoft to-navy',
-    cardImage: 'https://images.unsplash.com/photo-1580048915913-4f8f5cb481c4?auto=format&fit=crop&w=900&q=80',
-  },
-  {
-    bank: 'IDFC FIRST',
-    card: 'Credit Card',
-    cashback: 'Welcome offers and zero joining fee',
-    partners: 'Fuel • Grocery • Online spends',
-    rewards: 'Lifetime Free',
-    wrapper: 'from-midnight via-navysoft to-navy',
-    cardImage: 'https://images.unsplash.com/photo-1627989580309-bfaf3e58af6f?auto=format&fit=crop&w=900&q=80',
-  },
-]
-
 function CreditCardTile({ item, lightText = false, slideIndex = 0, onApplyNow }) {
-  const imageSlides = [item.cardImage, altCardImage]
+  const imageSlides = [item.cardImage || altCardImage, altCardImage]
 
   return (
     <article
-      className={`relative h-full overflow-hidden rounded-3xl border border-line bg-gradient-to-r p-3.5 shadow-sm transition-all duration-300 hover:-translate-y-2 sm:p-5 ${item.wrapper}`}
+      className={`relative h-full overflow-hidden rounded-3xl border border-line bg-gradient-to-r p-3.5 shadow-sm transition-all duration-300 hover:-translate-y-2 sm:p-5 ${lightText ? 'from-midnight via-navysoft to-navy' : 'from-cream via-surface to-cream'}`}
     >
       <div className="inline-flex w-fit flex-col rounded-2xl bg-white/95 px-3 py-2 text-xs font-bold text-ink shadow-sm">
         <p>{item.bank}</p>
@@ -109,9 +32,10 @@ function CreditCardTile({ item, lightText = false, slideIndex = 0, onApplyNow })
 
       <div className="absolute right-3 top-14 h-24 w-24 overflow-hidden rounded-2xl border border-white/10 bg-midnight shadow-lg sm:top-16 sm:h-56 sm:w-44">
         <img
-          src={imageSlides[slideIndex % 2]}
+          src={imageSlides[slideIndex % imageSlides.length]}
           alt={`${item.bank} ${item.card}`}
           className="h-full w-full bg-midnight object-cover transition-all duration-500"
+          onError={e => e.target.style.display='none'}
         />
       </div>
     </article>
@@ -119,6 +43,7 @@ function CreditCardTile({ item, lightText = false, slideIndex = 0, onApplyNow })
 }
 
 function CardRow({ title, items, lifetime = false, slideIndex = 0, onApplyNow, onViewAll }) {
+  if (!items || items.length === 0) return null
   return (
     <div>
       <div className="mb-4 flex items-center justify-between sm:mb-5">
@@ -128,7 +53,7 @@ function CardRow({ title, items, lifetime = false, slideIndex = 0, onApplyNow, o
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {items.slice(0, 2).map((item) => (
-          <CreditCardTile key={`${title}-${item.bank}-${item.card}`} item={item} lightText={lifetime} slideIndex={slideIndex} onApplyNow={onApplyNow} />
+          <CreditCardTile key={`${title}-${item.bank}-${item.card}-${item.id}`} item={item} lightText={lifetime} slideIndex={slideIndex} onApplyNow={onApplyNow} />
         ))}
       </div>
     </div>
@@ -138,6 +63,10 @@ function CardRow({ title, items, lifetime = false, slideIndex = 0, onApplyNow, o
 function JustInPromoSection() {
   const [slideIndex, setSlideIndex] = useState(0)
   const navigate = useNavigate()
+  const { creditCards } = useData()
+
+  const activeShoppingCards = (creditCards.shopping || []).filter(c => c.active !== false)
+  const activeLifetimeCards = (creditCards.lifetime || []).filter(c => c.active !== false)
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -147,23 +76,29 @@ function JustInPromoSection() {
     return () => clearInterval(intervalId)
   }, [])
 
+  if (activeShoppingCards.length === 0 && activeLifetimeCards.length === 0) return null
+
   return (
     <section className="mt-16 space-y-10 sm:mt-20 sm:space-y-14">
-      <CardRow
-        title="Best Cards for Shopping"
-        items={shoppingCards}
-        slideIndex={slideIndex}
-        onApplyNow={() => navigate('/credit-cards')}
-        onViewAll={() => navigate('/credit-cards')}
-      />
-      <CardRow
-        title="Best Lifetime Free Credit Cards"
-        items={lifetimeCards}
-        lifetime
-        slideIndex={slideIndex}
-        onApplyNow={() => navigate('/credit-cards')}
-        onViewAll={() => navigate('/credit-cards')}
-      />
+      {activeShoppingCards.length > 0 && (
+        <CardRow
+          title="Best Cards for Shopping"
+          items={activeShoppingCards}
+          slideIndex={slideIndex}
+          onApplyNow={() => navigate('/credit-cards')}
+          onViewAll={() => navigate('/credit-cards')}
+        />
+      )}
+      {activeLifetimeCards.length > 0 && (
+        <CardRow
+          title="Best Lifetime Free Credit Cards"
+          items={activeLifetimeCards}
+          lifetime
+          slideIndex={slideIndex}
+          onApplyNow={() => navigate('/credit-cards')}
+          onViewAll={() => navigate('/credit-cards')}
+        />
+      )}
     </section>
   )
 }
