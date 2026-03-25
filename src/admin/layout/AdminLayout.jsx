@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useData } from '../../context/DataContext'
 
@@ -77,9 +77,6 @@ const Icons = {
   Upload: () => (
     <svg viewBox="0 0 20 20" className="h-4 w-4 fill-current"><path fillRule="evenodd" d="M13 8a1 1 0 0 1-.993.883L11 9H9v7a1 1 0 0 1-.993.883L8 17a1 1 0 0 1-.993-.883L7 16V9H5a1 1 0 0 1-.117-1.993L5 7h2V4a3 3 0 0 1 5.995-.176L13 4v3h2a1 1 0 0 1 .117 1.993L15 9h-2V8z" clipRule="evenodd"/></svg>
   ),
-  Shield: () => (
-    <svg viewBox="0 0 20 20" className="h-4 w-4 fill-current"><path fillRule="evenodd" d="M10 1a4.5 4.5 0 0 0-4.5 4.5V9H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5V5.5A4.5 4.5 0 0 0 10 1zm3 8V5.5a3 3 0 1 0-6 0V9h6z" clipRule="evenodd"/></svg>
-  ),
 }
 
 const navItems = [
@@ -99,7 +96,6 @@ const toolItems = [
   { label: 'Analytics',     to: '/admin/analytics',     Icon: Icons.Analytics },
   { label: 'Expiry Alerts', to: '/admin/expiry-alerts', Icon: Icons.Alert },
   { label: 'Bulk Import',   to: '/admin/bulk-import',   Icon: Icons.Upload },
-  { label: 'Audit Log',     to: '/admin/audit-log',     Icon: Icons.Shield },
 ]
 
 // Accent colour — matches login page green
@@ -107,10 +103,22 @@ const G = '#00D47E'
 
 export default function AdminLayout({ children, title }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [profileOpen, setProfileOpen] = useState(false)
+  const profileRef = useRef(null)
   const navigate = useNavigate()
-  const { adminSettings } = useData()
+  const { adminSettings, adminMembers } = useData()
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e) => {
+      if (profileRef.current && !profileRef.current.contains(e.target)) setProfileOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
 
   const handleLogout = () => navigate('/admin')
+  const owner = adminMembers?.find(m => m.role === 'Owner') || adminMembers?.[0]
 
   return (
     <div className="flex min-h-screen" style={{ background: '#070B12' }}>
@@ -223,22 +231,75 @@ export default function AdminLayout({ children, title }) {
               <span className="text-xs font-bold" style={{ color: G }}>Live CMS</span>
             </div>
 
-            {/* Avatar */}
-            {adminSettings?.avatar ? (
-              <img
-                src={adminSettings.avatar}
-                alt="Admin"
-                className="h-9 w-9 rounded-xl object-cover"
-                style={{ border: `1px solid rgba(0,212,126,0.25)` }}
-              />
-            ) : (
-              <div
-                className="flex h-9 w-9 items-center justify-center rounded-xl text-sm font-black"
-                style={{ background: 'rgba(0,212,126,0.12)', border: `1px solid rgba(0,212,126,0.2)`, color: G }}
+            {/* Avatar with dropdown */}
+            <div className="relative" ref={profileRef}>
+              <button
+                onClick={() => setProfileOpen(p => !p)}
+                className="flex items-center gap-2 rounded-xl p-1 pr-2 transition-all hover:opacity-90"
+                style={{ background: profileOpen ? 'rgba(0,212,126,0.12)' : 'transparent', border: profileOpen ? '1px solid rgba(0,212,126,0.25)' : '1px solid transparent' }}
               >
-                {(adminSettings?.siteName || 'A').charAt(0).toUpperCase()}
-              </div>
-            )}
+                {adminSettings?.avatar ? (
+                  <img src={adminSettings.avatar} alt="Admin" className="h-8 w-8 rounded-xl object-cover" style={{ border: '1px solid rgba(0,212,126,0.3)' }} />
+                ) : (
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl text-sm font-black" style={{ background: 'rgba(0,212,126,0.15)', border: '1px solid rgba(0,212,126,0.25)', color: G }}>
+                    {(adminSettings?.siteName || 'A').charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <div className="hidden sm:block text-left">
+                  <p className="text-[11px] font-black text-white leading-none">{owner?.name || 'Admin'}</p>
+                  <p className="text-[9px] text-white/35 mt-0.5">{owner?.role || 'Owner'}</p>
+                </div>
+                <svg viewBox="0 0 20 20" className="h-3 w-3 fill-white/30 hidden sm:block"><path fillRule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.168l3.71-3.938a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06z" clipRule="evenodd"/></svg>
+              </button>
+
+              {/* Dropdown */}
+              {profileOpen && (
+                <div className="absolute right-0 top-full mt-2 w-60 rounded-2xl shadow-2xl p-1 z-50"
+                  style={{ background: '#0C1018', border: '1px solid rgba(255,255,255,0.12)' }}>
+
+                  {/* Profile card */}
+                  <div className="p-4 rounded-xl mb-1" style={{ background: 'rgba(0,212,126,0.07)', border: '1px solid rgba(0,212,126,0.15)' }}>
+                    <div className="flex items-center gap-3">
+                      {adminSettings?.avatar ? (
+                        <img src={adminSettings.avatar} alt="" className="h-12 w-12 rounded-xl object-cover" style={{ border: '2px solid rgba(0,212,126,0.4)' }} />
+                      ) : (
+                        <div className="flex h-12 w-12 items-center justify-center rounded-xl text-lg font-black" style={{ background: 'rgba(0,212,126,0.15)', border: '2px solid rgba(0,212,126,0.3)', color: G }}>
+                          {(adminSettings?.siteName || 'A').charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <div>
+                        <p className="text-sm font-black text-white">{owner?.name || 'Admin User'}</p>
+                        <p className="text-[10px] font-bold mt-0.5" style={{ color: G }}>{owner?.role || 'Owner'}</p>
+                        <p className="text-[10px] text-white/35">{owner?.email || adminSettings?.supportEmail || ''}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Quick links */}
+                  {[
+                    { label: 'Edit Profile', to: '/admin/settings', icon: '⚙️' },
+                    { label: 'Manage Members', to: '/admin/members', icon: '👥' },
+                  ].map(item => (
+                    <button key={item.to} onClick={() => { navigate(item.to); setProfileOpen(false) }}
+                      className="w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold text-white/60 hover:text-white transition-colors"
+                      style={{ ':hover': { background: 'rgba(255,255,255,0.05)' } }}
+                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                      <span>{item.icon}</span>{item.label}
+                    </button>
+                  ))}
+
+                  <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', margin: '4px 0' }} />
+                  <button onClick={() => { handleLogout(); setProfileOpen(false) }}
+                    className="w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold text-red-400 hover:text-red-300 transition-colors"
+                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(239,68,68,0.07)'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                    <svg viewBox="0 0 20 20" className="h-4 w-4 fill-current"><path fillRule="evenodd" d="M3 4.25A2.25 2.25 0 0 1 5.25 2h5.5A2.25 2.25 0 0 1 13 4.25v2a.75.75 0 0 1-1.5 0v-2a.75.75 0 0 0-.75-.75h-5.5a.75.75 0 0 0-.75.75v11.5c0 .414.336.75.75.75h5.5a.75.75 0 0 0 .75-.75v-2a.75.75 0 0 1 1.5 0v2A2.25 2.25 0 0 1 10.75 18h-5.5A2.25 2.25 0 0 1 3 15.75V4.25Z" clipRule="evenodd"/><path fillRule="evenodd" d="M6 10a.75.75 0 0 1 .75-.75h9.546l-1.048-1.05a.75.75 0 1 1 1.061-1.06l2.5 2.5a.75.75 0 0 1 0 1.06l-2.5 2.5a.75.75 0 1 1-1.06-1.06l1.047-1.05H6.75A.75.75 0 0 1 6 10Z" clipRule="evenodd"/></svg>
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </header>
 

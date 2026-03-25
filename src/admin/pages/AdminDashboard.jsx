@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { useData } from '../../context/DataContext'
 import AdminLayout from '../layout/AdminLayout'
 import { useNavigate } from 'react-router-dom'
@@ -48,8 +49,29 @@ function StatCard({ label, value, IconComp, accentBg, accentColor, to }) {
 }
 
 export default function AdminDashboard() {
-  const { deals, lootDeals, stores, coupons, giveaways, creditCards } = useData()
+  const { deals, lootDeals, stores, coupons, giveaways, creditCards, adminSettings } = useData()
   const allCards = [...(creditCards.shopping || []), ...(creditCards.lifetime || [])]
+
+  // ── Time-based greeting ──
+  const [greeting, setGreeting] = useState('')
+  const [greetingIcon, setGreetingIcon] = useState('')
+  const [timeStr, setTimeStr] = useState('')
+
+  useEffect(() => {
+    const update = () => {
+      const h = new Date().getHours()
+      if (h >= 5 && h < 12)  { setGreeting('Good Morning');   setGreetingIcon('🌅') }
+      else if (h >= 12 && h < 17) { setGreeting('Good Afternoon'); setGreetingIcon('☀️') }
+      else if (h >= 17 && h < 21) { setGreeting('Good Evening');   setGreetingIcon('🌆') }
+      else                        { setGreeting('Good Night');     setGreetingIcon('🌙') }
+      setTimeStr(new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }))
+    }
+    update()
+    const t = setInterval(update, 60000)
+    return () => clearInterval(t)
+  }, [])
+
+  const adminName = adminSettings?.siteName?.replace(' Admin', '') || 'Admin'
 
   const stats = [
     { label: 'Total Deals',  value: deals.length,     IconComp: StatIcons.deals,     accentBg: 'rgba(0,212,126,0.12)',  accentColor: G,           to: '/admin/deals' },
@@ -64,9 +86,32 @@ export default function AdminDashboard() {
 
   return (
     <AdminLayout title="Dashboard">
-      <div className="mb-8">
-        <h2 className="text-2xl font-black text-white">Overview</h2>
-        <p className="mt-1 text-sm text-white/40">Everything you manage reflects instantly on the user panel.</p>
+
+      {/* ── Greeting Banner ── */}
+      <div className="mb-8 rounded-2xl p-6 flex items-center justify-between gap-4"
+        style={{ background: 'linear-gradient(135deg, rgba(0,212,126,0.10) 0%, rgba(0,212,126,0.04) 100%)', border: '1px solid rgba(0,212,126,0.20)' }}>
+        <div>
+          <p className="text-[11px] font-black uppercase tracking-widest mb-1" style={{ color: 'rgba(0,212,126,0.6)' }}>
+            {greetingIcon} {timeStr}
+          </p>
+          <h2 className="text-2xl font-black text-white">
+            {greeting}, <span style={{ color: G }}>{adminName}</span>! 👋
+          </h2>
+          <p className="mt-1 text-sm text-white/40">Here's what's happening across your CMS today.</p>
+        </div>
+        <div className="hidden sm:flex flex-col items-end gap-1 shrink-0">
+          <div className="flex items-center gap-2 rounded-xl px-4 py-2" style={{ background: 'rgba(0,212,126,0.10)', border: '1px solid rgba(0,212,126,0.20)' }}>
+            <div className="h-2 w-2 rounded-full animate-pulse" style={{ background: G }} />
+            <span className="text-xs font-black" style={{ color: G }}>CMS Live</span>
+          </div>
+          <p className="text-[10px] text-white/25">{deals.length + lootDeals.length + coupons.length} items managed</p>
+        </div>
+      </div>
+
+      {/* Section heading */}
+      <div className="mb-6">
+        <h3 className="text-lg font-black text-white">Overview</h3>
+        <p className="mt-0.5 text-xs text-white/40">Everything you manage reflects instantly on the user panel.</p>
       </div>
 
       {/* Stat cards */}
@@ -74,13 +119,10 @@ export default function AdminDashboard() {
         {stats.map((s) => <StatCard key={s.label} {...s} />)}
       </div>
 
-      {/* CMS Live banner */}
-      <div className="mb-10 rounded-2xl p-5 flex items-center gap-4" style={{ background: 'rgba(0,212,126,0.07)', border: '1px solid rgba(0,212,126,0.18)' }}>
-        <div className="h-3 w-3 rounded-full animate-pulse shrink-0" style={{ background: G }} />
-        <div>
-          <p className="text-sm font-black" style={{ color: G }}>CMS is Live</p>
-          <p className="text-xs text-white/40 mt-0.5">All changes made here are instantly reflected on the user-facing website in real-time via shared state.</p>
-        </div>
+      {/* CMS Live banner — collapsed since greeting now shows it */}
+      <div className="mb-10 rounded-2xl p-4 flex items-center gap-4" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div className="h-2.5 w-2.5 rounded-full animate-pulse shrink-0" style={{ background: G }} />
+        <p className="text-xs text-white/40">All changes made here are <span className="font-bold text-white/60">instantly reflected</span> on the user-facing website via shared state.</p>
       </div>
 
       {/* Recent Deals table */}

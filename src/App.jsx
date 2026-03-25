@@ -31,7 +31,7 @@ import AdminSettings from './admin/pages/AdminSettings'
 import AdminAnalytics from './admin/pages/AdminAnalytics'
 import AdminExpiryAlerts from './admin/pages/AdminExpiryAlerts'
 import AdminBulkImport from './admin/pages/AdminBulkImport'
-import AdminAuditLog from './admin/pages/AdminAuditLog'
+
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -78,7 +78,7 @@ function AppRoutes() {
           <Route path="/admin/analytics" element={<AdminAnalytics />} />
           <Route path="/admin/expiry-alerts" element={<AdminExpiryAlerts />} />
           <Route path="/admin/bulk-import" element={<AdminBulkImport />} />
-          <Route path="/admin/audit-log" element={<AdminAuditLog />} />
+
           <Route path="/admin/*" element={<Navigate to="/admin" replace />} />
         </Routes>
       ) : (
