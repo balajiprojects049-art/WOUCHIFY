@@ -82,6 +82,25 @@ const defaultAdminMembers = [
   { id: 'am1', name: 'Admin User', email: 'admin@wouchify.com', role: 'Owner', active: true },
 ]
 
+// ── Default Analytics ───────────────────────────────────────────────────────
+const defaultAnalytics = {
+  dealClicks: {},    // { slug: count }
+  couponCopies: {},  // { id: count }
+  pageViews: {},     // { page: count }
+}
+
+// ── Audit Log helpers ───────────────────────────────────────────────────────
+function buildLog(action, entity, detail, actor = 'Admin') {
+  return {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2),
+    timestamp: new Date().toISOString(),
+    actor,
+    action,   // 'CREATE' | 'UPDATE' | 'DELETE' | 'IMPORT'
+    entity,   // 'Deal' | 'Coupon' | 'Store' etc.
+    detail,   // human-readable string
+  }
+}
+
 // ── Helper ───────────────────────────────────────────────────────────────────
 function loadFromStorage(key, defaultValue) {
   try {
@@ -113,6 +132,18 @@ export function DataProvider({ children }) {
   const [banners, setBanners] = useState(() => loadFromStorage('wouchify_banners', defaultBanners))
   const [adminSettings, setAdminSettings] = useState(() => loadFromStorage('wouchify_admin_settings', defaultAdminSettings))
   const [adminMembers, setAdminMembers] = useState(() => loadFromStorage('wouchify_admin_members', defaultAdminMembers))
+  const [auditLog, setAuditLog] = useState(() => loadFromStorage('wouchify_audit_log', []))
+  const [analytics, setAnalytics] = useState(() => loadFromStorage('wouchify_analytics', defaultAnalytics))
+
+  const addAuditLog = (action, entity, detail) => {
+    const entry = buildLog(action, entity, detail)
+    setAuditLog(prev => [entry, ...prev].slice(0, 500)) // keep last 500
+  }
+
+  const trackDealClick = (slug) => setAnalytics(prev => ({ ...prev, dealClicks: { ...prev.dealClicks, [slug]: (prev.dealClicks[slug] || 0) + 1 } }))
+  const trackCouponCopy = (id) => setAnalytics(prev => ({ ...prev, couponCopies: { ...prev.couponCopies, [id]: (prev.couponCopies[id] || 0) + 1 } }))
+  const trackPageView = (page) => setAnalytics(prev => ({ ...prev, pageViews: { ...prev.pageViews, [page]: (prev.pageViews[page] || 0) + 1 } }))
+  const clearAuditLog = () => { setAuditLog([]); saveToStorage('wouchify_audit_log', []) }
 
   // Persist to localStorage on every change
   useEffect(() => { saveToStorage('wouchify_deals', deals) }, [deals])
@@ -124,6 +155,8 @@ export function DataProvider({ children }) {
   useEffect(() => { saveToStorage('wouchify_banners', banners) }, [banners])
   useEffect(() => { saveToStorage('wouchify_admin_settings', adminSettings) }, [adminSettings])
   useEffect(() => { saveToStorage('wouchify_admin_members', adminMembers) }, [adminMembers])
+  useEffect(() => { saveToStorage('wouchify_audit_log', auditLog) }, [auditLog])
+  useEffect(() => { saveToStorage('wouchify_analytics', analytics) }, [analytics])
 
   // ── BANNERS CRUD ─────────────────────────────────────────────────────────
   const addBanner = (page, banner) => setBanners(prev => ({ ...prev, [page]: [...(prev[page] || []), { ...banner, id: generateId(), active: true }] }))
@@ -132,27 +165,69 @@ export function DataProvider({ children }) {
   const reorderBanners = (page, newList) => setBanners(prev => ({ ...prev, [page]: newList }))
 
   // ── DEALS CRUD ───────────────────────────────────────────────────────────
-  const addDeal = (deal) => setDeals((prev) => [{ ...deal, slug: deal.slug || generateId(), createdAt: new Date().toISOString() }, ...prev])
-  const updateDeal = (slug, updates) => setDeals((prev) => prev.map((d) => d.slug === slug ? { ...d, ...updates } : d))
-  const deleteDeal = (slug) => setDeals((prev) => prev.filter((d) => d.slug !== slug))
+  const addDeal = (deal) => {
+    const d = { ...deal, slug: deal.slug || generateId(), createdAt: new Date().toISOString() }
+    setDeals((prev) => [d, ...prev])
+    addAuditLog('CREATE', 'Deal', `Created deal "${deal.title}"`)
+  }
+  const updateDeal = (slug, updates) => {
+    setDeals((prev) => prev.map((d) => d.slug === slug ? { ...d, ...updates } : d))
+    addAuditLog('UPDATE', 'Deal', `Updated deal "${updates.title || slug}"`)
+  }
+  const deleteDeal = (slug) => {
+    const d = deals.find(x => x.slug === slug)
+    setDeals((prev) => prev.filter((d) => d.slug !== slug))
+    addAuditLog('DELETE', 'Deal', `Deleted deal "${d?.title || slug}"`)
+  }
   const getDealBySlug = (slug) => deals.find((d) => d.slug === slug)
 
   // ── LOOT DEALS CRUD ─────────────────────────────────────────────────────
-  const addLootDeal = (deal) => setLootDeals((prev) => [{ ...deal, id: generateId(), slug: deal.slug || generateId() }, ...prev])
-  const updateLootDeal = (slug, updates) => setLootDeals((prev) => prev.map((d) => d.slug === slug ? { ...d, ...updates } : d))
-  const deleteLootDeal = (slug) => setLootDeals((prev) => prev.filter((d) => d.slug !== slug))
+  const addLootDeal = (deal) => {
+    setLootDeals((prev) => [{ ...deal, id: generateId(), slug: deal.slug || generateId() }, ...prev])
+    addAuditLog('CREATE', 'Loot Deal', `Created loot deal "${deal.title}"`)
+  }
+  const updateLootDeal = (slug, updates) => {
+    setLootDeals((prev) => prev.map((d) => d.slug === slug ? { ...d, ...updates } : d))
+    addAuditLog('UPDATE', 'Loot Deal', `Updated loot deal "${updates.title || slug}"`)
+  }
+  const deleteLootDeal = (slug) => {
+    const d = lootDeals.find(x => x.slug === slug)
+    setLootDeals((prev) => prev.filter((d) => d.slug !== slug))
+    addAuditLog('DELETE', 'Loot Deal', `Deleted loot deal "${d?.title || slug}"`)
+  }
   const getLootDealBySlug = (slug) => lootDeals.find((d) => d.slug === slug)
 
   // ── STORES CRUD ──────────────────────────────────────────────────────────
-  const addStore = (store) => setStores((prev) => [{ ...store, slug: store.slug || generateId(), offers: store.offers || [] }, ...prev])
-  const updateStore = (slug, updates) => setStores((prev) => prev.map((s) => s.slug === slug ? { ...s, ...updates } : s))
-  const deleteStore = (slug) => setStores((prev) => prev.filter((s) => s.slug !== slug))
+  const addStore = (store) => {
+    setStores((prev) => [{ ...store, slug: store.slug || generateId(), offers: store.offers || [] }, ...prev])
+    addAuditLog('CREATE', 'Store', `Created store "${store.name}"`)
+  }
+  const updateStore = (slug, updates) => {
+    setStores((prev) => prev.map((s) => s.slug === slug ? { ...s, ...updates } : s))
+    addAuditLog('UPDATE', 'Store', `Updated store "${updates.name || slug}"`)
+  }
+  const deleteStore = (slug) => {
+    const s = stores.find(x => x.slug === slug)
+    setStores((prev) => prev.filter((s) => s.slug !== slug))
+    addAuditLog('DELETE', 'Store', `Deleted store "${s?.name || slug}"`)
+  }
   const getStoreBySlug = (slug) => stores.find((s) => s.slug === slug)
 
   // ── COUPONS CRUD ─────────────────────────────────────────────────────────
-  const addCoupon = (coupon) => setCoupons((prev) => [{ ...coupon, id: generateId(), active: true }, ...prev])
-  const updateCoupon = (id, updates) => setCoupons((prev) => prev.map((c) => c.id === id ? { ...c, ...updates } : c))
-  const deleteCoupon = (id) => setCoupons((prev) => prev.filter((c) => c.id !== id))
+  const addCoupon = (coupon) => {
+    setCoupons((prev) => [{ ...coupon, id: generateId(), active: true }, ...prev])
+    addAuditLog('CREATE', 'Coupon', `Created coupon "${coupon.code}" for ${coupon.store}`)
+  }
+  const updateCoupon = (id, updates) => {
+    setCoupons((prev) => prev.map((c) => c.id === id ? { ...c, ...updates } : c))
+    if (!updates.active === false && Object.keys(updates).length > 1)
+      addAuditLog('UPDATE', 'Coupon', `Updated coupon ID ${id}`)
+  }
+  const deleteCoupon = (id) => {
+    const c = coupons.find(x => x.id === id)
+    setCoupons((prev) => prev.filter((c) => c.id !== id))
+    addAuditLog('DELETE', 'Coupon', `Deleted coupon "${c?.code}" (${c?.store})`)
+  }
 
   // ── GIVEAWAYS CRUD ───────────────────────────────────────────────────────
   const addGiveaway = (giveaway) => setGiveaways((prev) => [{ ...giveaway, id: generateId(), active: true }, ...prev])
@@ -218,6 +293,10 @@ export function DataProvider({ children }) {
       // Admin Settings / Members
       updateAdminSettings,
       addAdminMember, updateAdminMember, deleteAdminMember,
+      // Audit Log
+      auditLog, addAuditLog, clearAuditLog,
+      // Analytics
+      analytics, trackDealClick, trackCouponCopy, trackPageView,
     }}>
       {children}
     </DataContext.Provider>

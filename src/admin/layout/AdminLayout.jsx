@@ -66,9 +66,19 @@ const Icons = {
     </svg>
   ),
   Close: () => (
-    <svg viewBox="0 0 20 20" className="h-4 w-4 fill-current">
-      <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"/>
-    </svg>
+    <svg viewBox="0 0 20 20" className="h-4 w-4 fill-current"><path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"/></svg>
+  ),
+  Analytics: () => (
+    <svg viewBox="0 0 20 20" className="h-4 w-4 fill-current"><path d="M2 11a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-5zm6-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V7zm6-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1V4z"/></svg>
+  ),
+  Alert: () => (
+    <svg viewBox="0 0 20 20" className="h-4 w-4 fill-current"><path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 10 5zm0 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" clipRule="evenodd"/></svg>
+  ),
+  Upload: () => (
+    <svg viewBox="0 0 20 20" className="h-4 w-4 fill-current"><path fillRule="evenodd" d="M13 8a1 1 0 0 1-.993.883L11 9H9v7a1 1 0 0 1-.993.883L8 17a1 1 0 0 1-.993-.883L7 16V9H5a1 1 0 0 1-.117-1.993L5 7h2V4a3 3 0 0 1 5.995-.176L13 4v3h2a1 1 0 0 1 .117 1.993L15 9h-2V8z" clipRule="evenodd"/></svg>
+  ),
+  Shield: () => (
+    <svg viewBox="0 0 20 20" className="h-4 w-4 fill-current"><path fillRule="evenodd" d="M10 1a4.5 4.5 0 0 0-4.5 4.5V9H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5V5.5A4.5 4.5 0 0 0 10 1zm3 8V5.5a3 3 0 1 0-6 0V9h6z" clipRule="evenodd"/></svg>
   ),
 }
 
@@ -83,6 +93,13 @@ const navItems = [
   { label: 'Banners',      to: '/admin/banners',      Icon: Icons.Banner },
   { label: 'Members',      to: '/admin/members',      Icon: Icons.Members },
   { label: 'Settings',     to: '/admin/settings',     Icon: Icons.Settings },
+]
+
+const toolItems = [
+  { label: 'Analytics',     to: '/admin/analytics',     Icon: Icons.Analytics },
+  { label: 'Expiry Alerts', to: '/admin/expiry-alerts', Icon: Icons.Alert },
+  { label: 'Bulk Import',   to: '/admin/bulk-import',   Icon: Icons.Upload },
+  { label: 'Audit Log',     to: '/admin/audit-log',     Icon: Icons.Shield },
 ]
 
 // Accent colour — matches login page green
@@ -133,22 +150,29 @@ export default function AdminLayout({ children, title }) {
         {/* Nav */}
         <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-4">
           {navItems.map(({ label, to, Icon }) => (
-            <NavLink
-              key={to}
-              to={to}
-              onClick={() => setSidebarOpen(false)}
-              className={({ isActive }) =>
-                `flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 ${isActive ? 'active-nav' : 'inactive-nav'}`
-              }
+            <NavLink key={to} to={to} onClick={() => setSidebarOpen(false)}
+              className={({ isActive }) => `flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 ${isActive ? 'active-nav' : 'inactive-nav'}`}
             >
               {({ isActive }) => (
                 <>
-                  <span style={isActive ? { color: G } : { color: 'rgba(255,255,255,0.4)' }}>
-                    <Icon />
-                  </span>
-                  <span style={isActive ? { color: G } : { color: 'rgba(255,255,255,0.55)' }}>
-                    {label}
-                  </span>
+                  <span style={isActive ? { color: G } : { color: 'rgba(255,255,255,0.4)' }}><Icon /></span>
+                  <span style={isActive ? { color: G } : { color: 'rgba(255,255,255,0.55)' }}>{label}</span>
+                </>
+              )}
+            </NavLink>
+          ))}
+
+          {/* Tools divider */}
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', margin: '0.75rem 0.5rem 0.5rem' }} />
+          <p className="px-4 pb-1 text-[9px] font-black uppercase tracking-widest text-white/20">Tools</p>
+          {toolItems.map(({ label, to, Icon }) => (
+            <NavLink key={to} to={to} onClick={() => setSidebarOpen(false)}
+              className={({ isActive }) => `flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 ${isActive ? 'active-nav' : 'inactive-nav'}`}
+            >
+              {({ isActive }) => (
+                <>
+                  <span style={isActive ? { color: G } : { color: 'rgba(255,255,255,0.4)' }}><Icon /></span>
+                  <span style={isActive ? { color: G } : { color: 'rgba(255,255,255,0.55)' }}>{label}</span>
                 </>
               )}
             </NavLink>
