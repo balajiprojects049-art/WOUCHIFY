@@ -17,9 +17,43 @@ export default function ImageUpload({ value, onChange, label = 'Image', height =
   const processFile = (file) => {
     if (!file) return
     if (!file.type.startsWith('image/')) { alert('Please select a valid image file.'); return }
-    if (file.size > 5 * 1024 * 1024) { alert('Image must be under 5 MB.'); return }
+    if (file.size > 20 * 1024 * 1024) { alert('Image must be under 20 MB.'); return }
+    
     const reader = new FileReader()
-    reader.onload = (e) => onChange(e.target.result)
+    reader.onload = (e) => {
+      const img = new Image()
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        const MAX_WIDTH = 1920
+        const MAX_HEIGHT = 1080
+        let width = img.width
+        let height = img.height
+
+        if (width > height) {
+          if (width > MAX_WIDTH) { height = Math.round(height * (MAX_WIDTH / width)); width = MAX_WIDTH }
+        } else {
+          if (height > MAX_HEIGHT) { width = Math.round(width * (MAX_HEIGHT / height)); height = MAX_HEIGHT }
+        }
+
+        canvas.width = width
+        canvas.height = height
+        const ctx = canvas.getContext('2d')
+        ctx.imageSmoothingQuality = 'high'
+        ctx.drawImage(img, 0, 0, width, height)
+        
+        // Export as WebP for 60-80% smaller sizes! (0.92 ensures near-lossless maximum visual clarity)
+        let result = canvas.toDataURL('image/webp', 0.92)
+        if (result === 'data:,') result = canvas.toDataURL('image/jpeg', 0.92) // fallback
+        
+        // If the original file was tiny and somehow smaller than canvas output, use original
+        if (e.target.result.length < result.length && file.size < 300 * 1024) {
+          onChange(e.target.result)
+        } else {
+          onChange(result)
+        }
+      }
+      img.src = e.target.result
+    }
     reader.readAsDataURL(file)
   }
 
@@ -98,7 +132,7 @@ export default function ImageUpload({ value, onChange, label = 'Image', height =
                 <p className="text-sm font-black text-white/70">
                   {dragging ? 'Drop to upload' : 'Click or drag & drop'}
                 </p>
-                <p className="mt-1 text-[11px] text-white/30">PNG, JPG, WebP · Max 5 MB</p>
+                <p className="mt-1 text-[11px] text-white/30">PNG, JPG, WebP · Max 20 MB</p>
               </div>
             </div>
           )}

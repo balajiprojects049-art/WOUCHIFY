@@ -44,7 +44,7 @@ function ConfirmDialog({ onConfirm, onCancel }) {
   )
 }
 
-function CouponForm({ initial, onSave, onCancel }) {
+function CouponForm({ initial, onSave, onCancel, storeOptions }) {
   const [form, setForm] = useState(initial)
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
   const inputProps = { className: inp, style: inpStyle, onFocus: addFocus, onBlur: remFocus }
@@ -59,7 +59,11 @@ function CouponForm({ initial, onSave, onCancel }) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={lbl}>Store Name <span style={{ color: G }}>*</span></label>
-                <input {...inputProps} required value={form.store} onChange={e => set('store', e.target.value)} placeholder="e.g. Amazon India" />
+                <select {...selectProps} required value={form.store} onChange={e => set('store', e.target.value)}>
+                  <option value="" className="bg-[#0C1018]">Select store</option>
+                  {form.store && !storeOptions.includes(form.store) && <option value={form.store} className="bg-[#0C1018]">{form.store}</option>}
+                  {storeOptions.map(s => <option key={s} value={s} className="bg-[#0C1018]">{s}</option>)}
+                </select>
               </div>
               <div>
                 <label className={lbl}>Coupon Code <span style={{ color: G }}>*</span></label>
@@ -150,7 +154,7 @@ function CouponForm({ initial, onSave, onCancel }) {
 }
 
 export default function AdminCoupons() {
-  const { coupons, addCoupon, updateCoupon, deleteCoupon } = useData()
+  const { coupons, stores, addCoupon, updateCoupon, deleteCoupon } = useData()
   const [mode, setMode] = useState(null)
   const [editing, setEditing] = useState(null)
   const [search, setSearch] = useState('')
@@ -167,10 +171,12 @@ export default function AdminCoupons() {
     setMode(null); setEditing(null)
   }
 
+  const storeOptions = Array.from(new Set((stores || []).map(s => s.name).filter(Boolean)))
+
   if (mode) return (
     <AdminLayout title={mode === 'add' ? 'Add Coupon' : 'Edit Coupon'}>
       <div className="mb-5"><button onClick={() => { setMode(null); setEditing(null) }} className={backLinkCls}>← Back to Coupons</button></div>
-      <CouponForm initial={editing || EMPTY} onSave={handleSave} onCancel={() => { setMode(null); setEditing(null) }} />
+      <CouponForm initial={editing || EMPTY} storeOptions={storeOptions} onSave={handleSave} onCancel={() => { setMode(null); setEditing(null) }} />
     </AdminLayout>
   )
 

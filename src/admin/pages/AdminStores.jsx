@@ -2,6 +2,7 @@ import { useState } from 'react'
 import AdminLayout from '../layout/AdminLayout'
 import { useData } from '../../context/DataContext'
 import ImageUpload from '../components/ImageUpload'
+import { resolveStoreLogoUrl } from '../../utils/storeLogo'
 import {
   G, inp, lbl, cardStyle, tableWrapStyle, thStyle, trBorderStyle,
   searchInpCls, searchInpStyle, btnPrimary, btnPrimaryCls, btnCancelCls, btnCancelStyle,
@@ -17,6 +18,29 @@ const CATEGORIES = ['Electronics', 'Fashion', 'Travel', 'Food', 'Beauty', 'Lifes
 
 function addFocus(e) { Object.assign(e.target.style, inpFocus) }
 function remFocus(e) { Object.assign(e.target.style, { borderColor: 'rgba(255,255,255,0.09)', boxShadow: 'none' }) }
+
+function AdminStoreLogo({ store, size = 'h-12 w-12', fallbackTextSize = 'text-sm' }) {
+  const [broken, setBroken] = useState(false)
+  const logoUrl = resolveStoreLogoUrl(store)
+
+  if (logoUrl && !broken) {
+    return (
+      <img
+        src={logoUrl}
+        alt={store?.name || 'Store logo'}
+        className={`${size} rounded-full object-cover`}
+        style={{ border: '1px solid rgba(255,255,255,0.12)' }}
+        onError={() => setBroken(true)}
+      />
+    )
+  }
+
+  return (
+    <div className={`flex ${size} items-center justify-center rounded-full ${fallbackTextSize} font-black`} style={{ background: 'rgba(0,212,126,0.12)', border: '1px solid rgba(0,212,126,0.2)', color: G }}>
+      {store?.logoText || (store?.name || '').slice(0, 2).toUpperCase() || 'ST'}
+    </div>
+  )
+}
 
 function SectionHeader({ title }) {
   return (
@@ -116,12 +140,7 @@ function StoreForm({ initial, onSave, onCancel }) {
             <SectionHeader title="Preview" />
             <div className="rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
               <div className="flex items-center gap-3 mb-3">
-                {form.logo
-                  ? <img src={form.logo} alt="" className="h-12 w-12 rounded-full object-cover" style={{ border: '1px solid rgba(255,255,255,0.12)' }} onError={e => e.target.style.display = 'none'} />
-                  : <div className="flex h-12 w-12 items-center justify-center rounded-full text-sm font-black" style={{ background: 'rgba(0,212,126,0.12)', border: '1px solid rgba(0,212,126,0.2)', color: G }}>
-                    {form.logoText || (form.name || '').slice(0, 2).toUpperCase() || 'ST'}
-                  </div>
-                }
+                <AdminStoreLogo store={form} />
                 <div>
                   <p className="font-black text-white text-sm">{form.name || 'Store Name'}</p>
                   <p className="text-[11px] text-white/40">{form.category}</p>
@@ -193,10 +212,7 @@ export default function AdminStores() {
                 >
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
-                      {s.logo
-                        ? <img src={s.logo} alt={s.name} className="h-9 w-9 rounded-full object-cover shrink-0" style={{ border: '1px solid rgba(255,255,255,0.10)' }} onError={e => e.target.style.display = 'none'} />
-                        : <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-xs font-black" style={{ background: 'rgba(0,212,126,0.12)', color: G }}>{s.logoText || (s.name || '').slice(0, 2).toUpperCase()}</div>
-                      }
+                      <div className="shrink-0"><AdminStoreLogo store={s} size="h-9 w-9" fallbackTextSize="text-xs" /></div>
                       <div>
                         <p className="font-semibold text-white text-sm">{s.name}</p>
                         <p className="text-[11px] text-white/30">{s.highlight?.slice(0, 40)}</p>

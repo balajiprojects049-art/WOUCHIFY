@@ -2,41 +2,16 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useData } from '../context/DataContext'
 
-const fallbackSlides = [
-  {
-    image: 'https://images.unsplash.com/photo-1517336714739-489689fd1ca8?auto=format&fit=crop&w=1200&q=80',
-    label: 'Featured Drop',
-    title: 'Apple Essentials Collection',
-    description: 'Limited-time premium accessories at the best prices.',
-    link: '/deals',
-  },
-  {
-    image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1200&q=80',
-    label: 'Trending Now',
-    title: 'Sport Shoes Mega Deal',
-    description: 'Top-rated performance footwear with instant discounts.',
-    link: '/deals',
-  },
-  {
-    image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=80',
-    label: 'Audio Picks',
-    title: 'Headphones & Audio Gear',
-    description: 'Clear sound, premium comfort, and unbeatable offers.',
-    link: '/deals',
-  },
-]
-
 function HeroSection() {
   const [activeSlide, setActiveSlide] = useState(0)
   const navigate = useNavigate()
   const { banners } = useData()
 
-  // Use admin home banners if available, otherwise use fallbacks
-  const adminBanners = (banners.home || []).filter(b => b.active !== false)
-  const heroSlides = adminBanners.length > 0 ? adminBanners : fallbackSlides
+  // Only show admin-configured banners — no hardcoded fallbacks
+  const heroSlides = (banners.home || []).filter(b => b.active !== false)
 
   useEffect(() => {
-    setActiveSlide(0) // reset when slides change
+    setActiveSlide(0)
   }, [heroSlides.length])
 
   useEffect(() => {
@@ -44,13 +19,46 @@ function HeroSection() {
     const intervalId = setInterval(() => {
       setActiveSlide((previous) => (previous + 1) % heroSlides.length)
     }, 3500)
-
     return () => clearInterval(intervalId)
   }, [heroSlides.length])
 
-  const currentSlide = heroSlides[Math.min(activeSlide, heroSlides.length - 1)]
+  if (!heroSlides.length) {
+    return (
+      <section className="pb-12 pt-4 sm:pb-20 sm:pt-8">
+        <div className="grid items-start gap-7 lg:grid-cols-2 lg:gap-12">
+          <div className="text-left">
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-gold sm:mb-5 sm:text-xs sm:tracking-[0.24em]">Smart Savings</p>
+            <h1 className="text-3xl font-bold leading-[1.08] tracking-tight sm:text-5xl">
+              <span className="text-ink">Discover the best deals,</span>
+              <br className="hidden sm:block" />
+              <span className="text-gold">Coupons &amp; Rewards</span> <span className="text-ink">in One place</span>
+            </h1>
+            <p className="mt-4 max-w-xl text-sm leading-6 text-muted sm:mt-6 sm:leading-7 sm:text-base">
+              <span className="font-semibold text-gold">WOUCHIFY</span>{' '}
+              <span className="text-muted">helps users find the best online deals, loot offers, coupon codes, giveaways, and reward opportunities from top brands.</span>
+            </p>
+          </div>
+          <article className="rounded-2xl border-2 border-dashed border-line bg-gradient-to-br from-cream via-white to-cream p-3 shadow-sm sm:p-5">
+            <div className="flex h-56 flex-col items-center justify-center gap-3 rounded-2xl sm:h-80">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gold/10">
+                <svg className="h-7 w-7 text-gold/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <p className="text-sm font-semibold text-muted">Banner will appear here</p>
+              <p className="text-xs text-muted/60">Add from Admin Panel → Banners → Home</p>
+            </div>
+          </article>
+        </div>
+      </section>
+    )
+  }
 
+  const currentSlide = heroSlides[Math.min(activeSlide, heroSlides.length - 1)]
   if (!currentSlide) return null
+
+  const desktopImage = currentSlide.image || currentSlide.mobileImage || ''
+  const mobileImage = currentSlide.mobileImage || currentSlide.image || ''
 
   return (
     <section className="pb-12 pt-4 sm:pb-20 sm:pt-8">
@@ -72,11 +80,17 @@ function HeroSection() {
 
         <article className="rounded-2xl border border-line bg-white p-3 shadow-sm transition-all duration-300 hover:-translate-y-2 sm:p-5">
           <div className="relative overflow-hidden rounded-2xl">
+            {/* Desktop Image */}
             <img
-              src={currentSlide.image}
+              src={desktopImage}
               alt={currentSlide.title}
-              className="h-56 w-full rounded-2xl object-cover transition-all duration-300 hover:scale-105 sm:h-80"
-              onError={e => e.target.style.display='none'}
+              className="hidden md:block h-56 w-full rounded-2xl object-cover transition-all duration-300 hover:scale-105 sm:h-80"
+            />
+            {/* Mobile Image */}
+            <img
+              src={mobileImage}
+              alt={currentSlide.title}
+              className="md:hidden h-56 w-full rounded-2xl object-cover transition-all duration-300 hover:scale-105 sm:h-80"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
@@ -113,9 +127,7 @@ function HeroSection() {
                   type="button"
                   onClick={() => setActiveSlide(index)}
                   aria-label={`Slide ${index + 1}`}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    activeSlide === index ? 'w-6 bg-gold' : 'w-2 bg-line'
-                  }`}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${activeSlide === index ? 'w-6 bg-gold' : 'w-2 bg-line'}`}
                 />
               ))}
             </div>

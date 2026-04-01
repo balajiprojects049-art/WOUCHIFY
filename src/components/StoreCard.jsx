@@ -1,17 +1,11 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { resolveStoreLogoUrl } from '../utils/storeLogo'
 
 function StoreCard({ store, featured = false }) {
   const [logoBroken, setLogoBroken] = useState(false)
 
-  const logoUrl = useMemo(() => {
-    try {
-      const hostname = new URL(store.website).hostname.replace('www.', '')
-      return `https://logo.clearbit.com/${hostname}`
-    } catch {
-      return ''
-    }
-  }, [store.website])
+  const logoUrl = useMemo(() => resolveStoreLogoUrl(store), [store])
 
   return (
     <Link
@@ -22,7 +16,7 @@ function StoreCard({ store, featured = false }) {
     >
       <div className="mx-auto flex h-20 w-44 items-center justify-center overflow-hidden rounded-lg border border-line bg-cream/60">
         {!logoBroken && logoUrl ? (
-          <img src={logoUrl} alt={`${store.name} logo`} className="h-full w-full object-contain p-3" onError={() => setLogoBroken(true)} />
+          <img loading="lazy" src={logoUrl} alt={`${store.name} logo`} className="h-full w-full object-contain p-3" onError={() => setLogoBroken(true)} />
         ) : (
           <p className="text-2xl font-bold tracking-[0.2em] text-ink">{store.logoText}</p>
         )}

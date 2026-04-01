@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useData } from '../context/DataContext'
+import { getDealRemainingSeconds } from '../utils/dealExpiry'
 
 function formatCountdown(totalSeconds) {
   const safeSeconds = Math.max(totalSeconds, 0)
@@ -11,9 +12,9 @@ function formatCountdown(totalSeconds) {
   return [hours, minutes, seconds].map((time) => String(time).padStart(2, '0')).join(':')
 }
 
-function LatestCard({ item, elapsedSeconds }) {
+function LatestCard({ item, nowMs }) {
   const navigate = useNavigate()
-  const remainingSeconds = item.expiresInSeconds - elapsedSeconds
+  const remainingSeconds = getDealRemainingSeconds(item, nowMs)
 
   return (
     <article className="min-w-[260px] rounded-2xl bg-white p-3 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-md sm:min-w-0 sm:p-4">
@@ -22,7 +23,7 @@ function LatestCard({ item, elapsedSeconds }) {
           src={item.image}
           alt={item.title}
           className="h-40 w-full rounded-xl object-cover transition-all duration-300 hover:scale-105 sm:h-48"
-          onError={e => e.target.style.display='none'}
+          onError={e => e.target.style.display = 'none'}
         />
       </div>
       <div className="mt-4 flex items-center justify-between">
@@ -60,7 +61,7 @@ function LatestCard({ item, elapsedSeconds }) {
 
 function LatestDealsSection() {
   const { deals } = useData()
-  const [elapsedSeconds, setElapsedSeconds] = useState(0)
+  const [nowMs, setNowMs] = useState(Date.now())
 
   const latestDeals = [...deals]
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
@@ -68,7 +69,7 @@ function LatestDealsSection() {
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setElapsedSeconds((previous) => previous + 1)
+      setNowMs(Date.now())
     }, 1000)
 
     return () => clearInterval(intervalId)
@@ -89,7 +90,7 @@ function LatestDealsSection() {
       </div>
       <div className="flex gap-4 overflow-x-auto pb-2 sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:pb-0 lg:grid-cols-4">
         {latestDeals.map((item) => (
-          <LatestCard key={item.slug} item={item} elapsedSeconds={elapsedSeconds} />
+          <LatestCard key={item.slug} item={item} nowMs={nowMs} />
         ))}
       </div>
     </section>

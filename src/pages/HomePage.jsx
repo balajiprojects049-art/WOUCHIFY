@@ -4,7 +4,6 @@ import FeaturedDealSection from '../components/FeaturedDealSection'
 import TopStoresSection from '../components/TopStoresSection'
 import DealsFilterBar from '../components/DealsFilterBar'
 import CategoryTabs from '../components/CategoryTabs'
-import TrendingDealsSection from '../components/TrendingDealsSection'
 import JustInPromoSection from '../components/JustInPromoSection'
 import GiveawaySection from '../components/GiveawaySection'
 import TelegramBanner from '../components/TelegramBanner'
@@ -22,7 +21,6 @@ function HomePage() {
         <TopStoresSection />
         <DealsFilterBar />
         <CategoryTabs />
-        <TrendingDealsSection />
         <LatestDealsSection />
       </main>
 

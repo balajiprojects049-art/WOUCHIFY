@@ -1,15 +1,7 @@
 import { Link } from 'react-router-dom'
 import ScrollingPageBanner from '../components/ScrollingPageBanner'
+import { useData } from '../context/DataContext'
 
-const banners = [
-  {
-    image: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1200&q=80',
-    label: 'Terms & Conditions',
-    title: 'Rules That Protect You',
-    description: 'Clear, fair terms designed to ensure the best experience for every Wouchify user.',
-    link: '/terms',
-  },
-]
 
 const sections = [
   {
@@ -47,10 +39,13 @@ const sections = [
 ]
 
 function TermsOfUse() {
+  const { banners } = useData()
+  const activeBanners = (banners.termsOfUse || []).filter((banner) => banner.active !== false)
+
   return (
     <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
       <section className="mb-14">
-        <ScrollingPageBanner banners={banners} />
+        <ScrollingPageBanner banners={activeBanners} />
       </section>
 
       <div className="mx-auto max-w-3xl">

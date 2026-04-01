@@ -12,9 +12,11 @@ const PAGE_SECTIONS = [
   { key: 'coupons',     label: 'Coupons',      description: 'Banners at the top of /coupons page' },
   { key: 'creditCards', label: 'Credit Cards', description: 'Banners at the top of /credit-cards page' },
   { key: 'giveaways',   label: 'Giveaways',    description: 'Banners at the top of /giveaways page' },
+  { key: 'privacyPolicy', label: 'Privacy Policy', description: 'Banners at the top of /privacy-policy page' },
+  { key: 'termsOfUse',    label: 'Terms of Use',   description: 'Banners at the top of /terms page' },
 ]
 
-const EMPTY_BANNER = { image: '', label: '', title: '', description: '', link: '', active: true }
+const EMPTY_BANNER = { image: '', mobileImage: '', label: '', title: '', description: '', link: '', active: true }
 
 function addFocus(e) { Object.assign(e.target.style, inpFocus) }
 function remFocus(e) { Object.assign(e.target.style, { borderColor: 'rgba(255,255,255,0.09)', boxShadow: 'none' }) }
@@ -25,8 +27,18 @@ function BannerForm({ initial, onSave, onCancel }) {
   const inputProps = { className: inp, style: inpStyle, onFocus: addFocus, onBlur: remFocus }
 
   return (
-    <form onSubmit={e => { e.preventDefault(); onSave(form) }} className="space-y-5">
-      <ImageUpload label="Banner Image *" value={form.image} onChange={v => set('image', v)} height="h-52" />
+    <form onSubmit={e => { e.preventDefault(); onSave(form) }} className="space-y-6">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <div className="space-y-2">
+          <label className={lbl}>Desktop Image (Website) <span className="text-[10px] text-white/40 block mt-0.5">Recommended: 1200x400px</span></label>
+          <ImageUpload value={form.image} onChange={v => set('image', v)} height="h-32" />
+        </div>
+        <div className="space-y-2">
+          <label className={lbl}>Mobile Image <span className="text-[10px] text-white/40 block mt-0.5">Recommended: 600x400px (or 1:1)</span></label>
+          <ImageUpload value={form.mobileImage} onChange={v => set('mobileImage', v)} height="h-32" />
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div>
           <label className={lbl}>Badge / Label</label>
@@ -70,6 +82,11 @@ export default function AdminBanners() {
   const currentSection = PAGE_SECTIONS.find(p => p.key === activeSection)
 
   const handleSave = (data) => {
+    if (!data.image && !data.mobileImage) {
+      alert('Please add at least one banner image (desktop or mobile).')
+      return
+    }
+
     if (mode === 'add') addBanner(activeSection, data)
     else updateBanner(activeSection, editing.id, data)
     setMode(null); setEditing(null)
@@ -148,14 +165,23 @@ export default function AdminBanners() {
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {sectionBanners.map((banner) => (
             <div key={banner.id} className="relative overflow-hidden rounded-2xl" style={{ border: banner.active ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(239,68,68,0.2)', background: 'rgba(255,255,255,0.02)' }}>
-              <div className="relative h-40 overflow-hidden">
-                {banner.image ? (
-                  <img src={banner.image} alt={banner.title} className="h-full w-full object-cover" onError={e => e.target.style.display = 'none'} />
-                ) : (
-                  <div className="flex h-full items-center justify-center text-white/20" style={{ background: 'rgba(255,255,255,0.03)' }}>
-                    <svg viewBox="0 0 20 20" className="h-8 w-8 fill-current"><path d="M2 3.25A2.25 2.25 0 0 1 4.25 1h11.5A2.25 2.25 0 0 1 18 3.25v9.5A2.25 2.25 0 0 1 15.75 15h-3.878l1.575 2.495a.75.75 0 0 1-1.274.805L10 15.5l-2.173 2.8a.75.75 0 0 1-1.274-.805L8.128 15H4.25A2.25 2.25 0 0 1 2 12.75v-9.5Z"/></svg>
-                  </div>
-                )}
+              <div className="relative h-40 overflow-hidden flex gap-0.5">
+                <div className="relative flex-1 h-full overflow-hidden bg-white/5">
+                  {banner.image ? (
+                    <img src={banner.image} alt="Desktop" className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-white/10 text-[10px] font-bold">DESKTOP</div>
+                  )}
+                  <div className="absolute top-1 left-1 rounded bg-black/50 px-1 py-0.5 text-[8px] font-black text-white/70">W</div>
+                </div>
+                <div className="relative w-24 h-full overflow-hidden bg-white/5 border-l border-white/5">
+                  {banner.mobileImage ? (
+                    <img src={banner.mobileImage} alt="Mobile" className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-white/10 text-[10px] font-bold">MOB</div>
+                  )}
+                  <div className="absolute top-1 left-1 rounded bg-black/50 px-1 py-0.5 text-[8px] font-black text-white/70">M</div>
+                </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                 <button onClick={() => updateBanner(activeSection, banner.id, { active: !banner.active })}
                   className="absolute right-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-black backdrop-blur-sm"

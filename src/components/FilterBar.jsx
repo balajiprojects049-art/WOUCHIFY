@@ -16,6 +16,8 @@ function FilterBar({
   discountOptions = defaultDiscountFilters,
   priceRange,
   onPriceRangeChange,
+  priceRangeMin = 50,
+  priceRangeMax = 2000,
   sortBy,
   onSortByChange,
   sortOptions = defaultSortOptions,
@@ -62,12 +64,12 @@ function FilterBar({
           <div className="min-w-[200px] flex-1 rounded-xl border border-line bg-white px-3 py-2">
             <div className="flex items-center justify-between text-xs font-semibold text-muted">
               <span>Price Range</span>
-              <span>Up to ${priceRange}</span>
+              <span>Up to ₹{priceRange}</span>
             </div>
             <input
               type="range"
-              min="50"
-              max="2000"
+              min={priceRangeMin}
+              max={priceRangeMax}
               step="10"
               value={priceRange}
               onChange={(event) => onPriceRangeChange(Number(event.target.value))}

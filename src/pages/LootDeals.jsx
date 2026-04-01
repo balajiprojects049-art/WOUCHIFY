@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import FilterBar from '../components/FilterBar'
 import LootDealCard from '../components/LootDealCard'
-import PageBanner from '../components/PageBanner'
+import ScrollingPageBanner from '../components/ScrollingPageBanner'
 import { useData } from '../context/DataContext'
 
 function parseDiscount(value) {
@@ -15,9 +15,8 @@ function LootDeals() {
   const [minDiscount, setMinDiscount] = useState('50%+')
   const [sortBy, setSortBy] = useState('Most Popular')
 
-  // Use admin-configured banner or fallback
+  // Use admin-configured banners or fallbacks
   const lootBanners = (banners.lootDeals || []).filter(b => b.active !== false)
-  const bannerImage = lootBanners[0]?.image || 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1200&q=80'
 
   const filteredDeals = useMemo(() => {
     const minDiscountValue = parseDiscount(minDiscount)
@@ -45,11 +44,7 @@ function LootDeals() {
   return (
     <main>
       <section className="mx-auto mt-6 max-w-7xl px-6">
-        <PageBanner
-          image={bannerImage}
-          alt="Loot deals banner"
-          href="https://www.flipkart.com/offers-store"
-        />
+        <ScrollingPageBanner banners={lootBanners} />
       </section>
 
       <section className="mx-auto max-w-7xl px-6 py-12">

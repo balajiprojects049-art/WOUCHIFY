@@ -2,7 +2,6 @@ import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import pkg from 'pg'
-import path from 'path'
 
 dotenv.config()
 const { Pool } = pkg
@@ -11,113 +10,170 @@ const app = express()
 app.use(cors())
 app.use(express.json({ limit: '50mb' }))
 
-// If no DATABASE_URL, server will run but return empty/unconnected state
+const COLLECTIONS = {
+  deals:         { table: 'wouchify_deals',          mode: 'list' },
+  lootDeals:     { table: 'wouchify_loot_deals',     mode: 'list' },
+  stores:        { table: 'wouchify_stores',          mode: 'list' },
+  coupons:       { table: 'wouchify_coupons',         mode: 'list' },
+  giveaways:     { table: 'wouchify_giveaways',       mode: 'list' },
+  adminMembers:  { table: 'wouchify_admin_members',   mode: 'list' },
+  auditLog:      { table: 'wouchify_audit_log',       mode: 'list' },
+  adminSettings: { table: 'wouchify_admin_settings',  mode: 'single' },
+  creditCards:   { table: 'wouchify_credit_cards',    mode: 'single' },
+  banners:       { table: 'wouchify_banners',         mode: 'single' },
+  analytics:     { table: 'wouchify_analytics',       mode: 'single' },
+}
+
 const pool = process.env.DATABASE_URL ? new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
+  ssl: { rejectUnauthorized: false },
 }) : null
 
-// Create generic table for Wouchify entities
-async function initDB() {
+async function ensureTables() {
   if (!pool) return
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS wouchify_items (
-      collection VARCHAR(50) NOT NULL,
-      id VARCHAR(255) NOT NULL,
-      data JSONB NOT NULL,
-      PRIMARY KEY (collection, id)
-    );
-  `)
-  console.log('✅ Neon Database connected and tables ensured.')
+  const ddl = Object.values(COLLECTIONS)
+    .map(({ table }) => `
+      CREATE TABLE IF NOT EXISTS ${table} (
+        id VARCHAR(255) PRIMARY KEY,
+        data JSONB NOT NULL,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `)
+    .join('\n')
+  await pool.query(ddl)
 }
-if (pool) initDB().catch(console.error)
 
-// ── GET all data ──
+function getItemId(cfg, data) {
+  if (cfg.mode === 'single') return 'single'
+  return data?.slug || data?.id || Math.random().toString(36).slice(2)
+}
+
+async function upsertItem(db, cfg, data, forcedId = null) {
+  const id = forcedId !== null ? forcedId : getItemId(cfg, data)
+  await db.query(
+    `INSERT INTO ${cfg.table} (id, data) VALUES ($1, $2)
+     ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_at = NOW()`,
+    [id, data]
+  )
+  return id
+}
+
+// init
+if (pool) {
+  ensureTables()
+    .then(() => console.log('✅ Neon DB connected and tables ensured.'))
+    .catch(console.error)
+}
+
+// ── GET /api/data ─────────────────────────────────────────────────────────────
 app.get('/api/data', async (req, res) => {
-  if (!pool) return res.json({ isConnected: false })
-  
+  if (!pool) return res.json({ isConnected: false, hasData: false, data: {} })
+
   try {
-    const { rows } = await pool.query('SELECT collection, data FROM wouchify_items')
-    const grouped = {}
-    
-    // Group back into arrays/objects based on collection type
-    rows.forEach(r => {
-      if (!grouped[r.collection]) grouped[r.collection] = []
-      grouped[r.collection].push(r.data)
-    })
+    const data = {}
+    let rowCount = 0
 
-    // Special handling for single objects instead of arrays
-    if (grouped['adminSettings']?.length) grouped['adminSettings'] = grouped['adminSettings'][0]
-    if (grouped['banners']?.length) grouped['banners'] = grouped['banners'][0]
-    if (grouped['creditCards']?.length) grouped['creditCards'] = grouped['creditCards'][0]
+    for (const [collection, cfg] of Object.entries(COLLECTIONS)) {
+      if (cfg.mode === 'single') {
+        const { rows } = await pool.query(`SELECT data FROM ${cfg.table} ORDER BY updated_at DESC LIMIT 1`)
+        if (rows[0]) { data[collection] = rows[0].data; rowCount++ }
+      } else {
+        const { rows } = await pool.query(`SELECT data FROM ${cfg.table} ORDER BY updated_at DESC`)
+        data[collection] = rows.map((r) => r.data)
+        rowCount += rows.length
+      }
+    }
 
-    const hasData = rows.length > 0
-    res.json({ isConnected: true, hasData, data: grouped })
+    res.json({ isConnected: true, hasData: rowCount > 0, data })
   } catch (err) {
-    console.error('DB fetch error:', err)
+    console.error('GET /api/data error:', err)
     res.status(500).json({ isConnected: false, error: err.message })
   }
 })
 
-// ── FULL SYNC (from browser localStorage to Neon DB) ──
+// ── POST /api/sync ─────────────────────────────────────────────────────────
 app.post('/api/sync', async (req, res) => {
-  if (!pool) return res.status(400).json({ error: 'No DATABASE_URL configured' })
-  
+  if (!pool) return res.status(400).json({ error: 'No DATABASE_URL' })
+
   const state = req.body
   const client = await pool.connect()
   try {
     await client.query('BEGIN')
-    await client.query('TRUNCATE TABLE wouchify_items') // Clear and replace
+    const tables = Object.values(COLLECTIONS).map((cfg) => cfg.table).join(', ')
+    await client.query(`TRUNCATE TABLE ${tables}`)
 
-    const insertQ = 'INSERT INTO wouchify_items (collection, id, data) VALUES ($1, $2, $3)'
-    
-    for (const [collection, items] of Object.entries(state)) {
-      if (Array.isArray(items)) {
-        for (const item of items) {
-          const id = item.slug || item.id || Math.random().toString(36).slice(2)
-          await client.query(insertQ, [collection, id, item])
+    for (const [collection, payload] of Object.entries(state)) {
+      const cfg = COLLECTIONS[collection]
+      if (!cfg) continue
+      if (cfg.mode === 'single') {
+        if (payload && typeof payload === 'object' && !Array.isArray(payload)) {
+          await upsertItem(client, cfg, payload, 'single')
         }
-      } else if (items && typeof items === 'object') {
-        // Objects like banners, creditCards, adminSettings
-        await client.query(insertQ, [collection, 'single', items])
+      } else if (Array.isArray(payload)) {
+        for (const item of payload) {
+          await upsertItem(client, cfg, item)
+        }
       }
     }
-    
+
     await client.query('COMMIT')
-    res.json({ success: true, message: 'Successfully synced all data to Neon Database!' })
+    res.json({ success: true })
   } catch (err) {
     await client.query('ROLLBACK')
-    console.error('Migration error:', err)
+    console.error('POST /api/sync error:', err)
     res.status(500).json({ error: err.message })
   } finally {
     client.release()
   }
 })
 
-// ── INDIVIDUAL CRUD OPERATIONS (to keep DB in sync on edits) ──
-// We'll fire off background fetches when admin edits a deal
-app.post('/api/:collection', async (req, res) => {
+// ── POST /api/collection/:collection — upsert item ────────────────────────
+app.post('/api/collection/:collection', async (req, res) => {
   if (!pool) return res.json({ skip: true })
+
   const { collection } = req.params
-  const data = req.body
-  const id = data.slug || data.id || 'single'
-  
+  const cfg = COLLECTIONS[collection]
+  if (!cfg) return res.status(400).json({ error: `Unknown collection: ${collection}` })
+
   try {
-    await pool.query(
-      'INSERT INTO wouchify_items (collection, id, data) VALUES ($1, $2, $3) ON CONFLICT (collection, id) DO UPDATE SET data = EXCLUDED.data',
-      [collection, id, data]
-    )
-    res.json({ success: true })
-  } catch (err) { res.status(500).json({ error: err.message }) }
+    const id = await upsertItem(pool, cfg, req.body)
+    res.json({ success: true, id })
+  } catch (err) {
+    console.error(`POST /api/collection/${collection} error:`, err)
+    res.status(500).json({ error: err.message })
+  }
 })
 
-app.delete('/api/:collection/:id', async (req, res) => {
+// ── DELETE /api/collection/:collection/:id — delete item ──────────────────
+app.delete('/api/collection/:collection/:id', async (req, res) => {
   if (!pool) return res.json({ skip: true })
+
   const { collection, id } = req.params
+  const cfg = COLLECTIONS[collection]
+  if (!cfg) return res.status(400).json({ error: `Unknown collection: ${collection}` })
+
   try {
-    await pool.query('DELETE FROM wouchify_items WHERE collection = $1 AND id = $2', [collection, id])
+    await pool.query(`DELETE FROM ${cfg.table} WHERE id = $1`, [id])
     res.json({ success: true })
-  } catch (err) { res.status(500).json({ error: err.message }) }
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+})
+
+// ── DELETE /api/collection/:collection — clear collection ─────────────────
+app.delete('/api/collection/:collection', async (req, res) => {
+  if (!pool) return res.json({ skip: true })
+
+  const { collection } = req.params
+  const cfg = COLLECTIONS[collection]
+  if (!cfg) return res.status(400).json({ error: `Unknown collection: ${collection}` })
+
+  try {
+    await pool.query(`DELETE FROM ${cfg.table}`)
+    res.json({ success: true })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
 })
 
 const PORT = 5000

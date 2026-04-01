@@ -2,9 +2,10 @@ import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import DealGrid from '../components/DealGrid'
 import FilterBar from '../components/FilterBar'
-import PageBanner from '../components/PageBanner'
+import ScrollingPageBanner from '../components/ScrollingPageBanner'
 import TopDealsSection from '../components/TopDealsSection'
 import { useData } from '../context/DataContext'
+import { getDealRemainingSeconds } from '../utils/dealExpiry'
 
 function parseDiscount(value) {
   return Number.parseInt((value || '').replace('%+', ''), 10)
@@ -21,14 +22,27 @@ function parseUsageCount(value) {
 function Deals() {
   const { deals: allDeals, banners } = useData()
   const [searchParams] = useSearchParams()
-  const [elapsedSeconds, setElapsedSeconds] = useState(0)
+  const [nowMs, setNowMs] = useState(Date.now())
 
   const [searchText, setSearchText] = useState('')
   const [category, setCategory] = useState('All')
-  const [minDiscount, setMinDiscount] = useState('10%+')
-  const [priceRange, setPriceRange] = useState(2000)
+  const [minDiscount, setMinDiscount] = useState('0%+')
+  const maxDealPrice = useMemo(() => {
+    const highest = allDeals.reduce((max, deal) => {
+      const value = Number(deal?.priceValue)
+      return Number.isFinite(value) ? Math.max(max, value) : max
+    }, 0)
+
+    // Keep a practical floor so slider remains usable even with small datasets.
+    return Math.max(2000, Math.ceil(highest / 1000) * 1000)
+  }, [allDeals])
+  const [priceRange, setPriceRange] = useState(maxDealPrice)
   const [sortBy, setSortBy] = useState('Trending')
   const [onlyActive, setOnlyActive] = useState(true)
+
+  useEffect(() => {
+    setPriceRange(maxDealPrice)
+  }, [maxDealPrice])
 
   useEffect(() => {
     const query = searchParams.get('q') || ''
@@ -37,21 +51,20 @@ function Deals() {
 
   useEffect(() => {
     const timerId = setInterval(() => {
-      setElapsedSeconds((previous) => previous + 1)
+      setNowMs(Date.now())
     }, 1000)
 
     return () => clearInterval(timerId)
   }, [])
 
-  // Use admin-configured banner or fallback
+  // Use admin-configured banners or fallbacks
   const dealsBanners = (banners.deals || []).filter(b => b.active !== false)
-  const bannerImage = dealsBanners[0]?.image || 'https://images.unsplash.com/photo-1517336714739-489689fd1ca8?auto=format&fit=crop&w=1200&q=80'
 
   const filteredDeals = useMemo(() => {
     const minDiscountValue = parseDiscount(minDiscount)
 
     const filtered = allDeals.filter((deal) => {
-      const remainingSeconds = deal.expiresInSeconds - elapsedSeconds
+      const remainingSeconds = getDealRemainingSeconds(deal, nowMs)
       const query = searchText.trim().toLowerCase()
       const matchesSearch = !query || deal.title.toLowerCase().includes(query) || deal.store.toLowerCase().includes(query)
       const matchesCategory = category === 'All' || deal.category === category
@@ -63,8 +76,8 @@ function Deals() {
     })
 
     return filtered.sort((first, second) => {
-      const firstRemaining = first.expiresInSeconds - elapsedSeconds
-      const secondRemaining = second.expiresInSeconds - elapsedSeconds
+      const firstRemaining = getDealRemainingSeconds(first, nowMs)
+      const secondRemaining = getDealRemainingSeconds(second, nowMs)
 
       if (sortBy === 'Latest') {
         return new Date(second.createdAt).getTime() - new Date(first.createdAt).getTime()
@@ -80,15 +93,13 @@ function Deals() {
       }
       return parseUsageCount(second.usageCount) - parseUsageCount(first.usageCount)
     })
-  }, [category, elapsedSeconds, minDiscount, onlyActive, priceRange, searchText, sortBy, allDeals])
+  }, [category, nowMs, minDiscount, onlyActive, priceRange, searchText, sortBy, allDeals])
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-16">
-      <PageBanner
-        image={bannerImage}
-        alt="Deals banner"
-        href="https://www.amazon.in/gp/goldbox"
-      />
+      <div className="mb-10">
+        <ScrollingPageBanner banners={dealsBanners} />
+      </div>
 
       <FilterBar
         searchText={searchText}
@@ -97,15 +108,18 @@ function Deals() {
         onCategoryChange={setCategory}
         minDiscount={minDiscount}
         onMinDiscountChange={setMinDiscount}
+        discountOptions={['0%+', '10%+', '25%+', '50%+', '70%+']}
         priceRange={priceRange}
         onPriceRangeChange={setPriceRange}
+        priceRangeMin={0}
+        priceRangeMax={maxDealPrice}
         sortBy={sortBy}
         onSortByChange={setSortBy}
         onlyActive={onlyActive}
         onOnlyActiveChange={setOnlyActive}
       />
 
-      <DealGrid deals={filteredDeals} elapsedSeconds={elapsedSeconds} />
+      <DealGrid deals={filteredDeals} nowMs={nowMs} />
       <TopDealsSection />
     </main>
   )

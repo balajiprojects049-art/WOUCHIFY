@@ -3,16 +3,21 @@ import { Link, useParams } from 'react-router-dom'
 import CouponCard from '../components/CouponCard'
 import StoreFilterBar from '../components/StoreFilterBar'
 import { useData } from '../context/DataContext'
+import { resolveStoreLogoUrl } from '../utils/storeLogo'
+
 
 function StoreDetail() {
   const { storeName } = useParams()
   const { stores } = useData()
-  const store = stores.find(s => s.slug === (storeName || '').toLowerCase())
+  const store = (stores || []).find(s => s.slug === (storeName || '').toLowerCase())
 
   const [searchText, setSearchText] = useState('')
   const [offerType, setOfferType] = useState('All')
   const [minDiscount, setMinDiscount] = useState('10%+')
   const [sortBy, setSortBy] = useState('Latest')
+  const [logoBroken, setLogoBroken] = useState(false)
+
+  const storeLogoUrl = useMemo(() => resolveStoreLogoUrl(store), [store])
 
   const filteredOffers = useMemo(() => {
     if (!store) return []
@@ -56,8 +61,8 @@ function StoreDetail() {
       <section className="rounded-2xl bg-white p-6 shadow-md">
         <div className="flex flex-wrap items-center justify-between gap-5">
           <div className="flex items-start gap-4">
-            {store.logo ? (
-              <img src={store.logo} alt={store.name} className="h-14 w-14 rounded-full object-cover" onError={e => e.target.style.display='none'} />
+            {storeLogoUrl && !logoBroken ? (
+              <img src={storeLogoUrl} alt={store.name} className="h-14 w-14 rounded-full object-cover" onError={() => setLogoBroken(true)} />
             ) : (
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gold/15 text-sm font-bold text-gold">
                 {store.logoText || (store.name || '').slice(0, 2).toUpperCase()}
@@ -94,13 +99,13 @@ function StoreDetail() {
         onSortByChange={setSortBy}
       />
 
-      <section className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
+      <section className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {filteredOffers.map((offer) => (
           <CouponCard key={offer.id} store={store} offer={offer} />
         ))}
 
         {filteredOffers.length === 0 && (
-          <article className="rounded-2xl border border-line bg-white p-8 text-center text-sm font-medium text-muted md:col-span-2">
+          <article className="rounded-2xl border border-line bg-white p-8 text-center text-sm font-medium text-muted sm:col-span-2 lg:col-span-4">
             {(store.offers || []).length === 0
               ? 'No offers have been added to this store yet.'
               : 'No offers found. Try changing the filters.'}

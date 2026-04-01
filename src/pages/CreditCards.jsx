@@ -78,32 +78,12 @@ function CreditCards() {
   const activeShoppingCards = (creditCards.shopping || []).filter(c => c.active !== false)
   const activeLifetimeCards = (creditCards.lifetime || []).filter(c => c.active !== false)
 
-  // Use admin-configured banners or fallback
   const activeBanners = (banners.creditCards || []).filter(b => b.active !== false)
-  const fallbackBanners = [
-    {
-      image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1200&q=80',
-      label: 'Axis Flipkart Card',
-      title: 'Flat ₹1,400 Welcome Rewards',
-      description: 'Plus 5% Unlimited Cashback on Flipkart & Myntra forever.',
-      link: '/credit-cards',
-    },
-    {
-      image: 'https://images.unsplash.com/photo-1517336714739-489689fd1ca8?auto=format&fit=crop&w=1200&q=80',
-      label: 'SBI Cashback Card',
-      title: '5% Ready Cashback',
-      description: 'Direct cashback on all your online spends with no daily caps.',
-      link: '/credit-cards',
-    },
-  ]
-
-  const displayBanners = activeBanners.length > 0 ? activeBanners : fallbackBanners
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-      {/* Banner Scrolling Section */}
       <section className="mb-14">
-        <ScrollingPageBanner banners={displayBanners} />
+        <ScrollingPageBanner banners={activeBanners} />
       </section>
 
       {/* Shopping Cards */}

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import AdminLayout from '../layout/AdminLayout'
 import { useData } from '../../context/DataContext'
 import { G, cardStyle, tableWrapStyle, thStyle, trBorderStyle, editBtnCls, editBtnStyle, delBtnCls } from '../components/adminStyles'
+import { getDealRemainingSeconds } from '../../utils/dealExpiry'
 
 // ── Expiry parsing ────────────────────────────────────────────────────────────
 const EXPIRED_PHRASES  = ['expired', 'ended', 'unavailable']
@@ -20,7 +21,7 @@ function classify(text = '') {
 function classifySeconds(seconds) {
   const n = Number(seconds)
   if (isNaN(n) || n <= 0) return 'expired'
-  if (n <= 3600)  return 'expired'
+  if (n <= 3600)  return 'today'
   if (n <= 7200)  return 'today'
   if (n <= 86400) return 'soon'
   return null
@@ -41,8 +42,13 @@ export default function AdminExpiryAlerts() {
     const items = []
 
     deals.forEach(d => {
-      const level = classify(d.expiry)
-      if (level) items.push({ id: d.slug, type: 'Deal', title: d.title, expiryText: d.expiry, level, store: d.store, editPath: `/admin/deals` })
+      const remainingSeconds = getDealRemainingSeconds(d)
+      const level = classifySeconds(remainingSeconds) || classify(d.expiry)
+      if (level) {
+        const hrs = Math.max(0, Math.round(remainingSeconds / 3600))
+        const expiryText = d.expiry || (remainingSeconds <= 0 ? 'Expired' : `${hrs}h remaining`)
+        items.push({ id: d.slug, type: 'Deal', title: d.title, expiryText, level, store: d.store, editPath: `/admin/deals` })
+      }
     })
 
     lootDeals.forEach(d => {

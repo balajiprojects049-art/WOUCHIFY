@@ -8,6 +8,7 @@ import {
   backLinkCls, editBtnCls, editBtnStyle, delBtnCls, delBtnStyle, badgePillStyle,
   confirmDialogStyle, inpStyle, inpFocus
 } from '../components/adminStyles'
+import { formatExpiryFromSeconds } from '../../utils/dealExpiry'
 
 const EMPTY_DEAL = {
   slug: '', title: '', store: '', category: 'Electronics', discountLabel: '', discountValue: 0,
@@ -35,7 +36,7 @@ function ConfirmDialog({ onConfirm, onCancel, message = 'This will immediately r
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)' }}>
       <div className="w-full max-w-sm p-8 text-center shadow-2xl" style={confirmDialogStyle}>
         <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl" style={{ background: 'rgba(239,68,68,0.12)' }}>
-          <svg viewBox="0 0 20 20" className="h-7 w-7 fill-red-400"><path d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z"/></svg>
+          <svg viewBox="0 0 20 20" className="h-7 w-7 fill-red-400"><path d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z" /></svg>
         </div>
         <h3 className="text-lg font-black text-white">Delete this deal?</h3>
         <p className="mt-2 text-sm text-white/40">{message}</p>
@@ -54,13 +55,15 @@ function DealForm({ initial, onSave, onCancel }) {
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    const expiresHours = Math.max(1, Number(form._expiresHours) || 1)
     const slug = form.slug || form.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
     onSave({
       ...form, slug,
       discountValue: Number(form.discountValue),
       priceValue: Number(form.priceValue),
-      expiresInSeconds: Number(form._expiresHours) * 3600,
+      expiresInSeconds: expiresHours * 3600,
       successRate: Number(form.successRate),
+      expiry: form.expiry?.trim() || formatExpiryFromSeconds(expiresHours * 3600),
       steps: typeof form.steps === 'string' ? form.steps.split('\n').filter(Boolean) : form.steps,
       highlights: typeof form.highlights === 'string' ? form.highlights.split('\n').filter(Boolean) : form.highlights,
       createdAt: form.createdAt || new Date().toISOString(),

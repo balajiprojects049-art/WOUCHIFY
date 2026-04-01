@@ -1,15 +1,7 @@
 import { Link } from 'react-router-dom'
 import ScrollingPageBanner from '../components/ScrollingPageBanner'
+import { useData } from '../context/DataContext'
 
-const banners = [
-  {
-    image: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1200&q=80',
-    label: 'Privacy First',
-    title: 'Your Data Is Safe With Us',
-    description: 'We are committed to full transparency about how we collect and use your information.',
-    link: '/privacy-policy',
-  },
-]
 
 const sections = [
   {
@@ -47,10 +39,13 @@ const sections = [
 ]
 
 function PrivacyPolicy() {
+  const { banners } = useData()
+  const activeBanners = (banners.privacyPolicy || []).filter((banner) => banner.active !== false)
+
   return (
     <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
       <section className="mb-14">
-        <ScrollingPageBanner banners={banners} />
+        <ScrollingPageBanner banners={activeBanners} />
       </section>
 
       <div className="mx-auto max-w-3xl">

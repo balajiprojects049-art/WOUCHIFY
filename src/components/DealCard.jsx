@@ -15,7 +15,7 @@ function DealCard({ deal, remainingSeconds }) {
   return (
     <article className="rounded-2xl bg-white p-4 shadow-[0_10px_30px_rgba(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.15)]">
       <div className="relative mb-4 overflow-hidden rounded-xl">
-        <img src={deal.image} alt={deal.title} className="h-44 w-full rounded-xl object-cover transition-all duration-300 hover:scale-105" />
+        <img loading="lazy" src={deal.image} alt={deal.title} className="h-44 w-full rounded-xl object-cover transition-all duration-300 hover:scale-105" />
         <span className="absolute right-3 top-3 rounded-full bg-gold px-3 py-1 text-xs font-semibold text-white">
           {deal.discountLabel}
         </span>

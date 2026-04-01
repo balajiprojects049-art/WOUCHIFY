@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import DealGrid from '../components/DealGrid'
 import { useData } from '../context/DataContext'
+import { getDealRemainingSeconds } from '../utils/dealExpiry'
 
 function formatCountdown(totalSeconds) {
   const safeSeconds = Math.max(totalSeconds, 0)
@@ -16,7 +17,7 @@ function DealDetail() {
   const { dealSlug } = useParams()
   const { deals, getStoreBySlug } = useData()
   const deal = deals.find(d => d.slug === (dealSlug || '').toLowerCase())
-  const [elapsedSeconds, setElapsedSeconds] = useState(0)
+  const [nowMs, setNowMs] = useState(Date.now())
   const [saved, setSaved] = useState(false)
 
   if (!deal) {
@@ -32,13 +33,13 @@ function DealDetail() {
 
   useEffect(() => {
     const timerId = setInterval(() => {
-      setElapsedSeconds((previous) => previous + 1)
+      setNowMs(Date.now())
     }, 1000)
 
     return () => clearInterval(timerId)
   }, [])
 
-  const remainingSeconds = deal.expiresInSeconds - elapsedSeconds
+  const remainingSeconds = getDealRemainingSeconds(deal, nowMs)
 
   // Build store path
   const storeSlug = deal.store ? deal.store.toLowerCase().replace(/[^a-z0-9]+/g, '-') : ''
@@ -153,7 +154,7 @@ function DealDetail() {
 
       <section className="mt-12">
         <h2 className="text-2xl font-bold tracking-tight text-ink">Related Deals</h2>
-        <DealGrid deals={relatedDeals} elapsedSeconds={elapsedSeconds} />
+        <DealGrid deals={relatedDeals} nowMs={nowMs} />
       </section>
     </main>
   )

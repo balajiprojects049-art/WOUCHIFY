@@ -1,10 +1,11 @@
 import DealCard from './DealCard'
+import { getDealRemainingSeconds } from '../utils/dealExpiry'
 
-function DealGrid({ deals, elapsedSeconds }) {
+function DealGrid({ deals, nowMs }) {
   return (
     <section className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
       {deals.map((deal) => (
-        <DealCard key={deal.slug} deal={deal} remainingSeconds={deal.expiresInSeconds - elapsedSeconds} />
+        <DealCard key={deal.slug} deal={deal} remainingSeconds={getDealRemainingSeconds(deal, nowMs)} />
       ))}
 
       {deals.length === 0 && (

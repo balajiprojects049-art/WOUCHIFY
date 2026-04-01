@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useData } from '../context/DataContext'
+import { getDealRemainingSeconds } from '../utils/dealExpiry'
 
 function formatCountdown(totalSeconds) {
   const safeSeconds = Math.max(totalSeconds, 0)
@@ -11,9 +12,9 @@ function formatCountdown(totalSeconds) {
   return [hours, minutes, seconds].map((time) => String(time).padStart(2, '00')).join(':')
 }
 
-function TrendingCard({ item, elapsedSeconds }) {
+function TrendingCard({ item, nowMs }) {
   const navigate = useNavigate()
-  const remainingSeconds = item.expiresInSeconds - elapsedSeconds
+  const remainingSeconds = getDealRemainingSeconds(item, nowMs)
 
   return (
     <article className="min-w-[260px] rounded-2xl bg-white p-3 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-md sm:min-w-0 sm:p-4">
@@ -22,7 +23,7 @@ function TrendingCard({ item, elapsedSeconds }) {
           src={item.image}
           alt={item.title}
           className="h-40 w-full rounded-xl object-cover transition-all duration-300 hover:scale-105 sm:h-48"
-          onError={e => e.target.style.display='none'}
+          onError={e => e.target.style.display = 'none'}
         />
       </div>
       <h3 className="mt-4 text-sm font-semibold text-ink sm:mt-5">{item.title}</h3>
@@ -55,11 +56,11 @@ function TrendingCard({ item, elapsedSeconds }) {
 
 function TrendingDealsSection() {
   const { deals } = useData()
-  const [elapsedSeconds, setElapsedSeconds] = useState(0)
+  const [nowMs, setNowMs] = useState(Date.now())
 
   // Show first 4 trending deals (sorted by usageCount / "HOT" badge)
   const trendingDeals = deals
-    .filter(d => d.expiresInSeconds - elapsedSeconds > 0)
+    .filter(d => getDealRemainingSeconds(d, nowMs) > 0)
     .sort((a, b) => {
       // Prioritize HOT/TRENDING badges
       const badgePriority = { 'HOT': 3, 'TRENDING': 2, 'FLASH': 1 }
@@ -74,11 +75,11 @@ function TrendingDealsSection() {
       }
       return parseCount(b.usageCount) - parseCount(a.usageCount)
     })
-    .slice(0, 4)
+    .slice(0, 1)
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setElapsedSeconds((previous) => previous + 1)
+      setNowMs(Date.now())
     }, 1000)
 
     return () => clearInterval(intervalId)
@@ -96,7 +97,7 @@ function TrendingDealsSection() {
       </div>
       <div className="flex gap-4 overflow-x-auto pb-2 sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:pb-0 lg:grid-cols-4">
         {trendingDeals.map((item) => (
-          <TrendingCard key={item.slug} item={item} elapsedSeconds={elapsedSeconds} />
+          <TrendingCard key={item.slug} item={item} nowMs={nowMs} />
         ))}
       </div>
     </section>

@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import PageBanner from '../components/PageBanner'
+import ScrollingPageBanner from '../components/ScrollingPageBanner'
 import StoreCard from '../components/StoreCard'
 import SearchBar from '../components/SearchBar'
 import { useData } from '../context/DataContext'
+
 
 const alphabet = ['All', ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')]
 
@@ -14,11 +15,13 @@ function Stores() {
   const [selectedLetter, setSelectedLetter] = useState('All')
   const [selectedCategory, setSelectedCategory] = useState('All')
 
+  const visibleStores = useMemo(() => (stores || []).filter(s => s?.slug), [stores])
+
   // Get store categories dynamically from context data
   const storeCategories = useMemo(() => {
-    const cats = ['All', ...new Set(stores.map(s => s.category).filter(Boolean))]
+    const cats = ['All', ...new Set(visibleStores.map(s => s.category).filter(Boolean))]
     return cats
-  }, [stores])
+  }, [visibleStores])
 
   useEffect(() => {
     const queryParam = searchParams.get('q') || ''
@@ -38,27 +41,23 @@ function Stores() {
     setSearchParams(next, { replace: true })
   }
 
-  // Use admin-configured banner or fallback
   const storesBanners = (banners.stores || []).filter(b => b.active !== false)
-  const bannerImage = storesBanners[0]?.image || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1200&q=80'
 
   const filteredStores = useMemo(() => {
-    return stores.filter((store) => {
+    return visibleStores.filter((store) => {
       const matchesSearch = !query.trim() || store.name.toLowerCase().includes(query.trim().toLowerCase())
       const matchesLetter = selectedLetter === 'All' || store.name.toUpperCase().startsWith(selectedLetter)
       const matchesCategory = selectedCategory === 'All' || store.category === selectedCategory
 
       return matchesSearch && matchesLetter && matchesCategory
     })
-  }, [query, selectedLetter, selectedCategory, stores])
+  }, [query, selectedLetter, selectedCategory, visibleStores])
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-16">
-      <PageBanner
-        image={bannerImage}
-        alt="Stores banner"
-        href="https://www.myntra.com"
-      />
+      <div className="mb-10">
+        <ScrollingPageBanner banners={storesBanners} />
+      </div>
 
       <section className="mt-8 rounded-2xl bg-white p-6 shadow-sm sm:p-8">
 

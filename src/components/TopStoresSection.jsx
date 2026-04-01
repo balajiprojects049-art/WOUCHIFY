@@ -1,14 +1,20 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useData } from '../context/DataContext'
+import { useMemo, useState } from 'react'
+import { resolveStoreLogoUrl } from '../utils/storeLogo'
+
 
 function StoreBadge({ store }) {
-  if (store.logo) {
+  const [logoBroken, setLogoBroken] = useState(false)
+  const logoUrl = useMemo(() => resolveStoreLogoUrl(store), [store])
+
+  if (logoUrl && !logoBroken) {
     return (
       <img
-        src={store.logo}
+        src={logoUrl}
         alt={store.name}
         className="h-10 w-10 rounded-full object-cover"
-        onError={e => e.target.style.display='none'}
+        onError={() => setLogoBroken(true)}
       />
     )
   }
@@ -23,10 +29,12 @@ function TopStoresSection() {
   const navigate = useNavigate()
   const { stores } = useData()
 
-  const featuredStore = stores[0]
-  const otherStores = stores.slice(1)
+  const visibleStores = useMemo(() => (stores || []).filter(s => s?.slug), [stores])
 
-  if (!stores.length) return null
+  const featuredStore = visibleStores[0]
+  const otherStores = visibleStores.slice(1, 6)
+
+  if (!visibleStores.length) return null
 
   return (
     <section className="mt-14 sm:mt-16">
