@@ -176,16 +176,16 @@ export default function Categories() {
 
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-black tracking-tight text-ink mb-2">Categories</h1>
-              <div className="flex flex-wrap items-center gap-4 text-[13px] font-bold">
-                <div className="flex items-center gap-2 text-muted">
+              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-ink mb-3">Categories</h1>
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-surface border border-line rounded-full text-xs font-semibold text-muted shadow-sm">
                   <div className="w-1.5 h-1.5 rounded-full bg-gold" />
-                  Total Categories: <span className="text-ink">{totalCategories.toLocaleString()}</span>
-                </div>
-                <div className="flex items-center gap-2 text-muted">
+                  Total Categories: <span className="text-ink font-bold">{totalCategories.toLocaleString()}</span>
+                </span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-surface border border-line rounded-full text-xs font-semibold text-muted shadow-sm">
                   <div className="w-1.5 h-1.5 rounded-full bg-midnight" />
-                  Total Coupons & Offers: <span className="text-ink">{totalCoupons.toLocaleString()}</span>
-                </div>
+                  Coupons & Offers: <span className="text-ink font-bold">{totalCoupons.toLocaleString()}</span>
+                </span>
               </div>
             </div>
             <div className="flex items-center gap-2.5 py-1.5 px-3 bg-cream rounded-xl border border-line self-start md:self-auto shadow-sm">
@@ -203,33 +203,38 @@ export default function Categories() {
           <aside className="lg:w-64 shrink-0">
             <div className="sticky top-20 space-y-6">
               {/* Navigation Menu */}
-              <nav className="bg-white rounded-3xl border border-line p-3 shadow-sm">
-                <div className="space-y-0.5">
+              <nav className="bg-white rounded-2xl border border-line p-2 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+                <div className="space-y-1">
                   {sidebarLinks.map(link => (
                     <button
                       key={link.id}
                       onClick={() => setActiveTab(link.id)}
-                      className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition-all duration-200 group ${activeTab === link.id ? 'bg-gold text-midnight' : 'text-muted hover:bg-cream hover:text-gold'}`}
+                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-300 group ${activeTab === link.id ? 'bg-gold/10 text-gold shadow-sm' : 'text-muted hover:bg-surface hover:text-ink'}`}
                     >
                       <div className="flex items-center gap-3">
-                        <IconRenderer name={link.icon} className={`w-4 h-4 ${activeTab === link.id ? 'text-midnight' : 'text-muted group-hover:text-gold'}`} />
-                        <span className="text-[13px] font-black tracking-tight">{link.label}</span>
+                        <div className={`p-1.5 rounded-lg transition-colors ${activeTab === link.id ? 'bg-gold text-white shadow-md shadow-gold/20' : 'bg-surface bg-opacity-50 text-muted group-hover:bg-line group-hover:text-ink'}`}>
+                          <IconRenderer name={link.icon} className="w-4 h-4" />
+                        </div>
+                        <span className={`text-[13px] font-bold tracking-tight ${activeTab === link.id ? 'text-ink' : 'group-hover:text-ink'}`}>{link.label}</span>
                       </div>
-                      {activeTab === link.id && <ChevronRight className="w-3.5 h-3.5" />}
+                      {activeTab === link.id && <ChevronRight className="w-4 h-4 text-gold" />}
                     </button>
                   ))}
                 </div>
               </nav>
 
               {/* Popular Merchants List */}
-              <div className="px-1">
-                <h3 className="text-[9px] font-black text-muted uppercase tracking-[0.2em] mb-4">Popular Merchants</h3>
-                <div className="flex flex-wrap gap-1.5">
+              <div className="px-2 pt-2">
+                <h3 className="text-[10px] font-bold text-muted uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-line"></span>
+                  Popular Stores
+                </h3>
+                <div className="flex flex-wrap gap-2">
                   {['Amazon', 'Flipkart', 'Myntra', 'Ajio', 'Swiggy', 'Zomato'].map(merchant => (
                     <Link
                       key={merchant}
                       to={`/store/${merchant.toLowerCase()}`}
-                      className="px-2.5 py-1 bg-cream hover:bg-gold hover:text-midnight text-[10px] font-black text-muted rounded-lg transition-all border border-line/30"
+                      className="px-3 py-1.5 bg-surface hover:bg-gold/10 hover:text-gold hover:border-gold/30 text-[11px] font-semibold text-muted rounded-full transition-all border border-line"
                     >
                       {merchant}
                     </Link>
@@ -243,27 +248,41 @@ export default function Categories() {
           <div className="flex-grow">
 
             {/* 🔥 SECTION 1: Popular Categories */}
-            <section className="mb-10">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-black text-ink flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-gold" />
-                  Popular Categories
+            <section className="mb-10 lg:mb-14">
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="text-xl font-bold tracking-tight text-ink flex items-center gap-2">
+                  <div className="p-1.5 bg-gold/10 rounded-lg"><TrendingUp className="w-4 h-4 text-gold" /></div>
+                  Trending Categories
                 </h2>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 gap-y-6 sm:gap-y-8">
                 {popularCategories.map((cat, i) => (
                   <Link
                     key={i}
                     to={`/category-results?category=${encodeURIComponent(cat.name)}`}
-                    className="group bg-white rounded-2xl p-4 border border-line shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer block"
+                    className="group flex flex-col items-center cursor-pointer"
                   >
-                    <div className="p-2.5 bg-cream text-gold rounded-xl w-fit group-hover:bg-gold group-hover:text-midnight transition-colors duration-300 mb-3">
-                      <IconRenderer name={cat.icon} className="w-4 h-4" />
+                    <div className="w-full relative h-[90px] flex items-center justify-center bg-white rounded-2xl border border-line overflow-hidden transition-all duration-300 group-hover:border-gold group-hover:shadow-[0_8px_20px_rgba(212,168,32,0.15)] group-hover:-translate-y-1">
+                      
+                      {/* Default State: Icon */}
+                      <div className="absolute inset-0 flex items-center justify-center transition-all duration-400 group-hover:opacity-0 group-hover:scale-50">
+                        <IconRenderer name={cat.icon} className="w-7 h-7 sm:w-8 sm:h-8 text-navy opacity-80" />
+                      </div>
+
+                      {/* Hover State: Content */}
+                      <div className="absolute inset-0 flex flex-col items-center justify-center bg-gold text-midnight transition-all duration-400 opacity-0 scale-125 group-hover:opacity-100 group-hover:scale-100">
+                        <span className="text-xl sm:text-2xl font-black">{getCatCount(cat.name)}</span>
+                        <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-widest opacity-90">Offers</span>
+                      </div>
                     </div>
-                    <h3 className="text-xs font-black text-ink mb-0.5">{cat.name}</h3>
-                    <p className="text-[9px] font-bold text-muted truncate">
-                      {getCatCount(cat.name)} Deals
-                    </p>
+                    
+                    {/* Label below the card */}
+                    <div className="mt-3.5 flex items-center gap-1.5 text-ink group-hover:text-gold transition-colors duration-300">
+                      <h3 className="text-[13px] sm:text-sm font-semibold text-center">
+                        {cat.name}
+                      </h3>
+                      <IconRenderer name="ArrowUpRight" className="w-3.5 h-3.5 opacity-0 -translate-x-2 translate-y-2 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-300" />
+                    </div>
                   </Link>
                 ))}
               </div>
@@ -272,7 +291,7 @@ export default function Categories() {
             {/* 🔥 SECTION 2: All Categories */}
             <section>
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4 border-b border-line">
-                <h2 className="text-xl font-black text-ink uppercase tracking-tight">Browse {activeTab}</h2>
+                <h2 className="text-xl sm:text-2xl font-bold text-ink tracking-tight">Browse {activeTab}</h2>
 
                 <div className="flex items-center gap-3">
                   {/* View Toggle */}
@@ -300,61 +319,68 @@ export default function Categories() {
                   <button
                     key={letter}
                     onClick={() => setActiveLetter(letter)}
-                    className={`h-8 min-w-8 px-2 rounded-lg flex items-center justify-center text-[11px] font-black transition-all duration-200 ${activeLetter === letter ? 'bg-gold text-midnight' : 'bg-white border border-line text-muted hover:border-gold hover:text-gold'}`}
+                    className={`h-8 px-3 rounded-lg flex items-center justify-center text-xs font-semibold whitespace-nowrap transition-all duration-200 ${activeLetter === letter ? 'bg-navy text-white shadow-md' : 'bg-surface border border-line text-muted hover:border-navy/30 hover:text-navy'}`}
                   >
-                    {letter}
+                    {letter === 'ALL' ? 'All' : letter}
                   </button>
                 ))}
               </div>
 
               {/* ── CATEGORY GRID SYSTEM ── */}
               {isLoading ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 gap-y-8 sm:gap-y-10">
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => (
-                    <div key={i} className="h-[140px] bg-cream rounded-[32px] border border-line animate-pulse" />
+                    <div key={i} className="flex flex-col">
+                      <div className="h-[100px] bg-cream rounded-2xl border border-line animate-pulse" />
+                      <div className="h-4 w-2/3 mx-auto mt-3.5 bg-cream rounded-full animate-pulse" />
+                    </div>
                   ))}
                 </div>
               ) : Object.keys(processedData).length > 0 ? (
-                <div className={viewMode === 'grid' ? "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6" : "flex flex-col gap-3"}>
+                <div className={viewMode === 'grid' ? "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 gap-y-8 sm:gap-y-10" : "flex flex-col gap-3"}>
                   {Object.entries(processedData).sort().map(([letter, items]) => (
                     <React.Fragment key={letter}>
                       {activeLetter === 'ALL' && (
-                        <div className="col-span-full mt-10 mb-6 relative">
-                          <div className="flex items-center">
-                            <div className="bg-midnight px-6 py-2 rounded-r-2xl border-l-4 border-gold shadow-xl">
-                              <h3 className="text-xl font-black text-gold tracking-widest">{letter}</h3>
-                            </div>
-                            <div className="h-[1px] flex-grow bg-midnight/10 ml-4" />
+                        <div className="col-span-full flex items-center justify-center mt-12 sm:mt-16 mb-6 sm:mb-10 w-full">
+                          {/* Bright Gradient Line Left */}
+                          <div className="h-[2px] flex-grow bg-gradient-to-r from-transparent via-gold/40 to-gold rounded-full opacity-80" />
+                          
+                          {/* Premium Circular Letter Badge */}
+                          <div className="mx-4 sm:mx-6 flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-full border-2 border-gold shadow-[0_4px_20px_rgba(212,168,32,0.25)] flex-shrink-0 relative">
+                            {/* Inner Dashed Ring */}
+                            <div className="absolute inset-1 sm:inset-1.5 rounded-full border border-dashed border-gold rotate-45"></div>
+                            <h3 className="text-xl sm:text-3xl font-black text-gold tracking-widest translate-x-0.5">{letter}</h3>
                           </div>
-                          <div className="absolute -bottom-2 left-0 w-24 h-1 bg-gold/20 rounded-full" />
+                          
+                          {/* Bright Gradient Line Right */}
+                          <div className="h-[2px] flex-grow bg-gradient-to-l from-transparent via-gold/40 to-gold rounded-full opacity-80" />
                         </div>
                       )}
                       {items.map((cat, idx) => (
                         <Link
                           key={idx}
                           to={`/category-results?category=${encodeURIComponent(cat.name)}`}
-                          className="group relative bg-white rounded-[32px] border border-line p-5 flex flex-col items-center justify-center text-center hover:border-gold hover:shadow-2xl hover:shadow-gold/10 transition-all duration-500 overflow-hidden min-h-[140px]"
+                          className="group flex flex-col items-center cursor-pointer"
                         >
-                          {/* Premium Background Glow */}
-                          <div className="absolute inset-0 bg-gradient-to-br from-gold/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-
-                          <div className="relative z-10 flex flex-col items-center">
-                            {/* Optimized Icon Size */}
-                            <div className="h-14 w-14 mb-4 flex items-center justify-center rounded-[22px] bg-cream text-muted group-hover:bg-gold group-hover:text-midnight group-hover:scale-110 group-hover:rotate-[360deg] transition-all duration-700 shadow-sm border border-line/50">
-                              <IconRenderer name={cat.icon || 'Tag'} className="w-6 h-6" />
+                          <div className="w-full relative h-[100px] flex items-center justify-center bg-white rounded-2xl border border-line overflow-hidden transition-all duration-300 group-hover:border-gold group-hover:shadow-[0_8px_20px_rgba(212,168,32,0.15)] group-hover:-translate-y-1">
+                            
+                            {/* Default State: Icon */}
+                            <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 group-hover:opacity-0 group-hover:-translate-y-4">
+                              <IconRenderer name={cat.icon || 'Tag'} className="w-8 h-8 text-navy/80 hover:text-midnight transition-colors" />
                             </div>
 
-                            {/* Balanced Typography */}
-                            <h4 className="text-[14px] font-black text-ink leading-tight group-hover:text-gold transition-colors duration-300 px-1">
+                            {/* Hover State: Content */}
+                            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gold text-midnight transition-all duration-400 opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
+                              <span className="text-xl sm:text-2xl font-black">{cat.realCount}</span>
+                              <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-widest opacity-90">Deals</span>
+                            </div>
+                          </div>
+                          
+                          <div className="mt-3.5 flex items-start justify-center gap-1.5 text-ink group-hover:text-gold transition-colors duration-300 w-full px-1">
+                            <h4 className="text-[13px] sm:text-sm font-semibold text-center leading-tight line-clamp-2">
                               {cat.name}
                             </h4>
-
-                            {/* Reveal Stats on Hover */}
-                            <div className="max-h-0 group-hover:max-h-12 opacity-0 group-hover:opacity-100 transition-all duration-500 overflow-hidden mt-2">
-                              <span className="inline-flex px-3 py-1 rounded-full bg-gold text-midnight text-[9px] font-black uppercase tracking-[0.15em] shadow-xl shadow-gold/20">
-                                {cat.realCount} OFFERS
-                              </span>
-                            </div>
+                            <IconRenderer name="ArrowUpRight" className="w-3.5 h-3.5 opacity-0 -translate-x-2 translate-y-1 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-300 flex-shrink-0 mt-0.5" />
                           </div>
                         </Link>
                       ))}
@@ -399,9 +425,9 @@ export default function Categories() {
               { name: 'Amazon', logo: 'https://cdn-icons-png.flaticon.com/512/732/732177.png' },
               { name: 'Flipkart', logo: 'https://logos-world.net/wp-content/uploads/2020/11/Flipkart-Logo.png' },
               { name: 'Myntra', logo: 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Myntra_Logo.png' },
-              { name: 'Ajio', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/AJIO_logo.svg/2560px-AJIO_logo.svg.png' },
-              { name: 'Swiggy', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/1/12/Swiggy_logo.svg/512px-Swiggy_logo.svg.png' },
-              { name: 'Zomato', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Zomato_logo.png/1024px-Zomato_logo.png' }
+              { name: 'Ajio', logo: 'https://assets.ajio.com/static/img/Ajio-Logo.svg' },
+              { name: 'Swiggy', logo: 'https://logos-world.net/wp-content/uploads/2020/11/Swiggy-Logo.png' },
+              { name: 'Zomato', logo: 'https://upload.wikimedia.org/wikipedia/commons/b/bd/Zomato_Logo.svg' }
             ].map(store => (
               <Link
                 key={store.name}

@@ -13,7 +13,7 @@ function ExclusiveDealsSection() {
   if (exclusiveDeals.length === 0) return null
 
   return (
-    <section className="relative mt-16 overflow-hidden border-y border-line bg-gradient-to-br from-cream via-surface to-gold/5 py-14 shadow-sm sm:mt-20 sm:py-20">
+    <section className="relative overflow-hidden border-y border-line bg-gradient-to-br from-cream via-surface to-gold/5 py-14 shadow-sm sm:py-20">
       {/* ── Animated Floating Glass Effects ── */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -left-[10%] -top-[20%] h-[70%] w-[60%] origin-center animate-[spin_20s_linear_infinite] rounded-full bg-gold/30 blur-[80px]" />
@@ -21,7 +21,7 @@ function ExclusiveDealsSection() {
         <div className="absolute inset-0 -rotate-12 transform bg-gradient-to-b from-transparent via-white/50 to-transparent opacity-60 blur-[2px]" style={{ animation: 'pulse 6s ease-in-out infinite' }} />
       </div>
 
-      <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
         <div className="mb-7 flex items-center justify-between sm:mb-10">
           <div>
             <p className="mb-2 text-sm font-bold uppercase tracking-[0.2em] text-gold">Members Only</p>
@@ -39,16 +39,16 @@ function ExclusiveDealsSection() {
           {exclusiveDeals.map((item) => (
             <article
               key={item.slug || item.id}
-              className="group relative rounded-[2.5rem] border border-white/40 bg-white/40 p-6 shadow-sm backdrop-blur-2xl transition-all duration-500 hover:-translate-y-3 hover:border-gold/30 hover:bg-white/60 hover:shadow-2xl"
+              className="group relative flex flex-col h-full rounded-3xl border border-line/50 bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.04)] transition-all duration-500 hover:-translate-y-2 hover:border-gold/40 hover:shadow-[0_20px_40px_rgba(212,168,32,0.12)]"
             >
-              <div className="relative overflow-hidden rounded-[2rem]">
+              <div className="relative shrink-0 overflow-hidden rounded-2xl">
                 <img
                   src={item.image}
                   alt={item.title}
-                  className="h-48 w-full rounded-[2rem] object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                  className="h-52 w-full rounded-2xl object-cover transition-transform duration-700 ease-out group-hover:scale-110"
                   onError={e => e.target.style.display='none'}
                 />
-                <span className="absolute left-3 top-3 z-20 rounded-xl bg-white/90 px-3 py-1.5 text-[10px] font-black tracking-widest text-ink backdrop-blur-md uppercase">
+                <span className="absolute left-3 top-3 z-20 rounded-xl bg-white/90 px-3 py-1.5 text-[10px] font-black tracking-widest text-ink backdrop-blur-md uppercase shadow-sm">
                   {item.urgency || 'Verified'}
                 </span>
                 <span className="absolute right-3 top-3 z-20 rounded-xl bg-gold px-3 py-1.5 text-[10px] font-black tracking-widest text-midnight shadow-lg uppercase">
@@ -56,9 +56,10 @@ function ExclusiveDealsSection() {
                 </span>
               </div>
 
-              <div className="mt-7 flex flex-col gap-1">
-                <h3 className="text-xl font-black tracking-tight text-ink leading-tight">{item.title}</h3>
-                <div className="mt-6 flex items-end justify-between border-t border-line/10 pt-5">
+              <div className="mt-6 flex flex-1 flex-col justify-between">
+                <h3 className="text-xl font-black tracking-tight text-ink leading-tight line-clamp-2 min-h-[3.5rem]">{item.title}</h3>
+                
+                <div className="mt-4 flex items-end justify-between border-t border-line/10 pt-5">
                   <div>
                     <p className="text-[10px] font-black uppercase tracking-widest text-muted mb-1">Exclusive Price</p>
                     <div className="flex items-baseline gap-2">
@@ -68,7 +69,7 @@ function ExclusiveDealsSection() {
                   </div>
                   <button
                     onClick={() => navigate(`/loot-deal/${item.slug || item.id}`)}
-                    className="flex h-12 items-center justify-center rounded-2xl bg-navy px-5 text-sm font-black text-cream transition-all duration-300 hover:bg-gold hover:text-midnight hover:scale-105 active:scale-95"
+                    className="flex h-12 items-center justify-center rounded-2xl bg-navy px-5 text-sm font-black text-cream shadow-md transition-all duration-300 hover:bg-gold hover:text-midnight hover:scale-105 active:scale-95"
                   >
                     Grab Deal
                   </button>

@@ -13,7 +13,7 @@ function TrendingDealsSection() {
       const bCount = parseInt(String(b.usageCount).replace(/[^0-9]/g, '')) || 0
       return bCount - aCount
     })
-    .slice(0, 4)
+    .slice(0, 8)
 
   if (trending.length === 0) return null
 
@@ -34,7 +34,7 @@ function TrendingDealsSection() {
       </div>
 
       {/* Compact horizontal list */}
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {trending.map((deal, idx) => (
           <article
             key={deal.slug}

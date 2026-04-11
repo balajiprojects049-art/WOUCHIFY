@@ -9,6 +9,7 @@ import TopCreditCardsSection from '../components/TopCreditCardsSection'
 import NewsTickerSection from '../components/NewsTickerSection'
 import AdZone from '../components/AdZone'
 import CreditCardAdBanner from '../components/CreditCardAdBanner'
+import AdImageBanner from '../components/AdImageBanner'
 
 /**
  * USER JOURNEY (Critical Order):
@@ -24,7 +25,7 @@ import CreditCardAdBanner from '../components/CreditCardAdBanner'
 
 function HomePage() {
   const sectionCls = "w-full py-12 sm:py-16"
-  const containerCls = "mx-auto max-w-6xl px-4 sm:px-6 lg:px-8"
+  const containerCls = "mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8"
 
   return (
     <div className="flex flex-col bg-[#F9FAFB]">
@@ -89,6 +90,9 @@ function HomePage() {
         </div>
       </section>
 
+      {/* ADVERTISEMENT IMAGE BANNER */}
+      <AdImageBanner />
+
       {/* 7. EXCLUSIVE LOOT (Stays as a specialized highlight) */}
       <ExclusiveDealsSection />
 
@@ -96,11 +100,6 @@ function HomePage() {
       <section className={`${sectionCls} mb-12`}>
         <div className={containerCls}>
           <CreditCardAdBanner />
-          <div className="flex items-center gap-3 mb-8">
-            <span className="h-8 w-1.5 rounded-full bg-gold" />
-            <h2 className="text-2xl font-black tracking-tight text-ink sm:text-3xl">Card Rewards & Perks</h2>
-          </div>
-          <TopCreditCardsSection />
         </div>
       </section>
     </div>

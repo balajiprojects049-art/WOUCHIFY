@@ -727,7 +727,7 @@ function MobileBottomFilterBar({ openDrawer, activeFilterCount }) {
   return (
     <div
       className="fixed left-0 right-0 z-[200] lg:hidden flex items-center border-t"
-      style={{ bottom: '60px', background: '#fff', borderTopColor: '#e5e7eb', boxShadow: '0 -2px 12px rgba(0,0,0,0.06)' }}
+      style={{ bottom: '0', background: '#fff', borderTopColor: '#e5e7eb', boxShadow: '0 -2px 12px rgba(0,0,0,0.06)' }}
     >
       {/* Quick chips — same size/spacing as Filter button */}
       <div className="flex flex-1 items-center overflow-x-auto scrollbar-none">

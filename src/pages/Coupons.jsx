@@ -348,7 +348,7 @@ function Coupons() {
   return (
     <>
       <style>{css}</style>
-      <main className="mx-auto max-w-7xl px-4 py-10 pb-32 sm:px-6 lg:px-8 lg:pb-10">
+      <main className="mx-auto max-w-[1400px] px-4 py-10 pb-32 sm:px-6 lg:px-8 lg:pb-10">
         <section className="mb-10">
           <ScrollingPageBanner banners={displayBanners} />
         </section>

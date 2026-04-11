@@ -115,7 +115,7 @@ function Deals() {
   }
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-10 pb-32 sm:px-6 lg:pb-10">
+    <main className="mx-auto max-w-[1400px] px-4 py-10 pb-32 sm:px-6 lg:pb-10">
       <div className="mb-8">
         <ScrollingPageBanner banners={dealsBanners} />
       </div>

@@ -10,7 +10,7 @@ import CouponsSection from '../components/CouponsSection'
 function DealsPage() {
   return (
     <>
-      <main className="mx-auto max-w-6xl px-3 pb-12 pt-4 sm:px-6 sm:pb-14 sm:pt-8 lg:px-8">
+      <main className="mx-auto max-w-[1400px] px-3 pb-12 pt-4 sm:px-6 sm:pb-14 sm:pt-8 lg:px-8">
         <section className="rounded-3xl border border-line bg-white p-5 shadow-sm sm:p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold">Deals Hub</p>
           <h1 className="mt-3 text-3xl font-bold tracking-tight text-ink sm:text-5xl">Find Today’s Best Deals, Coupons & Price Drops</h1>
@@ -31,7 +31,7 @@ function DealsPage() {
 
       <ExclusiveDealsSection />
 
-      <main className="mx-auto max-w-6xl px-3 pb-12 pt-8 sm:px-6 sm:pb-14 sm:pt-10 lg:px-8">
+      <main className="mx-auto max-w-[1400px] px-3 pb-12 pt-8 sm:px-6 sm:pb-14 sm:pt-10 lg:px-8">
         <CategoryTabs />
         <TrendingDealsSection />
         <DealsCatalogSection

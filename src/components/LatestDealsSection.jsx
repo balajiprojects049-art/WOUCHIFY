@@ -58,10 +58,10 @@ function LatestDealsSection() {
               {deal.title}
             </h3>
 
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mt-1">
               <p className="text-sm font-extrabold text-ink">{deal.price}</p>
-              <span className="rounded bg-gold/10 px-2 py-0.5 text-[10px] font-bold text-gold transition-colors group-hover:bg-gold group-hover:text-midnight">
-                View
+              <span className="rounded-lg bg-gold px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.1em] text-midnight shadow-sm transition-all group-hover:scale-[1.05] group-hover:shadow-[0_4px_10px_rgba(255,179,0,0.4)]">
+                View Deal →
               </span>
             </div>
           </article>

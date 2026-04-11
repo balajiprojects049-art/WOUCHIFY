@@ -23,7 +23,7 @@ function LootDealDetail() {
   }
 
   return (
-    <main className="mx-auto max-w-7xl px-6 py-16">
+    <main className="mx-auto max-w-[1400px] px-6 py-16">
       <section className="rounded-2xl bg-white p-6 shadow-[0_10px_30px_rgba(0,0,0,0.08)] sm:p-8">
         <div className="grid gap-8 md:grid-cols-2 md:gap-10">
           <div className="overflow-hidden rounded-2xl">

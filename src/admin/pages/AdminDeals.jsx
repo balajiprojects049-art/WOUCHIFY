@@ -14,7 +14,7 @@ import {
 
 const EMPTY_DEAL = {
   slug: '', title: '', store: '', category: 'Electronics', discountLabel: '', discountValue: 0,
-  type: 'offer', price: '', priceValue: 0, usageCount: '', expiresInSeconds: 7200,
+  type: 'offer', price: '', originalPrice: '', priceValue: 0, usageCount: '', expiresInSeconds: 7200,
   successRate: 90, expiry: '', badge: 'HOT', code: '', image: '', description: '',
   terms: '', steps: '', highlights: '', link: '', createdAt: new Date().toISOString(),
   priority: 'Medium', status: 'Active', featured: false, trending: false, telegramSync: true
@@ -166,7 +166,8 @@ function DealForm({ initial, onSave, onCancel }) {
             <SectionHeader title="Pricing & Discount" />
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
               {[
-                { lbl: 'Display Price', key: 'price', ph: '₹1,049', req: true },
+                { lbl: 'Current Price', key: 'price', ph: '₹1,049', req: true },
+                { lbl: 'Original Price (MRP)', key: 'originalPrice', ph: '₹1,299' },
                 { lbl: 'Price Value', key: 'priceValue', ph: '1049', type: 'number' },
                 { lbl: 'Discount Label', key: 'discountLabel', ph: 'Save 18%', req: true },
                 { lbl: 'Discount %', key: 'discountValue', ph: '18', type: 'number', max: 100 },

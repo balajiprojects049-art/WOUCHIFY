@@ -10,7 +10,6 @@ import StoreDetail from './pages/StoreDetail'
 import DealDetail from './pages/DealDetail'
 import LootDeals from './pages/LootDeals'
 import LootDealDetail from './pages/LootDealDetail'
-import MobileBottomNav from './components/MobileBottomNav'
 import AboutContact from './pages/AboutContact'
 import CreditCards from './pages/CreditCards'
 import PrivacyPolicy from './pages/PrivacyPolicy'
@@ -52,7 +51,7 @@ import AdZone from './components/AdZone'
 
 function PublicLayout({ children }) {
   return (
-    <div className="min-h-screen bg-cream pb-20 md:pb-0">
+    <div className="min-h-screen bg-cream">
       <Navbar />
       <AdZone position="global_top" className="mx-auto max-w-7xl px-6 pt-6" />
       {children}
@@ -67,7 +66,6 @@ function PublicLayout({ children }) {
 
 
       <Footer />
-      <MobileBottomNav />
     </div>
   )
 }

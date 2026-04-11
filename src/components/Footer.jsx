@@ -56,7 +56,7 @@ const socials = [
 function Footer() {
   return (
     <footer className="border-t border-white/5 bg-midnight text-slate-300" aria-label="Site footer">
-      <div className="mx-auto max-w-6xl px-4 pb-8 pt-12 sm:px-6 sm:pt-14 lg:px-8">
+      <div className="mx-auto max-w-[1400px] px-4 pb-8 pt-12 sm:px-6 sm:pt-14 lg:px-8">
 
         {/* Top row */}
         <div className="grid gap-10 sm:gap-12 lg:grid-cols-12">

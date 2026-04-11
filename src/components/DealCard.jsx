@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom'
 import { storesData } from '../data/storesData'
 import ShareButton from './ShareButton'
-import CircularTimer from './CircularTimer'
 
 function DealCard({ deal, remainingSeconds }) {
   const isExpired = remainingSeconds <= 0
@@ -11,100 +10,202 @@ function DealCard({ deal, remainingSeconds }) {
   const logoUrl = store?.logo
   const logoText = (deal.store || '').slice(0, 2).toUpperCase()
 
-  const getBadgeStyle = (badge) => {
+  // Timer units
+  const days    = Math.floor(remainingSeconds / 86400)
+  const hours   = Math.floor((remainingSeconds % 86400) / 3600)
+  const minutes = Math.floor((remainingSeconds % 3600) / 60)
+  const seconds = Math.floor(remainingSeconds % 60)
+
+  const getBadgeColors = (badge) => {
     const b = (badge || '').toUpperCase()
-    if (b === 'HOT') return 'bg-red-500 text-white shadow-[0_0_10px_rgba(239,68,68,0.5)] animate-pulse'
-    if (b === 'FLASH') return 'bg-amber-400 text-black font-black shadow-[0_0_10px_rgba(251,191,36,0.5)]'
-    if (b === 'EXCLUSIVE') return 'bg-purple-600 text-white shadow-[0_0_10px_rgba(147,51,234,0.5)]'
-    if (b === 'LOOT') return 'bg-green-500 text-white shadow-[0_0_10px_rgba(34,197,94,0.5)]'
+    if (b === 'HOT')       return 'bg-red-500 text-white'
+    if (b === 'FLASH')     return 'bg-amber-400 text-black'
+    if (b === 'EXCLUSIVE') return 'bg-purple-600 text-white'
+    if (b === 'LOOT')      return 'bg-emerald-500 text-white'
     return 'bg-gold/20 text-gold'
   }
 
+  // Derive original price: use stored field, or calculate from discount %
+  const derivedOriginalPrice = (() => {
+    const stored = deal.originalPrice || deal.oldPrice
+    if (stored) return stored
+
+    // Auto-calculate from discountValue % if available
+    try {
+      const curr = parseFloat(String(deal.price || '').replace(/[^\d.]/g, ''))
+      const pct  = parseFloat(String(deal.discountValue || '').replace(/[^\d.]/g, ''))
+      if (curr > 0 && pct > 0 && pct < 100) {
+        const orig = Math.round(curr / (1 - pct / 100))
+        return `₹${orig.toLocaleString()}`
+      }
+    } catch {}
+    return null
+  })()
+
+  const savings = (() => {
+    try {
+      const orig = parseFloat(String(derivedOriginalPrice || '').replace(/[^\d.]/g, ''))
+      const curr = parseFloat(String(deal.price || '').replace(/[^\d.]/g, ''))
+      if (orig && curr && orig > curr) return `Save ₹${(orig - curr).toLocaleString()}`
+    } catch {}
+    return deal.discountLabel
+  })()
+
+
   return (
-    <article className={`rounded-2xl bg-white p-4 shadow-[0_10px_30px_rgba(0,0,0,0.08)] transition-all duration-300 ${isExpired ? 'opacity-60 grayscale' : 'hover:-translate-y-1 hover:shadow-[0_20px_50px_rgba(0,0,0,0.15)]'}`}>
-      <div className="relative mb-4 overflow-hidden rounded-xl">
-        <img loading="lazy" src={deal.image} alt={deal.title} className="h-44 w-full rounded-xl object-cover transition-all duration-300 hover:scale-105" />
-        
-        <span className="absolute left-2.5 top-2.5 rounded-lg bg-black/60 backdrop-blur-[2px] px-2.5 py-1 text-[10px] font-black text-white shadow-md flex items-center justify-center gap-1.5 z-10 border border-white/10" title="Total Views">
-          <span className="text-[12px] leading-none mb-[1px]">👁️</span> {deal.usageCount || 0}
-        </span>
-        
-        <span className="absolute right-3 top-3 rounded-full bg-[#ff9800] px-3 py-1 text-xs font-bold text-white shadow-md">
+    <article className={`group flex flex-col rounded-2xl border bg-white overflow-hidden transition-all duration-300 ${
+      isExpired
+        ? 'opacity-60 grayscale border-line/30'
+        : 'border-line/50 shadow-[0_4px_20px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1'
+    }`}>
+
+      {/* ── Image Banner ── */}
+      <div className="relative overflow-hidden">
+        <img
+          loading="lazy"
+          src={deal.image}
+          alt={deal.title}
+          className="h-48 w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          onError={e => e.target.style.display = 'none'}
+        />
+
+        {/* Discount pill */}
+        <div className="absolute top-3 right-3 rounded-xl bg-[#C89B1E] px-3 py-1.5 text-xs font-black text-[#12151C] shadow-lg">
           {deal.discountLabel}
+        </div>
+
+        {/* Badge */}
+        {deal.badge && (
+          <span className={`absolute top-3 left-3 rounded-lg px-2.5 py-1 text-[10px] font-black uppercase tracking-wider shadow-sm ${getBadgeColors(deal.badge)}`}>
+            {deal.badge}
+          </span>
+        )}
+
+        {/* Views */}
+        <span className="absolute bottom-3 left-3 flex items-center gap-1 rounded-lg bg-black/60 px-2 py-1 text-[10px] font-bold text-white backdrop-blur-sm">
+          👁️ {deal.usageCount || 0} views
         </span>
+
         {isExpired && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[2px]">
-            <span className="rounded-xl border-2 border-white/80 bg-red-600/80 px-6 py-2 text-xl font-black tracking-widest text-white shadow-xl backdrop-blur-md rotate-[-12deg]">
+          <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+            <span className="rotate-[-10deg] rounded-xl border-2 border-white/70 bg-red-600/90 px-6 py-2 text-lg font-black tracking-widest text-white">
               EXPIRED
             </span>
           </div>
         )}
       </div>
 
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-3">
-          {logoUrl ? (
-            <img src={logoUrl} alt={deal.store} className="h-10 w-10 rounded-full object-contain bg-white border border-line p-1 shadow-sm" />
-          ) : (
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gold/15 text-xs font-bold text-gold">{logoText}</div>
-          )}
-          <div>
-            <p className="text-sm font-bold text-ink leading-none">{deal.store}</p>
-            <p className="text-[10px] text-muted mt-1 uppercase tracking-wider font-bold">Verified Store</p>
+      {/* ── Body ── */}
+      <div className="flex flex-1 flex-col p-4 gap-3">
+
+        {/* Store row */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            {logoUrl ? (
+              <img src={logoUrl} alt={deal.store} className="h-9 w-9 rounded-lg object-contain bg-white border border-line p-1 shadow-sm" />
+            ) : (
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gold/15 text-xs font-black text-gold border border-gold/20">{logoText}</div>
+            )}
+            <div>
+              <p className="text-sm font-black text-ink leading-tight">{deal.store}</p>
+              <p className="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
+                <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Verified Store
+              </p>
+            </div>
           </div>
+          {/* Category chip */}
+          <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-slate-500">
+            {deal.category}
+          </span>
         </div>
-        <span className={`rounded-full px-3 py-1 text-[10px] font-black tracking-tighter ${getBadgeStyle(deal.badge)}`}>
-          {deal.badge}
-        </span>
-      </div>
 
-      <h3 className="mt-4 text-base font-bold text-ink line-clamp-2 h-12">{deal.title}</h3>
+        {/* Title */}
+        <h3 className="text-[15px] font-bold text-ink line-clamp-2 leading-snug flex-1">
+          {deal.title}
+        </h3>
 
-      <div className="mt-4 flex items-end justify-between">
-        <div className="flex flex-col">
-          {(deal.originalPrice || deal.oldPrice) && (
-            <span className="text-[11px] font-bold text-gray-400 line-through mb-0.5">
-              {!String(deal.originalPrice || deal.oldPrice).includes('₹') && '₹'}{deal.originalPrice || deal.oldPrice}
-            </span>
-          )}
-          <p className="text-[22px] font-black text-[#12151C] leading-none tracking-tight">
+        {/* Price Row */}
+        <div className="flex items-center gap-3 flex-wrap">
+          <p className="text-2xl font-black text-ink tracking-tight leading-none">
             {!String(deal.price || '').includes('₹') && '₹'}{deal.price}
           </p>
-        </div>
-        <div className="rounded-md bg-[#ffb300]/10 border border-[#ffb300]/20 px-2 py-1 flex items-center justify-center">
-          <p className="text-[9px] font-black uppercase tracking-[0.15em] text-[#b48600]">
-            {deal.category}
-          </p>
-        </div>
-      </div>
-
-      <div className="mt-3 pt-3 border-t border-line/40 min-h-[50px] overflow-hidden">
-        <div className="overflow-x-auto overflow-y-hidden pb-1 no-scrollbar shrink">
-          <CircularTimer remainingSeconds={remainingSeconds} />
-        </div>
-      </div>
-
-      <div className="mt-4 flex items-center gap-2">
-        <Link
-          to={isExpired ? '#' : `/deal/${deal.slug}`}
-          className={`flex-1 inline-flex items-center justify-center rounded-xl px-4 py-3 text-xs font-black uppercase tracking-[0.2em] transition-all duration-500 overflow-hidden relative group ${isExpired
-            ? 'bg-gray-100 text-gray-400 cursor-not-allowed pointer-events-none'
-            : 'bg-[#ffb300] text-black shadow-xl hover:shadow-[0_10px_25px_rgba(255,179,0,0.3)] hover:-translate-y-1'
-            }`}
-        >
-          {!isExpired && (
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+          {derivedOriginalPrice && (
+            <p className="text-sm font-bold text-muted line-through">
+              {!String(derivedOriginalPrice).includes('₹') && '₹'}{derivedOriginalPrice}
+            </p>
           )}
-          {isExpired ? 'Offer Ended' : 'View Deal'}
-        </Link>
-        <ShareButton
-          title={deal.title}
-          text={`${deal.discountLabel} off at ${deal.store} — ${deal.title}`}
-          url={`${window.location.origin}/deal/${deal.slug}`}
-        />
+          {savings && savings !== deal.discountLabel && (
+            <span className="rounded-lg bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[10px] font-black text-emerald-600">
+              {savings}
+            </span>
+          )}
+        </div>
+
+        {/* ── Flipboard Timer ── */}
+        {!isExpired ? (
+          <div className="flex items-center gap-2 bg-[#1F1F22] rounded-xl px-3 py-2.5 border border-[#C89B1E]/20">
+            <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 flex-shrink-0">Ends in</span>
+            <div className="flex items-center gap-1 ml-auto">
+              {days > 0 && (
+                <>
+                  <FlipUnit value={days} label="D" />
+                  <Colon />
+                </>
+              )}
+              <FlipUnit value={hours} label="H" />
+              <Colon />
+              <FlipUnit value={minutes} label="M" />
+              <Colon />
+              <FlipUnit value={seconds} label="S" urgent={remainingSeconds < 3600} />
+            </div>
+          </div>
+        ) : (
+          <div className="rounded-xl bg-red-50 border border-red-200 px-3 py-2 text-center">
+            <span className="text-xs font-black tracking-widest text-red-500 uppercase">Deal Expired</span>
+          </div>
+        )}
+
+        {/* ── CTA ── */}
+        <div className="flex items-center gap-2 pt-1">
+          <Link
+            to={isExpired ? '#' : `/deal/${deal.slug}`}
+            className={`flex-1 relative overflow-hidden inline-flex items-center justify-center rounded-xl py-3 text-xs font-black uppercase tracking-[0.15em] transition-all duration-300 ${
+              isExpired
+                ? 'bg-gray-100 text-gray-400 cursor-not-allowed pointer-events-none'
+                : 'bg-[#C89B1E] text-[#12151C] shadow-lg shadow-amber-500/20 hover:bg-[#D4A820] hover:-translate-y-0.5'
+            }`}
+          >
+            {!isExpired && (
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+            )}
+            {isExpired ? 'Offer Ended' : '🔥 Grab Deal'}
+          </Link>
+          <ShareButton
+            title={deal.title}
+            text={`${deal.discountLabel} off at ${deal.store} — ${deal.title}`}
+            url={`${window.location.origin}/deal/${deal.slug}`}
+          />
+        </div>
       </div>
     </article>
   )
 }
 
+function FlipUnit({ value, label, urgent }) {
+  return (
+    <div className="flex flex-col items-center">
+      <div className={`flex h-8 w-8 items-center justify-center rounded-lg font-black text-sm font-mono tracking-tight ${urgent ? 'bg-red-500 text-white' : 'bg-[#C89B1E]/20 text-[#C89B1E]'}`}>
+        {String(value).padStart(2, '0')}
+      </div>
+      <span className="text-[7px] font-bold uppercase text-[#C89B1E]/60 mt-0.5">{label}</span>
+    </div>
+  )
+}
+
+function Colon() {
+  return <span className="text-[#C89B1E]/40 font-black text-sm mb-3">:</span>
+}
+
 export default DealCard
+
