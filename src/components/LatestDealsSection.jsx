@@ -40,7 +40,7 @@ function LatestDealsSection() {
               <img
                 src={deal.image}
                 alt={deal.title}
-                className="h-28 w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                className="h-24 sm:h-28 w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 onError={e => e.target.style.display = 'none'}
               />
               {deal.badge && (
@@ -58,9 +58,9 @@ function LatestDealsSection() {
               {deal.title}
             </h3>
 
-            <div className="flex items-center justify-between mt-1">
-              <p className="text-sm font-extrabold text-ink">{deal.price}</p>
-              <span className="rounded-lg bg-gold px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.1em] text-midnight shadow-sm transition-all group-hover:scale-[1.05] group-hover:shadow-[0_4px_10px_rgba(255,179,0,0.4)]">
+            <div className="mt-2 flex flex-col gap-1.5">
+              <p className="text-sm font-extrabold text-ink leading-none">{deal.price}</p>
+              <span className="w-full rounded-lg bg-gold px-2 py-1.5 text-[10px] font-black uppercase tracking-wider text-midnight text-center shadow-sm transition-all group-hover:shadow-[0_4px_10px_rgba(255,179,0,0.35)]">
                 View Deal →
               </span>
             </div>

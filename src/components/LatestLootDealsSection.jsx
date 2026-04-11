@@ -73,6 +73,14 @@ function LatestLootDealsSection() {
               <p className="mt-1 text-[9px] font-semibold text-white/35">
                 🔥 {item.grabbed || '0'} grabbed
               </p>
+
+              {/* View Deal button */}
+              <button
+                onClick={(e) => { e.stopPropagation(); navigate(`/loot-deal/${item.slug || item.id}`) }}
+                className="mt-2.5 w-full rounded-lg bg-gold py-1.5 text-[11px] font-black uppercase tracking-wide text-midnight shadow-sm transition-all duration-200 hover:bg-[#D4A820] hover:shadow-[0_4px_12px_rgba(212,168,32,0.4)] active:scale-95"
+              >
+                Grab Deal →
+              </button>
             </article>
           ))}
         </div>
