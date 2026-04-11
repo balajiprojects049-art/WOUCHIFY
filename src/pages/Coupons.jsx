@@ -95,17 +95,15 @@ function StoreLogo({ store, directLogo }) {
   )
 }
 
-/* ── Gradient themes ─────────────────────────────────────────────── */
-const GRADIENTS = [
-  'from-[#1a1a2e] via-[#16213e] to-[#0f3460]',
-  'from-[#1a0a2e] via-[#2d1b69] to-[#11998e]',
-  'from-[#0f2027] via-[#203a43] to-[#2c5364]',
-  'from-[#12100e] via-[#2b2b2b] to-[#1a1a1a]',
-  'from-[#1e3c72] via-[#2a5298] to-[#1e3c72]',
-  'from-[#200122] via-[#6f0000] to-[#200122]',
-  'from-[#093028] via-[#237a57] to-[#093028]',
-  'from-[#232526] via-[#414345] to-[#232526]',
-]
+/* ── Badge color helper ──────────────────────────────────────────── */
+function badgeStyle(badge) {
+  const b = (badge || '').toUpperCase()
+  if (b === 'HOT')      return 'bg-red-100 text-red-600 border-red-200'
+  if (b === 'TRENDING') return 'bg-amber-100 text-amber-600 border-amber-200'
+  if (b === 'EXCLUSIVE')return 'bg-purple-100 text-purple-600 border-purple-200'
+  if (b === 'NEW')      return 'bg-emerald-100 text-emerald-600 border-emerald-200'
+  return 'bg-[#FFF8E7] text-[#C89B1E] border-[#C89B1E]/30'
+}
 
 /* ── Dynamic Expiry Helper ───────────────────────────────────────── */
 function getDynamicExpiry(expiryString, createdAtStr) {
@@ -126,14 +124,15 @@ function getDynamicExpiry(expiryString, createdAtStr) {
   return expiryString.replace(match[0], `${remainingDays} days`)
 }
 
-/* ── Horizontal CouponCard ───────────────────────────────────────── */
+/* ── Professional CouponCard ─────────────────────────────────────── */
 function CouponCard({ item, index, dealLink }) {
   const [revealed, setRevealed] = useState(false)
   const [copied, setCopied] = useState(false)
   const [burst, setBurst] = useState(0)
-  const grad = GRADIENTS[index % GRADIENTS.length]
 
   const dynamicExpiryText = getDynamicExpiry(item.expiry, item.createdAt)
+  const isExpired = dynamicExpiryText === 'Expired'
+  const isUrgent = dynamicExpiryText && (dynamicExpiryText.includes('1 day') || dynamicExpiryText.includes('today'))
 
   const handleReveal = () => { setRevealed(true); setBurst(b => b + 1) }
   const handleCopy = () => {
@@ -143,81 +142,92 @@ function CouponCard({ item, index, dealLink }) {
   }
 
   return (
-    <article className={`
-      group relative flex w-full overflow-hidden rounded-2xl
-      bg-gradient-to-r ${grad} shadow-lg
-      transition-all duration-300 hover:-translate-y-0.5 hover:shadow-2xl
-    `}>
-      {/* Gold top accent */}
-      <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-transparent via-gold to-transparent" />
+    <article className={`group relative flex w-full overflow-hidden rounded-2xl bg-white border transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.10)] ${
+      isExpired ? 'opacity-60 grayscale border-gray-200' : 'border-[#C89B1E]/20 shadow-[0_2px_12px_rgba(0,0,0,0.06)]'
+    }`}>
 
-      {/* ── LEFT: info ───────────────────────────────────────── */}
+      {/* Gold top accent line */}
+      <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-transparent via-[#C89B1E] to-transparent" />
+
+      {/* ── LEFT: info ───────────────────────────────── */}
       <div className="flex min-w-0 flex-1 items-center gap-4 px-5 py-5">
-        {/* Store logo */}
         <StoreLogo store={item.store} directLogo={item.logo} />
 
-        {/* Text info */}
         <div className="min-w-0 flex-1">
           {/* Category + badge */}
-          <div className="flex items-center gap-2">
-            <span className="truncate text-[10px] font-black uppercase tracking-[0.15em] text-white/40">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 truncate">
               {item.category || 'Coupon'}
             </span>
             {item.badge && (
-              <span className="shrink-0 rounded-lg border border-gold/30 bg-gold/15 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest text-gold">
+              <span className={`shrink-0 rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${badgeStyle(item.badge)}`}>
                 {item.badge}
               </span>
             )}
           </div>
 
-          {/* Store */}
-          <h3 className="truncate text-base font-black text-white sm:text-lg">{item.store}</h3>
+          {/* Store name */}
+          <h3 className="truncate text-base font-black text-[#12151C] sm:text-lg group-hover:text-[#C89B1E] transition-colors">
+            {item.store}
+          </h3>
 
-          {/* Discount */}
-          <p className="line-clamp-1 text-sm font-semibold text-white/70">{item.discount}</p>
+          {/* Discount description */}
+          <p className="mt-0.5 line-clamp-1 text-sm font-semibold text-slate-600">{item.discount}</p>
 
-          {/* Meta */}
-          <div className="flex flex-wrap items-center gap-3 text-[11px] font-semibold">
-            {item.minOrder && <span className="text-white/35">Min: {item.minOrder}</span>}
-            {dynamicExpiryText && <span className={dynamicExpiryText === 'Expired' ? 'text-rose-500' : 'text-red-400'}>{dynamicExpiryText}</span>}
-            {item.success  && <span className="text-emerald-400">✓ {item.success}</span>}
+          {/* Meta row */}
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+            {item.minOrder && (
+              <span className="flex items-center gap-1 text-[11px] font-medium text-slate-400">
+                <span>🛒</span> Min: {item.minOrder}
+              </span>
+            )}
+            {dynamicExpiryText && (
+              <span className={`flex items-center gap-1 text-[11px] font-bold ${
+                isExpired ? 'text-red-500' : isUrgent ? 'text-orange-500' : 'text-slate-400'
+              }`}>
+                <span>⏰</span> {dynamicExpiryText}
+              </span>
+            )}
+            {item.success && (
+              <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-500">
+                <span>✓</span> {item.success} success
+              </span>
+            )}
           </div>
         </div>
       </div>
 
-      {/* ── Dashed vertical divider ───────────────────────────── */}
+      {/* ── Dashed divider ───────────────────────────── */}
       <div className="relative flex shrink-0 flex-col items-center justify-center py-4 px-0.5">
-        <div className="absolute -top-3 h-6 w-6 rounded-full bg-black/60" />
-        <div className="h-full border-l-2 border-dashed border-white/15" />
-        <span className="absolute rotate-90 text-[11px] text-white/20">✂</span>
-        <div className="absolute -bottom-3 h-6 w-6 rounded-full bg-black/60" />
+        <div className="absolute -top-3 h-6 w-6 rounded-full bg-[#F5F5F0]" />
+        <div className="h-full border-l-2 border-dashed border-[#C89B1E]/25" />
+        <span className="absolute rotate-90 text-[11px] text-[#C89B1E]/30">✂</span>
+        <div className="absolute -bottom-3 h-6 w-6 rounded-full bg-[#F5F5F0]" />
       </div>
 
-      {/* ── RIGHT: code reveal ───────────────────────────────── */}
-      <div className="relative flex w-40 shrink-0 flex-col items-center justify-center gap-3 px-5 py-5 sm:w-48">
+      {/* ── RIGHT: code reveal ───────────────────────── */}
+      <div className="relative flex w-40 shrink-0 flex-col items-center justify-center gap-2.5 px-4 py-5 sm:w-44">
         <ConfettiBurst trigger={burst} />
 
         {!revealed ? (
           <>
-            {/* Blurred placeholder */}
-            <div className="relative w-full overflow-hidden rounded-xl border border-white/10 bg-white/5 px-3 py-2.5">
-              <p className="select-none text-center text-xs font-black tracking-[0.35em] text-white/20 blur-[5px]">
+            {/* Blurred code preview */}
+            <div className="relative w-full overflow-hidden rounded-xl border border-[#C89B1E]/20 bg-[#FFF8E7] px-3 py-2.5">
+              <p className="select-none text-center text-xs font-black tracking-[0.35em] text-[#C89B1E]/30 blur-[5px]">
                 {item.code || 'XXXXXX'}
               </p>
               <div className="absolute inset-0 rounded-xl" style={{
-                background: 'linear-gradient(90deg,transparent,rgba(255,215,0,0.07),transparent)',
+                background: 'linear-gradient(90deg,transparent,rgba(200,155,30,0.08),transparent)',
                 backgroundSize: '200% 100%',
                 animation: 'shimmer 2s linear infinite',
               }} />
             </div>
 
-            {/* Reveal button with pulsing ring */}
+            {/* Reveal button */}
             <button
               onClick={handleReveal}
-              className="relative w-full overflow-hidden rounded-xl border border-gold/40 bg-gold/10 py-2.5 text-[11px] font-black text-gold transition-all duration-200 hover:bg-gold/20 hover:scale-105 active:scale-95"
+              className="relative w-full overflow-hidden rounded-xl border border-[#C89B1E] bg-[#C89B1E] py-2.5 text-[11px] font-black text-white shadow-sm shadow-amber-200 transition-all duration-200 hover:bg-[#D4A820] hover:scale-105 active:scale-95"
             >
-              <span className="absolute inset-0 rounded-xl border border-gold/25"
-                style={{ animation: 'pulse-ring 1.6s ease-out infinite' }} />
               <span className="relative flex items-center justify-center gap-1.5">
                 <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -230,20 +240,20 @@ function CouponCard({ item, index, dealLink }) {
         ) : (
           <>
             {/* Revealed code box */}
-            <div className="reveal-anim w-full rounded-xl border border-gold/40 bg-gold/10 px-3 py-2.5">
-              <p className="slide-up text-center text-[11px] font-black tracking-[0.2em] text-gold">
+            <div className="reveal-anim w-full rounded-xl border border-[#C89B1E]/40 bg-[#FFF8E7] px-3 py-2.5">
+              <p className="slide-up text-center text-[11px] font-black tracking-[0.2em] text-[#C89B1E]">
                 {item.code}
               </p>
             </div>
 
-            {/* Copy + Get Deal buttons */}
-            <div className="slide-up flex w-full flex-col gap-2">
+            {/* Action buttons */}
+            <div className="slide-up flex w-full flex-col gap-1.5">
               <button
                 onClick={handleCopy}
-                className={`w-full rounded-xl py-2 text-[11px] font-black shadow transition-all duration-200 hover:scale-105 active:scale-95 ${
+                className={`w-full rounded-xl py-2 text-[11px] font-black shadow-sm transition-all duration-200 hover:scale-105 active:scale-95 ${
                   copied
-                    ? 'bg-emerald-500 text-white shadow-emerald-500/30'
-                    : 'bg-gold text-[#111] shadow-gold/30'
+                    ? 'bg-emerald-500 text-white shadow-emerald-200'
+                    : 'bg-[#C89B1E] text-white shadow-amber-200 hover:bg-[#D4A820]'
                 }`}
               >
                 {copied ? '✓ Copied!' : 'Copy Code'}
@@ -255,24 +265,18 @@ function CouponCard({ item, index, dealLink }) {
                 onClick={!dealLink ? e => e.preventDefault() : undefined}
                 className={`flex w-full items-center justify-center gap-1 rounded-xl border py-2 text-[11px] font-black transition-all duration-200 hover:scale-105 active:scale-95 ${
                   dealLink
-                    ? 'border-white/20 bg-white/10 text-white hover:bg-white/20'
-                    : 'border-white/10 bg-white/5 text-white/30 cursor-not-allowed'
+                    ? 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
+                    : 'border-slate-100 bg-slate-50 text-slate-300 cursor-not-allowed'
                 }`}
               >
-                {dealLink ? 'Get Deal' : 'No Link'}
-                {dealLink && (
-                  <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                )}
+                {dealLink ? 'Get Deal ↗' : 'No Link'}
               </a>
-              {/* Share */}
               <ShareButton
                 variant="pill"
                 title={`${item.store} Coupon — ${item.discount}`}
                 text={`Use code ${item.code} for ${item.discount} at ${item.store}`}
                 url={dealLink || window.location.href}
-                className="w-full justify-center border-white/20 bg-white/5 text-white/60 hover:border-white/40 hover:text-white"
+                className="w-full justify-center border-slate-200 bg-slate-50 text-slate-500 hover:border-slate-300 hover:text-slate-700"
               />
             </div>
           </>
