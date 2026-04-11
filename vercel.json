@@ -1,0 +1,24 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "dist" }
+    }
+  ],
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/api/events", "dest": "/api/events.js" },
+    { "src": "/api/poll",   "dest": "/api/poll.js" },
+    { "src": "/api/data",   "dest": "/api/data.js" },
+    { "src": "/api/sync",   "dest": "/api/sync.js" },
+    { "src": "/api/(.*)",   "dest": "/api/collection/[...params].js" },
+    { "src": "/(.*)",       "dest": "/index.html" }
+  ]
+}
+

@@ -1,0 +1,103 @@
+/* src/components/CountdownTimer.css */
+
+:root {
+  --flip-bg: #12151C;
+  --flip-text: #ffb300;
+  --flip-unit-width: 44px;
+  --flip-unit-height: 48px;
+  --flip-font-size: 26px;
+  --flip-anim-speed: 0.6s;
+}
+
+.countdown-flip-card {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  width: var(--flip-unit-width);
+  height: var(--flip-unit-height);
+  perspective: 1000px;
+  border-radius: 8px;
+  background-color: var(--flip-bg);
+  box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+/* Base style for all card segments */
+.countdown-flip-top,
+.countdown-flip-bottom,
+.countdown-flip-leaf-front,
+.countdown-flip-leaf-back {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  overflow: hidden;
+  background-color: var(--flip-bg);
+  color: var(--flip-text);
+  display: flex;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+/* Digits perfectly centered without a middle split line */
+.countdown-flip-text {
+  font-size: var(--flip-font-size);
+  font-weight: 950;
+  line-height: var(--flip-unit-height); 
+  letter-spacing: -0.05em;
+  font-family: 'Inter', system-ui, sans-serif;
+  /* Soft glow for premiums */
+  filter: drop-shadow(0 0 8px rgba(255, 179, 0, 0.25));
+}
+
+/* Top Sections */
+.countdown-flip-top,
+.countdown-flip-leaf-front {
+  top: 0;
+  align-items: flex-start;
+  border-radius: 8px 8px 0 0;
+  z-index: 10;
+  /* Removed border-bottom / split line */
+}
+
+/* Bottom Sections */
+.countdown-flip-bottom,
+.countdown-flip-leaf-back {
+  bottom: 0;
+  align-items: flex-end;
+  border-radius: 0 0 8px 8px;
+  z-index: 5;
+}
+
+/* The leaf element that rotates */
+.countdown-flip-leaf {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  z-index: 20;
+  transform-style: preserve-3d;
+  transform-origin: bottom;
+  transition: transform var(--flip-anim-speed) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.countdown-flip-leaf-front,
+.countdown-flip-leaf-back {
+  height: 100%;
+  backface-visibility: hidden;
+}
+
+.countdown-flip-leaf-back {
+  transform: rotateX(-180deg);
+}
+
+.countdown-flip-card.flipping .countdown-flip-leaf {
+  transform: rotateX(-180deg);
+}
+
+/* Urgency State */
+.countdown-flip-card.urgent .countdown-flip-text {
+  color: #ff4d4d;
+  filter: drop-shadow(0 0 8px rgba(255, 77, 77, 0.3));
+}
