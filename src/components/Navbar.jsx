@@ -222,15 +222,17 @@ function Navbar() {
 
         {/* Mobile nav dropdown */}
         <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'max-h-[500px] border-t border-line/40' : 'max-h-0'}`}>
-          <nav className="flex flex-col gap-2 p-4 bg-cream/95 backdrop-blur-xl shadow-inner">
+        <nav className="flex flex-col gap-1 p-4 bg-cream/95 backdrop-blur-xl shadow-inner">
             {navLinks.map((link) => (
               <NavLink
                 key={link.label}
                 to={link.to}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={({ isActive }) =>
-                  `block rounded-xl px-4 py-3.5 text-[15px] uppercase tracking-wider font-extrabold transition-all duration-200 border border-transparent ${
-                    isActive ? 'bg-gold text-midnight shadow-md shadow-gold/20' : 'text-ink hover:border-line hover:bg-black/5'
+                  `block rounded-xl px-4 py-3.5 text-[15px] uppercase tracking-wider font-extrabold transition-all duration-200 ${
+                    isActive
+                      ? 'bg-gold text-midnight shadow-md shadow-gold/20'
+                      : 'text-ink active:bg-black/5 active:scale-[0.98]'
                   }`
                 }
               >
