@@ -229,10 +229,10 @@ function Navbar() {
                 to={link.to}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={({ isActive }) =>
-                  `block rounded-xl px-4 py-3.5 text-[15px] uppercase tracking-wider font-extrabold transition-all duration-200 ${
+                  `block rounded-xl px-4 py-3.5 text-[15px] uppercase tracking-wider font-extrabold transition-all duration-200 border border-transparent ${
                     isActive
                       ? 'bg-gold text-midnight shadow-md shadow-gold/20'
-                      : 'text-ink active:bg-black/5 active:scale-[0.98]'
+                      : 'text-ink active:bg-black/5 active:scale-[0.98] [@media(hover:hover)]:hover:bg-black/5 [@media(hover:hover)]:hover:border-line'
                   }`
                 }
               >

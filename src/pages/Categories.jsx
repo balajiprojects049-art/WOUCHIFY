@@ -34,7 +34,7 @@ const LETTERS = ["ALL", ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")]
 
 export default function Categories() {
   const { deals, lootDeals, coupons } = useData()
-  const [activeTab, setActiveTab] = useState('products')
+  const [activeTab, setActiveTab] = useState('all')
   const [activeLetter, setActiveLetter] = useState('ALL')
   const [search, setSearch] = useState('')
   const [isLoading, setIsLoading] = useState(true)
@@ -291,7 +291,12 @@ export default function Categories() {
                         <IconRenderer name={cat.icon} className="w-7 h-7 sm:w-8 sm:h-8 text-navy opacity-80" />
                       </div>
 
-                      {/* Hover State: Content */}
+                      {/* Count badge — mobile/tablet only */}
+                      <div className="lg:hidden absolute bottom-1.5 right-1.5 flex items-center rounded-full bg-gold px-1.5 py-0.5 pointer-events-none shadow-sm">
+                        <span className="text-[9px] font-black text-midnight leading-none">{getCatCount(cat.name)}</span>
+                      </div>
+
+                      {/* Hover State: Full overlay (desktop) */}
                       <div className="absolute inset-0 flex flex-col items-center justify-center bg-gold text-midnight transition-all duration-400 opacity-0 scale-125 group-hover:opacity-100 group-hover:scale-100">
                         <span className="text-xl sm:text-2xl font-black">{getCatCount(cat.name)}</span>
                         <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-widest opacity-90">Offers</span>
@@ -395,21 +400,27 @@ export default function Categories() {
                             
                             {/* Default State: Icon */}
                             <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 group-hover:opacity-0 group-hover:-translate-y-4">
-                              <IconRenderer name={cat.icon || 'Tag'} className="w-8 h-8 text-navy/80 hover:text-midnight transition-colors" />
+                              <IconRenderer name={cat.icon || 'Tag'} className="w-8 h-8 text-navy/80 transition-colors" />
                             </div>
 
-                            {/* Hover State: Content */}
+                            {/* Count badge — mobile/tablet only (hidden on desktop where hover works) */}
+                            <div className="lg:hidden absolute bottom-1.5 right-1.5 flex items-center rounded-full bg-gold px-1.5 py-0.5 pointer-events-none shadow-sm">
+                              <span className="text-[9px] font-black text-midnight leading-none">{cat.realCount}</span>
+                            </div>
+
+                            {/* Hover State: Full gold overlay (desktop) */}
                             <div className="absolute inset-0 flex flex-col items-center justify-center bg-gold text-midnight transition-all duration-400 opacity-0 translate-y-6 group-hover:opacity-100 group-hover:translate-y-0">
                               <span className="text-xl sm:text-2xl font-black">{cat.realCount}</span>
                               <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-widest opacity-90">Deals</span>
                             </div>
                           </div>
                           
-                          <div className="mt-3.5 flex items-start justify-center gap-1.5 text-ink group-hover:text-gold transition-colors duration-300 w-full px-1">
-                            <h4 className="text-[13px] sm:text-sm font-semibold text-center leading-tight line-clamp-2">
+                          <div className="mt-2.5 flex flex-col items-center gap-0.5 text-ink group-hover:text-gold transition-colors duration-300 w-full px-1">
+                            <h4 className="text-[12px] sm:text-[13px] font-semibold text-center leading-tight line-clamp-2">
                               {cat.name}
                             </h4>
-                            <IconRenderer name="ArrowUpRight" className="w-3.5 h-3.5 opacity-0 -translate-x-2 translate-y-1 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-300 flex-shrink-0 mt-0.5" />
+                            {/* Offer count below name — only on mobile/tablet */}
+                            <span className="lg:hidden text-[10px] font-bold text-gold">{cat.realCount} offers</span>
                           </div>
                         </Link>
                       ))}
