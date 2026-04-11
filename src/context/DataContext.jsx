@@ -177,9 +177,26 @@ export function DataProvider({ children }) {
       if (res.isConnected) {
         setDbConnected(true)
         if (res.hasData) {
-          // Merge db data over local defaults
-          if (res.data.deals) setDeals(res.data.deals)
-          if (res.data.lootDeals) setLootDeals(res.data.lootDeals)
+          // Smart merge: DB data wins but preserve any local-only fields
+          // (e.g. 'store' field added before DB had the column)
+          const mergeList = (dbItems, localItems) => {
+            if (!Array.isArray(dbItems)) return dbItems
+            return dbItems.map(dbItem => {
+              const local = localItems.find(l => l.slug === dbItem.slug || l.id === dbItem.id)
+              if (!local) return dbItem
+              // Spread local first, then DB overrides — but keep local non-empty fields if DB lacks them
+              const merged = { ...dbItem }
+              Object.entries(local).forEach(([k, v]) => {
+                if ((merged[k] === undefined || merged[k] === null || merged[k] === '') && v != null && v !== '') {
+                  merged[k] = v
+                }
+              })
+              return merged
+            })
+          }
+
+          if (res.data.deals) setDeals(prev => mergeList(res.data.deals, prev))
+          if (res.data.lootDeals) setLootDeals(prev => mergeList(res.data.lootDeals, prev))
           if (res.data.stores) setStores(res.data.stores)
           if (res.data.coupons) setCoupons(res.data.coupons)
           if (res.data.giveaways) setGiveaways(res.data.giveaways)
@@ -210,7 +227,7 @@ export function DataProvider({ children }) {
   // ── Database single-item persistence bridge ──
   const persist = (collection, item) => {
     if (!item) return
-    fetch(`/api/${collection}`, {
+    fetch(`/api/collection/${collection}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(item),
@@ -224,7 +241,7 @@ export function DataProvider({ children }) {
     })
   }
   const removeDb = (collection, id) => {
-    const endpoint = id ? `/api/${collection}/${id}` : `/api/${collection}`
+    const endpoint = id ? `/api/collection/${collection}/${id}` : `/api/collection/${collection}`
     fetch(endpoint, { method: 'DELETE' }).then((res) => {
       if (!res.ok) {
         console.error(`DB delete failed for ${id ? `${collection}/${id}` : collection}: HTTP ${res.status}`)
@@ -234,6 +251,7 @@ export function DataProvider({ children }) {
       // Deletion will remain local if backend is unavailable.
     })
   }
+
 
   const addAuditLog = (action, entity, detail) => {
     const entry = buildLog(action, entity, detail)
