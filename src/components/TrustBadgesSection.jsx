@@ -2,61 +2,59 @@ function TrustBadgesSection() {
   const badges = [
     {
       icon: (
-        <svg className="h-6 w-6 sm:h-7 sm:w-7" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+        <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.105-2.59-.308-3.838A11.959 11.959 0 0112 2.714z" />
         </svg>
       ),
-      label: '100% Free Platform',
-      sub: 'No fees ever',
+      label: 'Verified & Secure',
+      sub: 'STRICT SECURITY PROTOCOLS',
     },
     {
       icon: (
-        <svg className="h-6 w-6 sm:h-7 sm:w-7" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       ),
-      label: 'No Hidden Charges',
-      sub: 'Completely transparent',
+      label: 'Live Every Hour',
+      sub: 'REAL-TIME DATA REFRESH',
     },
     {
       icon: (
-        <svg className="h-6 w-6 sm:h-7 sm:w-7" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+        <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-3.833-6.24h-.001a4.125 4.125 0 00-3.833 6.24zM16.271 8.262a3.375 3.375 0 11.618-3.235 3.377 3.377 0 01-.618 3.235zM4.126 18.544a4.125 4.125 0 013.833-6.24h.001a4.125 4.125 0 013.833 6.24 9.303 9.303 0 01-6.425.86 9.303 9.303 0 01-1.242-.86zM6.155 7.15a3.375 3.375 0 11.618-3.235 3.377 3.377 0 01-.618 3.235z" />
         </svg>
       ),
-      label: 'Verified Deals Only',
-      sub: 'Handpicked & tested',
+      label: '50K+ Community',
+      sub: 'TRUSTED BY INDIAN SAVERS',
     },
     {
       icon: (
-        <svg className="h-6 w-6 sm:h-7 sm:w-7" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+        <svg fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
         </svg>
       ),
-      label: '50,000+ Happy Users',
-      sub: 'Growing every day',
+      label: 'No Login Required',
+      sub: '100% PRIVACY GUARANTEED',
     },
   ]
 
   return (
-    <section className="py-2">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
-        {badges.map((badge, i) => (
-          <div
-            key={i}
-            className="flex flex-col items-center gap-2 rounded-2xl border border-gold/20 bg-gradient-to-b from-gold/5 to-transparent p-4 text-center shadow-sm transition-all duration-300 hover:border-gold/40 hover:shadow-md sm:p-5"
-          >
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gold/10 text-gold sm:h-14 sm:w-14">
-              {badge.icon}
-            </div>
-            <div>
-              <p className="text-xs font-bold text-ink sm:text-sm">{badge.label}</p>
-              <p className="mt-0.5 text-[10px] text-muted sm:text-xs">{badge.sub}</p>
-            </div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {badges.map((badge, i) => (
+        <div
+          key={i}
+          className="flex items-center gap-4 group"
+        >
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gold/10 text-gold transition-all duration-300 group-hover:bg-gold group-hover:text-midnight">
+            {badge.icon}
           </div>
-        ))}
-      </div>
-    </section>
+          <div className="min-w-0">
+            <p className="text-[14px] font-black tracking-tight text-ink sm:text-[15px]">{badge.label}</p>
+            <p className="mt-0.5 text-[9px] font-black text-muted uppercase tracking-[0.15em]">{badge.sub}</p>
+          </div>
+        </div>
+      ))}
+    </div>
   )
 }
 

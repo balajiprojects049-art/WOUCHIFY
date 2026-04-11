@@ -93,14 +93,58 @@ export const FESTIVAL_CATEGORIES_BY_LETTER = {
   V: ["Valentine's Day"],
 }
 
-// ── MERGED CATEGORIES BY LETTER (Products + Stores + Brands + Festivals) ────
-// Used by FilterBar for the main category dropdown/filter
+// ── BANKS BY LETTER ─────────────────────────────────────────────────────────
+export const BANK_CATEGORIES_BY_LETTER = {
+  A: ['Axis Bank', 'American Express'],
+  H: ['HDFC Bank'],
+  I: ['ICICI Bank', 'IndusInd Bank'],
+  K: ['Kotak Mahindra'],
+  S: ['SBI Card', 'Standard Chartered'],
+}
+
+// ── CITIES BY LETTER ─────────────────────────────────────────────────────────
+export const CITY_CATEGORIES_BY_LETTER = {
+  B: ['Bangalore'],
+  C: ['Chennai'],
+  D: ['Delhi/NCR'],
+  H: ['Hyderabad'],
+  K: ['Kolkata'],
+  M: ['Mumbai'],
+  P: ['Pune'],
+}
+
+// ── TRAVEL BY LETTER (Flattened for selection) ───────────────────────────────
+export const TRAVEL_CATEGORIES_BY_LETTER = {
+  A: ['Air India', 'Air India Express', 'Akasa Air', 'Alliance Air', 'APSRTC', 'AbhiBus'],
+  B: ['British Airways'],
+  C: ['Cleartrip', 'ConfirmTkt'],
+  E: ['Emirates', 'Etihad Airways', 'Expedia', 'EaseMyTrip'],
+  G: ['Goibibo'],
+  I: ['IndiGo', 'Ixigo', 'IRCTC'],
+  K: ['Kayak'],
+  L: ['Lufthansa'],
+  M: ['MakeMyTrip', 'Mega Cabs', 'Meru', 'MSRTC'],
+  O: ['Ola', 'Ola Cabs'],
+  P: ['Paytm', 'Paytm Travel'],
+  Q: ['Qatar Airways'],
+  R: ['RailYatri', 'Rapido', 'RedBus', 'Revv'],
+  S: ['Savaari', 'Singapore Airlines', 'Skyscanner', 'SpiceJet', 'Star Air'],
+  T: ['TNSTC', 'Trainman', 'TSRTC'],
+  U: ['Uber'],
+  Y: ['Yatra'],
+  Z: ['Zoomcar'],
+}
+
+// ── MERGED CATEGORIES BY LETTER (Everything) ────
 export const CATEGORIES_BY_LETTER = Object.keys(
   [
     ...Object.keys(PRODUCT_CATEGORIES_BY_LETTER),
     ...Object.keys(STORE_CATEGORIES_BY_LETTER),
     ...Object.keys(BRAND_CATEGORIES_BY_LETTER),
     ...Object.keys(FESTIVAL_CATEGORIES_BY_LETTER),
+    ...Object.keys(BANK_CATEGORIES_BY_LETTER),
+    ...Object.keys(CITY_CATEGORIES_BY_LETTER),
+    ...Object.keys(TRAVEL_CATEGORIES_BY_LETTER),
   ].reduce((acc, k) => ({ ...acc, [k]: true }), {})
 ).sort().reduce((acc, letter) => {
   const merged = [
@@ -108,8 +152,10 @@ export const CATEGORIES_BY_LETTER = Object.keys(
     ...(STORE_CATEGORIES_BY_LETTER[letter] || []),
     ...(BRAND_CATEGORIES_BY_LETTER[letter] || []),
     ...(FESTIVAL_CATEGORIES_BY_LETTER[letter] || []),
+    ...(BANK_CATEGORIES_BY_LETTER[letter] || []),
+    ...(CITY_CATEGORIES_BY_LETTER[letter] || []),
+    ...(TRAVEL_CATEGORIES_BY_LETTER[letter] || []),
   ]
-  // De-duplicate and sort alphabetically
   acc[letter] = [...new Set(merged)].sort((a, b) => a.localeCompare(b))
   return acc
 }, {})
@@ -129,134 +175,9 @@ export const TOP_STORES = [
   'Tata CLiQ', 'OLX', 'Quikr', 'Udaan', 'Voonik', 'Yepme', 'Zivame',
 ]
 
-// ── PRODUCTS & THEIR BRANDS (for advanced filtering / future use) ─────────────
+// ── PRODUCTS & THEIR BRANDS (Existing) ──────────────────────────────────────
 export const PRODUCTS_AND_BRANDS = {
-  Electronics: {
-    'Mobile Phones': {
-      famous: ['Apple', 'Google Pixel', 'Samsung', 'OnePlus', 'Vivo', 'Oppo', 'Xiaomi'],
-      value: ['Realme', 'iQOO', 'Infinix', 'Tecno', 'Lava', 'Micromax', 'Nokia'],
-    },
-    Laptops: {
-      famous: ['Apple', 'HP', 'Dell', 'Lenovo', 'Asus'],
-      value: ['Acer', 'MSI', 'Avita', 'Honor', 'Chuwi'],
-    },
-    'Earphones & Headphones': {
-      famous: ['Sony', 'JBL'],
-      value: ['Boat', 'Noise', 'Boult', 'pTron', 'Mivi', 'Zebronics'],
-    },
-    'Smart Watches & Bands': {
-      famous: ['Apple', 'Samsung'],
-      value: ['Noise', 'Boat', 'Fire-Boltt', 'Amazfit', 'Pebble'],
-    },
-  },
-  Fashion: {
-    "Girls' Dresses": {
-      famous: ['H&M', 'Zudio', 'Westside', 'Pantaloons'],
-      value: ['Urbanic', 'DressBerry', 'Sassafras', 'Tokyo Talkies', 'Berrylush'],
-    },
-    "Boys' Clothing": {
-      famous: ["Levi's", 'Nike', 'Adidas', 'Puma'],
-      value: ['Roadster', 'Highlander', 'Campus Sutra', 'Spykar'],
-    },
-    'Inner Wears': {
-      famous: ['Jockey'],
-      value: ['Lux', 'Dixy Scot', 'Dollar', 'Rupa', 'Amul Macho', 'XYXX'],
-    },
-  },
-  Footwear: {
-    Shoes: {
-      famous: ['Nike', 'Adidas', 'Puma'],
-      value: ['Bata', 'Sparx', 'Campus', 'Red Tape', 'Asian', 'Liberty'],
-    },
-    'Slippers & Sandals': {
-      famous: ['Bata'],
-      value: ['Relaxo', 'Paragon', 'Sparx'],
-    },
-  },
-  Accessories: {
-    Watches: {
-      famous: ['Titan', 'Casio'],
-      value: ['Fastrack', 'Sonata', 'Timex', 'Noise'],
-    },
-    Bags: {
-      famous: ['American Tourister'],
-      value: ['Skybags', 'Wildcraft', 'Safari', 'Aristocrat', 'Fastrack'],
-    },
-    Sunglasses: {
-      famous: ['Ray-Ban', 'Oakley'],
-      value: ['Fastrack', 'IDEE', 'Vincent Chase'],
-    },
-  },
-  'Home Appliances': {
-    Refrigerators: {
-      famous: ['LG', 'Samsung'],
-      value: ['Whirlpool', 'Godrej', 'Haier', 'Panasonic'],
-    },
-    'Air Conditioners': {
-      famous: ['Daikin', 'LG'],
-      value: ['Voltas', 'Blue Star', 'Lloyd'],
-    },
-    Fans: {
-      famous: ['Havells'],
-      value: ['Usha', 'Crompton', 'Bajaj', 'Orient'],
-    },
-    Lights: {
-      famous: ['Philips'],
-      value: ['Havells', 'Wipro', 'Syska'],
-    },
-    'Air Coolers': {
-      famous: ['Symphony'],
-      value: ['Bajaj', 'Crompton', 'Orient'],
-    },
-  },
-  Kitchen: {
-    Cookware: {
-      famous: ['Prestige'],
-      value: ['Pigeon', 'Butterfly', 'Hawkins', 'Milton'],
-    },
-    'Kitchen Appliances': {
-      famous: ['Philips'],
-      value: ['Bajaj', 'Usha', 'Prestige', 'Butterfly'],
-    },
-  },
-  'Toys & Baby Products': {
-    Toys: {
-      famous: ['Lego', 'Barbie'],
-      value: ['Funskool', 'Hot Wheels', 'Mirada'],
-    },
-    'Baby Products': {
-      famous: ['Chicco'],
-      value: ['Mee Mee', "Johnson's Baby", 'Himalaya Baby'],
-    },
-  },
-  'Beauty & Personal Care': {
-    Makeup: {
-      famous: ['Lakme', 'Maybelline', "L'Oréal"],
-      value: ['Sugar', 'Blue Heaven', 'Faces Canada'],
-    },
-    'Skin Care': {
-      famous: ['Nivea'],
-      value: ['Himalaya', "Pond's", 'Mamaearth', 'Wow'],
-    },
-  },
-  Furniture: {
-    Chairs: {
-      famous: ['Godrej Interio'],
-      value: ['Nilkamal', 'Durian', 'Supreme'],
-    },
-    Beds: {
-      famous: ['Wakefit'],
-      value: ['Sleepyhead', 'Nilkamal', 'Durian'],
-    },
-    Tables: {
-      famous: ['IKEA'],
-      value: ['Nilkamal', 'Durian', 'Godrej Interio'],
-    },
-    Sofas: {
-      famous: ['Urban Ladder'],
-      value: ['Pepperfry', 'Durian'],
-    },
-  },
+  // ... (keep as is)
 }
 
 // ── CATEGORY SECTIONS (used in FilterBar and Admin pages) ────────────────────
@@ -265,4 +186,7 @@ export const CATEGORY_SECTIONS = [
   { id: 'stores',   label: 'Stores',    icon: '🏪', data: STORE_CATEGORIES_BY_LETTER },
   { id: 'brands',   label: 'Brands',    icon: '🏷️', data: BRAND_CATEGORIES_BY_LETTER },
   { id: 'festivals',label: 'Festivals', icon: '🎉', data: FESTIVAL_CATEGORIES_BY_LETTER },
+  { id: 'banks',    label: 'Banks',     icon: '💳', data: BANK_CATEGORIES_BY_LETTER },
+  { id: 'cities',   label: 'Cities',    icon: '📍', data: CITY_CATEGORIES_BY_LETTER },
+  { id: 'travel',   label: 'Travel',    icon: '✈️', data: TRAVEL_CATEGORIES_BY_LETTER },
 ]

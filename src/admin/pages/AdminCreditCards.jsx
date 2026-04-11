@@ -54,6 +54,7 @@ function CardForm({ initial, onSave, onCancel }) {
                 <p className="text-xs font-bold text-white/50 mb-3 uppercase tracking-wider">Quick Add Presets</p>
                 <div className="flex flex-wrap gap-2">
                   {[
+                    { bank: 'TIDE', card: 'Tide Credit Card', logo: 'https://www.google.com/s2/favicons?sz=256&domain=tide.co' },
                     { bank: 'INDUSIND BANK', card: 'IndusInd Credit Card', logo: 'https://www.google.com/s2/favicons?sz=256&domain=indusind.com' },
                     { bank: 'ICICI BANK', card: 'ICICI CC', logo: 'https://www.google.com/s2/favicons?sz=256&domain=icicibank.com' },
                     { bank: 'IDFC FIRST BANK', card: 'IDFC CC', logo: 'https://www.google.com/s2/favicons?sz=256&domain=idfcfirstbank.com' },

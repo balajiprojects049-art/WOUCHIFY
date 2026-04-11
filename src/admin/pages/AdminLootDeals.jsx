@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import AdminLayout from '../layout/AdminLayout'
 import { useData } from '../../context/DataContext'
 import ImageUpload from '../components/ImageUpload'
+import SearchableSelect from '../components/SearchableSelect'
 import { CATEGORY_SECTIONS } from '../../utils/categories'
 import {
   G, inp, lbl, cardStyle, tableWrapStyle, thStyle, trBorderStyle,
@@ -16,7 +17,6 @@ const EMPTY = {
   urgency: 'Ending soon — grab it now!', expiresInSeconds: 21600, popularity: 90, image: '',
   description: '', steps: '', terms: '', link: '',
 }
-// CATEGORY_SECTIONS is now used to group categories.
 
 function addFocus(e) { Object.assign(e.target.style, inpFocus) }
 function remFocus(e) { Object.assign(e.target.style, { borderColor: 'rgba(255,255,255,0.09)', boxShadow: 'none' }) }
@@ -48,18 +48,29 @@ function ConfirmDialog({ onConfirm, onCancel }) {
 }
 
 function LootForm({ initial, onSave, onCancel }) {
-  const [form, setForm] = useState({ ...initial, _expiresHours: Math.round(Number(initial.expiresInSeconds) / 3600) || 6 })
+  const [form, setForm] = useState(() => {
+    const startMs = initial.createdAt ? new Date(initial.createdAt).getTime() : Date.now()
+    const expiresMs = startMs + (initial.expiresInSeconds || 21600) * 1000
+    const d = new Date(expiresMs)
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
+    return { ...initial, expiresAt: d.toISOString().slice(0, 16) }
+  })
+  
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
   const inputProps = { className: inp, style: inpStyle, onFocus: addFocus, onBlur: remFocus }
-  const selectProps = { className: `${inp} cursor-pointer`, style: inpStyle, onFocus: addFocus, onBlur: remFocus }
+  const flatCategories = useMemo(() => Array.from(new Set(CATEGORY_SECTIONS.flatMap(s => Object.values(s.data).flat()))).sort(), [])
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    const createdAtMs = form.createdAt ? new Date(form.createdAt).getTime() : Date.now()
+    const expiresAtMs = new Date(form.expiresAt).getTime()
+    const expiresInSeconds = Math.max(0, Math.round((expiresAtMs - createdAtMs) / 1000))
+    
     const slug = form.slug || form.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
     onSave({
       ...form, slug,
       discountPercent: Number(form.discountPercent),
-      expiresInSeconds: Number(form._expiresHours) * 3600,
+      expiresInSeconds,
       popularity: Number(form.popularity),
       steps: typeof form.steps === 'string' ? form.steps.split('\n').filter(Boolean) : form.steps,
     })
@@ -78,16 +89,12 @@ function LootForm({ initial, onSave, onCancel }) {
               </div>
               <div>
                 <label className={lbl}>Category</label>
-                <select {...selectProps} value={form.category} onChange={e => set('category', e.target.value)}>
-                  <option value="Electronics" className="bg-[#0C1018]">Electronics</option>
-                  {CATEGORY_SECTIONS.map((section) => (
-                    <optgroup key={section.id} label={`── ${section.label.toUpperCase()} ──`}>
-                      {Object.values(section.data).flat().map(c => (
-                        <option key={`${section.id}-${c}`} value={c} className="bg-[#0C1018]">{c}</option>
-                      ))}
-                    </optgroup>
-                  ))}
-                </select>
+                <SearchableSelect 
+                  value={form.category} 
+                  onChange={v => set('category', v)} 
+                  options={flatCategories} 
+                  placeholder="Search categories..."
+                />
               </div>
               <div>
                 <label className={lbl}>Popularity (0–100)</label>
@@ -125,9 +132,9 @@ function LootForm({ initial, onSave, onCancel }) {
           <div className="rounded-2xl p-5" style={cardStyle}>
             <SectionHeader title="Urgency & Timing" />
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className={lbl}>Expires In (hours)</label>
-                <input type="number" min="1" {...inputProps} value={form._expiresHours} onChange={e => set('_expiresHours', e.target.value)} placeholder="6" />
+              <div className="col-span-2 sm:col-span-1">
+                <label className={lbl}>Exact Expiry Date & Time <span style={{ color: G }}>*</span></label>
+                <input {...inputProps} required type="datetime-local" value={form.expiresAt || ''} onChange={e => set('expiresAt', e.target.value)} />
               </div>
               <div>
                 <label className={lbl}>Grabbed Count</label>

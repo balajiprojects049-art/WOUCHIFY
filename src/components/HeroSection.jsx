@@ -70,7 +70,6 @@ function HeroSection() {
             const g = getGreeting()
             return (
               <div className="flex items-center gap-2">
-                <span className="text-2xl">{g.emoji}</span>
                 <span className="text-sm font-semibold text-muted sm:text-base">
                   {g.text}! Welcome to Wouchify
                 </span>

@@ -17,10 +17,9 @@ function Stores() {
 
   const visibleStores = useMemo(() => (stores || []).filter(s => s?.slug), [stores])
 
-  // Get store categories dynamically from context data
   const storeCategories = useMemo(() => {
-    const cats = ['All', ...new Set(visibleStores.map(s => s.category).filter(Boolean))]
-    return cats
+    const cats = [...new Set(visibleStores.map(s => s.category).filter(Boolean))].sort()
+    return ['All', ...cats]
   }, [visibleStores])
 
   useEffect(() => {
@@ -50,7 +49,7 @@ function Stores() {
       const matchesCategory = selectedCategory === 'All' || store.category === selectedCategory
 
       return matchesSearch && matchesLetter && matchesCategory
-    })
+    }).sort((a, b) => a.name.localeCompare(b.name))
   }, [query, selectedLetter, selectedCategory, visibleStores])
 
   return (

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import HowItWorksSection from '../components/HowItWorksSection'
+import AdvertiseWithUsSection from '../components/AdvertiseWithUsSection'
 
 function AboutContact() {
   const [formData, setFormData] = useState({
@@ -133,6 +134,11 @@ function AboutContact() {
               </div>
             )}
           </section>
+        </div>
+
+        {/* Advertise With Us Banner */}
+        <div className="mt-16 sm:mt-20">
+          <AdvertiseWithUsSection />
         </div>
 
         {/* How It Works Section */}

@@ -176,7 +176,7 @@ export default function AdminStores() {
   const [search, setSearch] = useState('')
   const [confirm, setConfirm] = useState(null)
 
-  const filtered = stores.filter(s => s.name.toLowerCase().includes(search.toLowerCase()))
+  const filtered = stores.filter(s => s.name.toLowerCase().includes(search.toLowerCase())).sort((a, b) => a.name.localeCompare(b.name))
   const handleSave = (data) => {
     if (mode === 'add') addStore(data)
     else updateStore(editing.slug, data)

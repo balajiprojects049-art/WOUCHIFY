@@ -1,74 +1,108 @@
 import HeroSection from '../components/HeroSection'
 import TrustBadgesSection from '../components/TrustBadgesSection'
 import TopStoresSection from '../components/TopStoresSection'
-
-import UserGuideSection from '../components/UserGuideSection'
+import LatestDealsSection from '../components/LatestDealsSection'
+import TrendingDealsSection from '../components/TrendingDealsSection'
+import LatestLootDealsSection from '../components/LatestLootDealsSection'
 import ExclusiveDealsSection from '../components/ExclusiveDealsSection'
-import JustInPromoSection from '../components/JustInPromoSection'
-import GiveawaySection from '../components/GiveawaySection'
-import FAQSection from '../components/FAQSection'
-import AdvertiseWithUsSection from '../components/AdvertiseWithUsSection'
-import BenefitsTicker from '../components/BenefitsTicker'
-import TelegramBanner from '../components/TelegramBanner'
+import TopCreditCardsSection from '../components/TopCreditCardsSection'
+import NewsTickerSection from '../components/NewsTickerSection'
 import AdZone from '../components/AdZone'
+import CreditCardAdBanner from '../components/CreditCardAdBanner'
 
 /**
  * USER JOURNEY (Critical Order):
  * 1. Hero → Understand the platform + CTAs
  * 2. Trust Badges → Build instant credibility
- * 3. How It Works → Concept clarity
- * 4. Featured Deals → Start browsing
- * 5. Top Stores → Explore brands
- * 6. Daily Rewards / Spin Wheel → Engagement hook
- * 7. Exclusive Deals → Deep content
- * 8. User Guide → Quick start clarity
- * 9. Just In Promos + Giveaways → More content
- * 10. FAQ → Address doubts
- * 11. Advertise + Telegram + Benefits → Community & trust
+ * 3. Top Stores → Explore brands
+ * 4. Latest Deals → Newest deals auto-updated
+ * 5. Trending Deals → What people are grabbing
+ * 6. Latest Loot Deals → Hottest loot section
+ * 7. Exclusive Deals (full-width) → Deep content
+ * 8. Advertise + FAQ → Community & trust
  */
 
 function HomePage() {
+  const sectionCls = "w-full py-12 sm:py-16"
+  const containerCls = "mx-auto max-w-6xl px-4 sm:px-6 lg:px-8"
+
   return (
-    <div className="flex flex-col pb-8 sm:pb-12">
-      <main className="mx-auto flex w-full flex-col gap-8 max-w-6xl px-4 pt-4 sm:gap-12 sm:px-6 sm:pt-6 lg:px-8">
+    <div className="flex flex-col bg-[#F9FAFB]">
+      {/* 1. HERO SECTION */}
+      <section className="w-full bg-white">
+        <div className={containerCls}>
+          <HeroSection />
+        </div>
+      </section>
 
-        {/* STEP 1: Land & Understand */}
-        <HeroSection />
+      {/* NEW: NEWS READER TICKER - Key Points */}
+      <NewsTickerSection />
 
-        {/* STEP 2: Trust instantly */}
-        <TrustBadgesSection />
+      {/* 2. TRUST SECTION - Professional Verification */}
+      <section className="w-full bg-white border-b border-line/10 py-10 sm:py-12">
+        <div className={containerCls}>
+          <TrustBadgesSection />
+        </div>
+      </section>
 
-        {/* AD Zone */}
-        <AdZone position="home_middle" />
+      {/* 3. TOP STORES */}
+      <section className={sectionCls}>
+        <div className={containerCls}>
+          <div className="flex items-center gap-3 mb-8">
+            <span className="h-8 w-1.5 rounded-full bg-gold" />
+            <h2 className="text-2xl font-black tracking-tight text-ink sm:text-3xl">Shop by top Stores</h2>
+          </div>
+          <TopStoresSection />
+        </div>
+      </section>
 
-        {/* STEP 5: Explore top stores */}
-        <TopStoresSection />
+      {/* 4. RECENTLY ADDED DEALS (White Background for contrast) */}
+      <section className={`${sectionCls} bg-white border-y border-line/30`}>
+        <div className={containerCls}>
+          <div className="flex items-center gap-3 mb-8">
+            <span className="h-8 w-1.5 rounded-full bg-gold" />
+            <h2 className="text-2xl font-black tracking-tight text-ink sm:text-3xl">Recently Added Deals</h2>
+          </div>
+          <LatestDealsSection />
+        </div>
+      </section>
 
+      {/* 5. TRENDING DEALS */}
+      <section className={sectionCls}>
+        <div className={containerCls}>
+          <div className="flex items-center gap-3 mb-8">
+            <span className="h-8 w-1.5 rounded-full bg-gold" />
+            <h2 className="text-2xl font-black tracking-tight text-ink sm:text-3xl">Trending Best Sellers</h2>
+          </div>
+          <TrendingDealsSection />
+        </div>
+      </section>
 
+      {/* 6. LOOT DEALS (White Section for High Urgency) */}
+      <section className={`${sectionCls} bg-white border-y border-line/30`}>
+        <div className={containerCls}>
+          <div className="flex items-center gap-3 mb-8">
+            <span className="h-8 w-1.5 rounded-full bg-gold" />
+            <h2 className="text-2xl font-black tracking-tight text-ink sm:text-3xl">Flash Loot Offers</h2>
+          </div>
+          <LatestLootDealsSection />
+        </div>
+      </section>
 
-      </main>
-
-      {/* STEP 7: Exclusive full-width deals */}
+      {/* 7. EXCLUSIVE LOOT (Stays as a specialized highlight) */}
       <ExclusiveDealsSection />
 
-      <main className="mx-auto flex w-full flex-col gap-8 max-w-6xl px-4 pt-8 sm:gap-12 sm:px-6 sm:pt-12 lg:px-8">
-
-        {/* STEP 8: User Guide — quick start */}
-        <UserGuideSection />
-
-        {/* STEP 9: More content */}
-        <JustInPromoSection />
-        <GiveawaySection />
-
-        {/* STEP 10: Community & Brand trust */}
-        <AdvertiseWithUsSection />
-        <BenefitsTicker />
-        <TelegramBanner />
-
-        {/* STEP 11: FAQ — last thing before footer */}
-        <FAQSection />
-
-      </main>
+      {/* 8. CREDIT CARDS */}
+      <section className={`${sectionCls} mb-12`}>
+        <div className={containerCls}>
+          <CreditCardAdBanner />
+          <div className="flex items-center gap-3 mb-8">
+            <span className="h-8 w-1.5 rounded-full bg-gold" />
+            <h2 className="text-2xl font-black tracking-tight text-ink sm:text-3xl">Card Rewards & Perks</h2>
+          </div>
+          <TopCreditCardsSection />
+        </div>
+      </section>
     </div>
   )
 }

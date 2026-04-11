@@ -15,8 +15,11 @@ import AboutContact from './pages/AboutContact'
 import CreditCards from './pages/CreditCards'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import TermsOfUse from './pages/TermsOfUse'
+import FaqPage from './pages/FaqPage'
 import Giveaways from './pages/Giveaways'
 import Coupons from './pages/Coupons'
+import Categories from './pages/Categories'
+import CategoryResults from './pages/CategoryResults'
 import AdminLogin from './admin/pages/AdminLogin'
 import AdminDashboard from './admin/pages/AdminDashboard'
 import AdminDeals from './admin/pages/AdminDeals'
@@ -51,11 +54,9 @@ function PublicLayout({ children }) {
   return (
     <div className="min-h-screen bg-cream pb-20 md:pb-0">
       <Navbar />
-      <div className="mx-auto max-w-7xl px-6 pt-6">
-        <AdZone position="global_top" />
-      </div>
+      <AdZone position="global_top" className="mx-auto max-w-7xl px-6 pt-6" />
       {children}
-      <div className="mx-auto max-w-7xl px-6 pb-6">
+      <div className="mx-auto max-w-7xl px-6">
         <AdZone position="global_bottom" />
       </div>
 
@@ -113,8 +114,11 @@ function AppRoutes() {
             <Route path="/credit-cards" element={<CreditCards />} />
             <Route path="/giveaways" element={<Giveaways />} />
             <Route path="/coupons" element={<Coupons />} />
+            <Route path="/categories" element={<Categories />} />
+            <Route path="/category-results" element={<CategoryResults />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsOfUse />} />
+            <Route path="/faq" element={<FaqPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </PublicLayout>

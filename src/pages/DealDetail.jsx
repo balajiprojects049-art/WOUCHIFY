@@ -4,8 +4,6 @@ import DealGrid from '../components/DealGrid'
 import { useData } from '../context/DataContext'
 import { getDealRemainingSeconds } from '../utils/dealExpiry'
 
-import CircularTimer from '../components/CircularTimer'
-
 function DealDetail() {
   const { dealSlug } = useParams()
   const { deals, getStoreBySlug } = useData()
@@ -23,179 +21,278 @@ function DealDetail() {
 
   const relatedDeals = useMemo(() => {
     if (!deal) return []
-    const sameCategory = deals.filter((item) => item.slug !== deal.slug && item.category === deal.category)
-    const fallback = deals.filter((item) => item.slug !== deal.slug)
-
+    const sameCategory = deals.filter(item => item.slug !== deal.slug && item.category === deal.category)
+    const fallback = deals.filter(item => item.slug !== deal.slug)
     return [...sameCategory, ...fallback].slice(0, 4)
   }, [deal, deals])
 
   useEffect(() => {
-    const timerId = setInterval(() => {
-      setNowMs(Date.now())
-    }, 1000)
-
+    const timerId = setInterval(() => setNowMs(Date.now()), 1000)
     return () => clearInterval(timerId)
   }, [])
 
-  if (!deal) {
-    return <Navigate to="/deals" replace />
-  }
+  if (!deal) return <Navigate to="/deals" replace />
 
   const remainingSeconds = getDealRemainingSeconds(deal, nowMs)
-
-  // Build store path
   const storeSlug = deal.store ? deal.store.toLowerCase().replace(/[^a-z0-9]+/g, '-') : ''
   const storeData = getStoreBySlug(storeSlug)
   const storePath = storeData ? `/store/${storeData.slug}` : '/stores'
 
-  return (
-    <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-20">
-      {/* Breadcrumb or Back Button */}
-      <Link to="/deals" className="mb-6 inline-flex items-center gap-2 text-xs font-black text-muted hover:text-gold transition-colors">
-        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
-        </svg>
-        BACK TO DEALS
-      </Link>
+  // Format time remaining for trust display
+  const days = Math.floor(remainingSeconds / 86400)
+  const hours = Math.floor((remainingSeconds % 86400) / 3600)
+  const mins = Math.floor((remainingSeconds % 3600) / 60)
+  const timeString = remainingSeconds > 0 
+    ? `${days}d ${hours}h ${mins}m remaining` 
+    : 'Offer Expired'
 
-      <section className="rounded-3xl bg-white p-5 shadow-[0_10px_40px_rgba(0,0,0,0.04)] sm:rounded-[2.5rem] sm:p-12 border border-line/40">
-        <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
-          <div className="relative group">
-            <div className="overflow-hidden rounded-2xl sm:rounded-[2rem] shadow-xl">
-              <img src={deal.image} alt={deal.title} className="h-64 w-full object-cover transition-all duration-700 group-hover:scale-110 sm:h-[32rem]" />
+  return (
+    <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+      {/* Breadcrumb Navigation */}
+      <nav className="mb-6 flex items-center gap-2 text-sm text-muted">
+        <Link to="/" className="hover:text-ink transition-colors">Home</Link>
+        <svg className="h-4 w-4 text-line" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+        <Link to="/deals" className="hover:text-ink transition-colors">Deals</Link>
+        <svg className="h-4 w-4 text-line" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+        <span className="text-ink font-medium truncate max-w-[200px]">{deal.title}</span>
+      </nav>
+
+      {/* Main Deal Container - Professional Card Layout */}
+      <section className="rounded-2xl bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)] ring-1 ring-black/5 overflow-hidden">
+        <div className="flex flex-col lg:flex-row">
+          
+          {/* Left Column: Visuals & Trust Badges */}
+          <div className="lg:w-5/12 bg-gray-50/50 p-6 sm:p-10 flex flex-col items-center border-b lg:border-b-0 lg:border-r border-line/40">
+            {/* Image Box */}
+            <div className="relative w-full aspect-[4/3] max-w-sm rounded-xl overflow-hidden bg-white shadow-sm ring-1 ring-black/5 p-4 flex items-center justify-center group">
+              <img
+                src={deal.image}
+                alt={deal.title}
+                className="h-full w-full object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-105"
+                onError={e => e.target.style.display = 'none'}
+              />
+              {/* Discount Tag Top Left */}
+              {deal.discountLabel && (
+                <div className="absolute top-3 left-3 bg-red-500 text-white text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded shadow-sm">
+                  {deal.discountLabel}
+                </div>
+              )}
             </div>
-            <div className="absolute top-4 left-4 sm:top-6 sm:left-6 rounded-xl bg-black/60 backdrop-blur-xl px-3 py-1.5 border border-white/10">
-              <span className="text-[10px] sm:text-xs font-black tracking-widest text-[#ffb300] uppercase">Verified Offer</span>
+
+            {/* Trust Signals */}
+            <div className="mt-6 w-full max-w-sm grid grid-cols-2 gap-3">
+              <div className="flex flex-col items-center justify-center p-3 rounded-lg bg-emerald-50 border border-emerald-100">
+                <div className="flex items-center gap-1.5 text-emerald-700">
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  <span className="text-xs font-bold">Verified Deal</span>
+                </div>
+                <span className="text-[10px] text-emerald-600/70 mt-0.5">Checked today</span>
+              </div>
+              <div className="flex flex-col items-center justify-center p-3 rounded-lg bg-blue-50 border border-blue-100">
+                <div className="flex items-center gap-1.5 text-blue-700">
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" /></svg>
+                  <span className="text-xs font-bold">{deal.successRate}% Success</span>
+                </div>
+                <span className="text-[10px] text-blue-600/70 mt-0.5">{deal.usageCount} utilized</span>
+              </div>
+            </div>
+            
+            <div className="mt-4 flex items-center gap-2 text-xs text-muted font-medium">
+               <svg className="h-4 w-4 text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+               {remainingSeconds > 0 ? (
+                 <span className="text-orange-600 font-semibold">{timeString}</span>
+               ) : (
+                 <span className="text-red-500 font-semibold">Expired</span>
+               )}
             </div>
           </div>
 
-          <div className="flex flex-col">
-            <span className="inline-flex max-w-fit rounded-full bg-red-500/10 px-3 py-1 text-[10px] font-black tracking-widest text-red-500 uppercase">
-              {deal.discountLabel || 'Hot Deal'}
-            </span>
-            <h1 className="mt-4 text-2xl font-black tracking-tight text-ink sm:mt-6 sm:text-5xl leading-[1.2] sm:leading-[1.1]">{deal.title}</h1>
-            <p className="mt-3 text-sm font-bold text-gold uppercase tracking-wider sm:mt-4 sm:text-lg">{deal.store}</p>
-            <p className="mt-5 text-sm leading-relaxed text-muted/80 sm:mt-6 sm:text-base">{deal.description}</p>
-
-            <div className="mt-8 grid gap-3 sm:grid-cols-2 sm:gap-4">
-              <div className="rounded-2xl bg-gray-50 border border-line/40 p-4 sm:p-5 transition-all hover:border-[#ffb300]/30 hover:bg-white hover:shadow-lg">
-                <p className="text-[9px] font-black uppercase tracking-widest text-muted">Price</p>
-                <p className="mt-1 text-2xl font-black text-ink sm:text-3xl">{deal.price}</p>
-              </div>
-              <div className="rounded-2xl bg-gray-50 border border-line/40 p-4 sm:p-5 transition-all hover:border-[#ffb300]/30 hover:bg-white hover:shadow-lg">
-                <p className="text-[9px] font-black uppercase tracking-widest text-muted">Success Rate</p>
-                <p className="mt-1 text-2xl font-black text-emerald-600 sm:text-3xl">{deal.successRate}%</p>
-              </div>
-            </div>
-
-            <div className="mt-8 flex flex-col items-center sm:items-start">
-              <p className="mb-4 text-[9px] font-black uppercase tracking-[0.2em] text-muted">Time Remaining</p>
-              <CircularTimer remainingSeconds={remainingSeconds} />
-            </div>
-
-            <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:gap-4 pt-8 border-t border-line/40">
-              <a
-                href={deal.link || deal.url || '#'}
-                target="_blank"
-                rel="noreferrer"
-                className="w-full rounded-xl bg-[#ffb300] py-4 flex items-center justify-center text-xs font-black uppercase tracking-[0.2em] text-black shadow-lg transition-all duration-500 hover:scale-[1.02] relative overflow-hidden group sm:rounded-2xl sm:py-5 sm:text-sm"
+          {/* Right Column: Details & Action */}
+          <div className="lg:w-7/12 p-6 sm:p-10 flex flex-col justify-center">
+            
+            {/* Header Area */}
+            <div className="flex items-center justify-between mb-4">
+              <Link to={storePath} className="inline-flex items-center gap-1.5 text-sm font-semibold text-gold hover:text-gold/80 transition-colors">
+                <span className="uppercase tracking-wider">{deal.store}</span>
+                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+              </Link>
+              <button 
+                onClick={() => setSaved(p => !p)} 
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${saved ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200' : 'bg-gray-50 text-muted hover:bg-gray-100 ring-1 ring-black/5'}`}
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                Get Deal
-              </a>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setSaved((p) => !p)}
-                  className={`flex-1 rounded-xl border-2 py-4 text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300 sm:rounded-2xl sm:py-5 sm:text-sm sm:px-8 ${saved ? 'bg-emerald-600 border-emerald-600 text-white' : 'bg-white border-line text-ink hover:border-[#ffb300]'
-                    }`}
-                >
-                  {saved ? 'Saved' : 'Save'}
-                </button>
-                <Link to={storePath} className="flex-1 rounded-xl border-2 border-line bg-white py-4 text-center text-[10px] font-black uppercase tracking-[0.2em] text-ink transition-all duration-300 hover:border-[#ffb300] sm:rounded-2xl sm:py-5 sm:text-sm sm:px-8">
-                  Store
-                </Link>
-              </div>
+                <svg className="h-3.5 w-3.5" fill={saved ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
+                {saved ? 'Saved' : 'Save'}
+              </button>
             </div>
 
-            {deal.code && (
-              <div className="mt-8 rounded-2xl border-2 border-dashed border-[#ffb300]/40 bg-[#ffb300]/5 p-5 sm:p-6 relative">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="text-center sm:text-left">
-                    <p className="text-[9px] font-black uppercase tracking-widest text-[#b48600]">Coupon Code</p>
-                    <p className="mt-1 text-xl font-black tracking-[0.25em] text-ink uppercase sm:text-2xl">{deal.code}</p>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-ink tracking-tight leading-tight mb-3">
+              {deal.title}
+            </h1>
+            
+            <p className="text-sm text-muted/90 leading-relaxed mb-8">
+              {deal.description}
+            </p>
+
+            {/* Price & Action Area */}
+            <div className="bg-gray-50 border border-line/50 rounded-xl p-5 mb-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <p className="text-xs font-medium text-muted mb-1">Deal Price</p>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-black text-ink">{deal.price}</span>
                   </div>
-                  <button
-                    onClick={handleCopy}
-                    className={`w-full sm:w-auto px-6 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${copied ? 'bg-emerald-600 text-white' : 'bg-black text-white hover:bg-gold hover:text-black shadow-lg'
-                      }`}
+                </div>
+                
+                <div className="flex-shrink-0 w-full sm:w-auto">
+                  <a
+                    href={deal.link || deal.url || '#'}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex w-full items-center justify-center gap-2 rounded-lg bg-ink px-8 py-3.5 text-sm font-bold text-white shadow hover:bg-ink/90 transition-all font-sans"
                   >
-                    {copied ? 'Copied' : 'Copy Code'}
-                  </button>
+                    Get Deal Now
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                  </a>
                 </div>
               </div>
+            </div>
+
+            {/* Coupon Code Section (If applicable) */}
+            {deal.code && (
+              <div className="flex flex-col sm:flex-row items-center justify-between p-4 rounded-xl border border-dashed border-gold/50 bg-gold/5 gap-4">
+                <div className="flex flex-col w-full text-center sm:text-left">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-gold">Use Code at Checkout</span>
+                  <span className="text-lg font-black text-ink tracking-widest">{deal.code}</span>
+                </div>
+                <button
+                  onClick={handleCopy}
+                  className={`w-full sm:w-auto shrink-0 px-6 py-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 ${copied ? 'bg-emerald-600 text-white shadow-sm' : 'bg-gold text-midnight hover:bg-gold/90 shadow-[0_2px_10px_rgba(212,168,32,0.2)]'}`}
+                >
+                  {copied ? (
+                    <>
+                      <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                      Copy Code
+                    </>
+                  )}
+                </button>
+              </div>
             )}
+            
           </div>
         </div>
       </section>
 
-      <section className="mt-8 rounded-3xl bg-white p-6 sm:mt-12 sm:rounded-[2.5rem] sm:p-12 shadow-sm border border-line/40">
-        <div className="max-w-3xl">
-          <h2 className="text-xl font-black tracking-widest text-ink uppercase sm:text-2xl">Offer Dossier</h2>
-          <p className="mt-5 text-sm leading-relaxed text-muted/90 sm:mt-6 sm:text-base">{deal.terms}</p>
-
-          {Array.isArray(deal.highlights) && deal.highlights.length > 0 && (
-            <div className="mt-10">
-              <h3 className="text-xs font-black text-gold uppercase tracking-widest">Highlights</h3>
-              <ul className="mt-4 grid gap-3 sm:grid-cols-2">
-                {deal.highlights.map((point) => (
-                  <li key={point} className="flex items-start gap-2 text-xs text-muted font-bold sm:text-sm">
-                    <svg className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                    {point}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {Array.isArray(deal.steps) && deal.steps.length > 0 && (
-            <div className="mt-10">
-              <h3 className="text-xs font-black text-gold uppercase tracking-widest">How to Redeem</h3>
-              <div className="mt-6 space-y-4">
-                {deal.steps.map((step, idx) => (
-                  <div key={idx} className="flex items-center gap-3 group">
-                    <span className="flex h-7 w-7 items-center justify-center rounded bg-gray-100 text-[10px] font-black text-ink transition-colors group-hover:bg-[#ffb300] sm:h-8 sm:w-8 sm:text-xs">{idx + 1}</span>
-                    <p className="text-xs font-bold text-muted transition-colors group-hover:text-ink sm:text-sm">{step}</p>
-                  </div>
-                ))}
+      <div className="grid lg:grid-cols-3 gap-8 mt-8">
+        
+        {/* Deal Terms and Info */}
+        <section className="lg:col-span-2">
+          <div className="bg-white rounded-2xl shadow-sm ring-1 ring-black/5 p-6 sm:p-8">
+            <h2 className="text-lg font-bold text-ink border-b border-line/40 pb-3 mb-5">Offer Details & Guidelines</h2>
+            
+            {Array.isArray(deal.steps) && deal.steps.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-sm font-semibold text-ink mb-4 flex items-center gap-2">
+                  <svg className="h-5 w-5 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                  How to Redeem
+                </h3>
+                <div className="space-y-3">
+                  {deal.steps.map((step, idx) => (
+                    <div key={idx} className="flex items-start gap-3">
+                      <span className="flex-shrink-0 flex items-center justify-center w-6 h-6 rounded-full bg-surface border border-line text-xs font-bold text-ink mt-0.5">
+                        {idx + 1}
+                      </span>
+                      <p className="text-sm text-muted leading-relaxed">{step}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
+             )}
 
-        <div className="mt-10 grid gap-3 grid-cols-2 lg:grid-cols-4 border-t border-line/40 pt-10">
-          {[
-            { label: 'Expiry', value: deal.expiry },
-            { label: 'Store', value: deal.store },
-            { label: 'Category', value: deal.category },
-            { label: 'Strategy', value: deal.type }
-          ].map((inf, i) => (
-            <div key={i} className="rounded-xl border border-line/40 bg-gray-50/50 p-3 sm:p-4">
-              <p className="text-[8px] font-black uppercase tracking-[0.2em] text-muted">{inf.label}</p>
-              <p className="mt-1 text-[10px] font-black text-ink sm:text-xs">{inf.value}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+            {Array.isArray(deal.highlights) && deal.highlights.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-sm font-semibold text-ink mb-4 flex items-center gap-2">
+                  <svg className="h-5 w-5 text-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
+                  Highlights
+                </h3>
+                <ul className="grid sm:grid-cols-2 gap-3">
+                  {deal.highlights.map(point => (
+                    <li key={point} className="flex items-start gap-2.5">
+                      <svg className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                      <span className="text-sm text-muted">{point}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
-      <section className="mt-16 sm:mt-20">
-        <div className="flex items-center justify-between mb-6 sm:mb-8">
-          <h2 className="text-lg font-black tracking-widest text-ink uppercase sm:text-2xl">Related Picks</h2>
-          <Link to="/deals" className="text-[10px] font-black text-gold uppercase tracking-[0.2em]">View All</Link>
-        </div>
-        <DealGrid deals={relatedDeals} nowMs={nowMs} />
-      </section>
+            <div>
+               <h3 className="text-sm font-semibold text-ink mb-3 flex items-center gap-2">
+                 <svg className="h-5 w-5 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                 Terms & Conditions
+               </h3>
+               <p className="text-sm text-muted/90 leading-relaxed bg-gray-50/50 p-4 rounded-xl border border-line/30">
+                 {deal.terms || 'Standard terms and conditions apply. Offer subject to change without prior notice. Verify at merchant site.'}
+               </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Sidebar Info & Safety */}
+        <aside className="lg:col-span-1 space-y-6">
+          <div className="bg-white rounded-2xl shadow-sm ring-1 ring-black/5 p-6">
+             <h3 className="text-sm font-semibold text-ink mb-4">Quick Information</h3>
+             <ul className="space-y-4">
+                <li className="flex justify-between items-center text-sm">
+                   <span className="text-muted">Category</span>
+                   <span className="font-medium text-ink">{deal.category}</span>
+                </li>
+                <li className="flex justify-between items-center text-sm">
+                   <span className="text-muted">Store/Brand</span>
+                   <span className="font-medium text-ink">{deal.store}</span>
+                </li>
+                <li className="flex justify-between items-center text-sm">
+                   <span className="text-muted">Offer Type</span>
+                   <span className="font-medium text-ink capitalize">{deal.type}</span>
+                </li>
+                <li className="flex justify-between items-center text-sm border-t border-line/40 pt-4 mt-2">
+                   <span className="text-muted">Added On</span>
+                   <span className="font-medium text-ink">
+                     {deal.createdAt ? new Date(deal.createdAt).toLocaleDateString() : 'Recently'}
+                   </span>
+                </li>
+             </ul>
+          </div>
+          
+          <div className="bg-blue-50/50 rounded-2xl border border-blue-100 p-5 flex gap-3">
+             <svg className="h-6 w-6 text-blue-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+             <div>
+                <h4 className="text-sm font-semibold text-blue-900 mb-1">Safe & Trusted Links</h4>
+                <p className="text-xs text-blue-800/80 leading-relaxed">
+                   Links on Wouchify are verified for safety. We only partner with reputed, official stores.
+                </p>
+             </div>
+          </div>
+        </aside>
+
+      </div>
+
+      {/* Related Picks */}
+      {relatedDeals.length > 0 && (
+        <section className="mt-12 sm:mt-16">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-ink">Similar Offers</h2>
+            <Link to="/deals" className="text-sm font-medium text-gold hover:text-gold/80 flex items-center gap-1">
+              View All <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+            </Link>
+          </div>
+          <DealGrid deals={relatedDeals} nowMs={nowMs} />
+        </section>
+      )}
     </main>
   )
 }

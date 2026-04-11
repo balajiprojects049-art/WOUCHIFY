@@ -134,9 +134,31 @@ function generateId() {
 const DataContext = createContext(null)
 
 export function DataProvider({ children }) {
-  const [deals, setDeals] = useState(() => loadFromStorage('wouchify_deals', dealsData))
-  const [lootDeals, setLootDeals] = useState(() => loadFromStorage('wouchify_loot_deals', lootDealsData))
-  const [stores, setStores] = useState(() => loadFromStorage('wouchify_stores', storesData))
+  // ── Deals & LootDeals: Load from localStorage (admin-added data persists across refreshes)
+  // Falls back to hardcoded file only if localStorage is empty.
+  // This means admin-added deals survive page refresh AND hardcoded seed data appears on first load.
+  const [deals, setDeals] = useState(() => {
+    try {
+      const stored = localStorage.getItem('wouchify_deals')
+      const cached = stored ? JSON.parse(stored) : null
+      // If localStorage has data, use it (admin-added deals survive refresh)
+      // If localStorage is empty/missing, use the hardcoded seed data
+      if (cached && Array.isArray(cached) && cached.length > 0) return cached
+      return dealsData
+    } catch { return dealsData }
+  })
+  const [lootDeals, setLootDeals] = useState(() => {
+    try {
+      const stored = localStorage.getItem('wouchify_loot_deals')
+      const cached = stored ? JSON.parse(stored) : null
+      if (cached && Array.isArray(cached) && cached.length > 0) return cached
+      return lootDealsData
+    } catch { return lootDealsData }
+  })
+  const [stores, setStores] = useState(() => {
+    const cached = loadFromStorage('wouchify_stores', storesData)
+    return cached.length < storesData.length ? storesData : cached
+  })
   const [coupons, setCoupons] = useState(() => loadFromStorage('wouchify_coupons', defaultCoupons))
   const [giveaways, setGiveaways] = useState(() => loadFromStorage('wouchify_giveaways', defaultGiveaways))
   const [creditCards, setCreditCards] = useState(() => loadFromStorage('wouchify_credit_cards', defaultCreditCards))

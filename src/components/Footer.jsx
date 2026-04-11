@@ -7,7 +7,7 @@ const footerLinks = {
     { label: 'Coupon Codes', to: '/coupons' },
     { label: 'Top Stores', to: '/stores' },
     { label: 'Credit Cards', to: '/credit-cards' },
-    { label: 'Giveaways', to: '/giveaways' },
+    { label: 'Help & FAQ', to: '/faq' },
   ],
   Company: [
     { label: 'About Us', to: '/about-contact' },
@@ -55,7 +55,7 @@ const socials = [
 
 function Footer() {
   return (
-    <footer className="mt-16 border-t border-white/5 bg-midnight text-slate-300" aria-label="Site footer">
+    <footer className="border-t border-white/5 bg-midnight text-slate-300" aria-label="Site footer">
       <div className="mx-auto max-w-6xl px-4 pb-8 pt-12 sm:px-6 sm:pt-14 lg:px-8">
 
         {/* Top row */}

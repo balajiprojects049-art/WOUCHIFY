@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import AdminLayout from '../layout/AdminLayout'
 import { useData } from '../../context/DataContext'
 import ImageUpload from '../components/ImageUpload'
+import SearchableSelect from '../components/SearchableSelect'
 import { CATEGORY_SECTIONS } from '../../utils/categories'
 import { formatExpiryFromSeconds } from '../../utils/dealExpiry'
 import {
@@ -54,20 +55,36 @@ function ConfirmDialog({ onConfirm, onCancel, message = 'This will immediately r
 }
 
 function DealForm({ initial, onSave, onCancel }) {
-  const [form, setForm] = useState({ ...initial, _expiresHours: Math.round(Number(initial.expiresInSeconds) / 3600) || 2 })
+  const [form, setForm] = useState(() => {
+    const startMs = initial.createdAt ? new Date(initial.createdAt).getTime() : Date.now()
+    const expiresMs = startMs + (initial.expiresInSeconds || 86400) * 1000
+    const d = new Date(expiresMs)
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
+    return { ...initial, expiresAt: d.toISOString().slice(0, 16) }
+  })
+  
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
+  const flatCategories = useMemo(() => Array.from(new Set(CATEGORY_SECTIONS.flatMap(s => Object.values(s.data).flat()))).sort(), [])
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    const expiresHours = Math.max(1, Number(form._expiresHours) || 1)
+    const createdAtMs = form.createdAt ? new Date(form.createdAt).getTime() : Date.now()
+    const expiresAtMs = new Date(form.expiresAt).getTime()
+    const expiresInSeconds = Math.max(0, Math.round((expiresAtMs - createdAtMs) / 1000))
+    
     const slug = form.slug || form.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+    
+    // Auto-generate clear expiry text
+    const expDate = new Date(form.expiresAt)
+    const expiryText = `Expires ${expDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}`
+
     onSave({
       ...form, slug,
       discountValue: Number(form.discountValue),
       priceValue: Number(form.priceValue),
-      expiresInSeconds: expiresHours * 3600,
+      expiresInSeconds,
       successRate: Number(form.successRate),
-      expiry: form.expiry?.trim() || formatExpiryFromSeconds(expiresHours * 3600),
+      expiry: expiryText,
       steps: typeof form.steps === 'string' ? form.steps.split('\n').filter(Boolean) : form.steps,
       highlights: typeof form.highlights === 'string' ? form.highlights.split('\n').filter(Boolean) : form.highlights,
       createdAt: form.createdAt || new Date().toISOString(),
@@ -98,16 +115,12 @@ function DealForm({ initial, onSave, onCancel }) {
               </div>
               <div>
                 <label className={lbl}>Category</label>
-                <select {...selectProps} value={form.category} onChange={e => set('category', e.target.value)}>
-                  <option value="Electronics" className="bg-[#0C1018]">Electronics</option>
-                  {CATEGORY_SECTIONS.map((section) => (
-                    <optgroup key={section.id} label={`── ${section.label.toUpperCase()} ──`}>
-                      {Object.values(section.data).flat().map(c => (
-                        <option key={`${section.id}-${c}`} value={c} className="bg-[#0C1018]">{c}</option>
-                      ))}
-                    </optgroup>
-                  ))}
-                </select>
+                <SearchableSelect 
+                  value={form.category} 
+                  onChange={v => set('category', v)} 
+                  options={flatCategories} 
+                  placeholder="Search categories..."
+                />
               </div>
               <div>
                 <label className={lbl}>Deal Type</label>
@@ -157,8 +170,6 @@ function DealForm({ initial, onSave, onCancel }) {
                 { lbl: 'Price Value', key: 'priceValue', ph: '1049', type: 'number' },
                 { lbl: 'Discount Label', key: 'discountLabel', ph: 'Save 18%', req: true },
                 { lbl: 'Discount %', key: 'discountValue', ph: '18', type: 'number', max: 100 },
-                { lbl: 'Expires In (hours)', key: '_expiresHours', ph: '2', type: 'number', min: 1 },
-                { lbl: 'Expiry Text', key: 'expiry', ph: 'Expires in 2 days' },
                 { lbl: 'Success Rate %', key: 'successRate', ph: '90', type: 'number', max: 100 },
               ].map(f => (
                 <div key={f.key}>
@@ -166,6 +177,10 @@ function DealForm({ initial, onSave, onCancel }) {
                   <input {...inputProps} type={f.type || 'text'} min={f.min} max={f.max} required={f.req} value={form[f.key]} onChange={e => set(f.key, e.target.value)} placeholder={f.ph} />
                 </div>
               ))}
+              <div className="col-span-2 sm:col-span-3">
+                <label className={lbl}>Exact Expiry Date & Time <span style={{ color: G }}>*</span></label>
+                <input {...inputProps} required type="datetime-local" value={form.expiresAt || ''} onChange={e => set('expiresAt', e.target.value)} />
+              </div>
             </div>
           </div>
 
