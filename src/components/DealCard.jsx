@@ -1,13 +1,17 @@
 import { Link } from 'react-router-dom'
 import { storesData } from '../data/storesData'
+import { resolveStoreLogoUrl } from '../utils/storeLogo'
 import ShareButton from './ShareButton'
 
 function DealCard({ deal, remainingSeconds }) {
   const isExpired = remainingSeconds <= 0
 
-  // Find store logo
-  const store = storesData.find(s => s.name.toLowerCase() === (deal.store || '').toLowerCase())
-  const logoUrl = store?.logo
+  // Find store logo — try exact match first, then partial/fuzzy
+  const storeName = (deal.store || '').toLowerCase()
+  const store = storesData.find(s => s.name.toLowerCase() === storeName)
+    || storesData.find(s => storeName.includes(s.name.toLowerCase()))
+    || storesData.find(s => s.name.toLowerCase().includes(storeName))
+  const logoUrl = store?.logo || resolveStoreLogoUrl(deal.store)
   const logoText = (deal.store || '').slice(0, 2).toUpperCase()
 
   // Timer units

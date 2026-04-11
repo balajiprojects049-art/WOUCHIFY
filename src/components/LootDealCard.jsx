@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
+import { storesData } from '../data/storesData'
+import { resolveStoreLogoUrl } from '../utils/storeLogo'
 import ShareButton from './ShareButton'
 
 function LootDealCard({ deal }) {
@@ -33,6 +35,14 @@ function LootDealCard({ deal }) {
     } catch {}
     return null
   })()
+
+  // Store logo
+  const storeName = (deal.store || '').toLowerCase()
+  const matchedStore = storesData.find(s => s.name.toLowerCase() === storeName)
+    || storesData.find(s => storeName.includes(s.name.toLowerCase()))
+    || storesData.find(s => s.name.toLowerCase().includes(storeName))
+  const logoUrl = matchedStore?.logo || resolveStoreLogoUrl(deal.store)
+  const logoText = (deal.store || '').slice(0, 2).toUpperCase()
 
   return (
     <article className={`group flex flex-col rounded-2xl border bg-white overflow-hidden transition-all duration-300 ${
@@ -79,6 +89,24 @@ function LootDealCard({ deal }) {
 
       {/* Body */}
       <div className="flex flex-1 flex-col p-4 gap-3">
+
+        {/* Store name + logo row */}
+        <div className="flex items-center gap-2.5 mb-1">
+          {logoUrl ? (
+            <div className="h-8 w-8 rounded-lg bg-white border border-line flex items-center justify-center p-1 shadow-sm overflow-hidden flex-shrink-0">
+              <img src={logoUrl} alt={deal.store} className="h-full w-full object-contain" onError={e => e.target.style.display='none'} />
+            </div>
+          ) : (
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gold/15 text-[10px] font-black text-gold border border-gold/20 flex-shrink-0">{logoText}</div>
+          )}
+          <div className="min-w-0">
+            <p className="text-sm font-black text-ink leading-tight truncate">{deal.store}</p>
+            <p className="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
+              Verified Store
+            </p>
+          </div>
+        </div>
 
         {/* Category + Badge row */}
         <div className="flex items-center justify-between">
