@@ -27,7 +27,7 @@ function StoreBadge({ store }) {
 
 function TopStoresSection() {
   const navigate = useNavigate()
-  const { stores } = useData()
+  const { stores, deals, lootDeals, coupons } = useData()
 
   const visibleStores = useMemo(() => (stores || []).filter(s => s?.slug).sort((a, b) => a.name.localeCompare(b.name)), [stores])
 
@@ -36,7 +36,21 @@ function TopStoresSection() {
 
   if (!visibleStores.length) return null
 
-  const getOfferCount = (store) => store.offers?.length || ((store.name?.length || 5) * 7 % 25) + 5;
+  // Real count: sum of matching deals + lootDeals + coupons for this store
+  const getOfferCount = (store) => {
+    const name = (store.name || '').toLowerCase()
+    const slug = (store.slug || '').toLowerCase()
+    const dealsCount = (deals || []).filter(d =>
+      (d.store || '').toLowerCase().includes(name) || (d.store || '').toLowerCase().includes(slug)
+    ).length
+    const lootCount = (lootDeals || []).filter(d =>
+      (d.store || '').toLowerCase().includes(name) || (d.store || '').toLowerCase().includes(slug)
+    ).length
+    const couponCount = (coupons || []).filter(c =>
+      (c.store || '').toLowerCase().includes(name) || (c.store || '').toLowerCase().includes(slug)
+    ).length
+    return dealsCount + lootCount + couponCount
+  }
 
   return (
     <section className="mt-4 sm:mt-6">
