@@ -271,6 +271,15 @@ export function DataProvider({ children }) {
   useEffect(() => { saveToStorage('wouchify_analytics', analytics) }, [analytics])
   useEffect(() => { saveToStorage('wouchify_advertisements', advertisements) }, [advertisements])
 
+  // ── Scheduled publishing filter ───────────────────────────────────────────
+  // A deal is "live" if publishAt is empty/missing OR if publishAt is in the past
+  const isPublished = (item) => {
+    if (!item.publishAt) return true
+    return new Date(item.publishAt).getTime() <= Date.now()
+  }
+  const publishedDeals = deals.filter(isPublished)
+  const publishedLootDeals = lootDeals.filter(isPublished)
+
   // ── ADVERTISEMENTS CRUD ───────────────────────────────────────────────────
   const addAdvertisement = (ad) => {
     const newAd = { ...ad, id: generateId() }
@@ -496,7 +505,7 @@ export function DataProvider({ children }) {
   return (
     <DataContext.Provider value={{
       // Data
-      deals, lootDeals, stores, coupons, giveaways, creditCards, banners, adminSettings, adminMembers, dbConnected, syncDataToDb,
+      deals, lootDeals, publishedDeals, publishedLootDeals, stores, coupons, giveaways, creditCards, banners, adminSettings, adminMembers, dbConnected, syncDataToDb,
       advertisements, addAdvertisement, updateAdvertisement, deleteAdvertisement,
       // Deals
       addDeal, updateDeal, deleteDeal, getDealBySlug,

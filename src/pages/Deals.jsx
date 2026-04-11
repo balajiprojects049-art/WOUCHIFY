@@ -21,7 +21,7 @@ function parseUsageCount(value) {
 }
 
 function Deals() {
-  const { deals: allDeals, banners } = useData()
+  const { publishedDeals: allDeals, banners } = useData()
   const [searchParams] = useSearchParams()
   const [nowMs, setNowMs] = useState(Date.now())
 

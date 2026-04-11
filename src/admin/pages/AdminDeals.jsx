@@ -17,7 +17,8 @@ const EMPTY_DEAL = {
   type: 'offer', price: '', originalPrice: '', priceValue: 0, usageCount: '', expiresInSeconds: 7200,
   successRate: 90, expiry: '', badge: 'HOT', code: '', image: '', description: '',
   terms: '', steps: '', highlights: '', link: '', createdAt: new Date().toISOString(),
-  priority: 'Medium', status: 'Active', featured: false, trending: false, telegramSync: true
+  priority: 'Medium', status: 'Active', featured: false, trending: false, telegramSync: true,
+  publishAt: '', // Scheduled publish date — empty = publish immediately
 }
 // CATEGORY_SECTIONS is now used to group categories.
 const BADGES = ['HOT', 'TRENDING', 'EXCLUSIVE', 'LIMITED', 'COUPON', 'TRAVEL', 'NEW', 'FLASH']
@@ -62,6 +63,7 @@ function DealForm({ initial, onSave, onCancel }) {
     d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
     return { ...initial, expiresAt: d.toISOString().slice(0, 16) }
   })
+  const [showAdvanced, setShowAdvanced] = useState(!!initial.publishAt)
   
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
   const flatCategories = useMemo(() => Array.from(new Set(CATEGORY_SECTIONS.flatMap(s => Object.values(s.data).flat()))).sort(), [])
@@ -88,6 +90,7 @@ function DealForm({ initial, onSave, onCancel }) {
       steps: typeof form.steps === 'string' ? form.steps.split('\n').filter(Boolean) : form.steps,
       highlights: typeof form.highlights === 'string' ? form.highlights.split('\n').filter(Boolean) : form.highlights,
       createdAt: form.createdAt || new Date().toISOString(),
+      publishAt: showAdvanced && form.publishAt ? new Date(form.publishAt).toISOString() : '',
     })
   }
 
@@ -257,8 +260,51 @@ function DealForm({ initial, onSave, onCancel }) {
             </div>
           </div>
 
+          {/* ── Advanced Scheduling ── */}
+          <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(251,191,36,0.2)', background: 'rgba(251,191,36,0.04)' }}>
+            <button
+              type="button"
+              onClick={() => { setShowAdvanced(v => !v); if (showAdvanced) set('publishAt', '') }}
+              className="w-full flex items-center justify-between px-5 py-3.5 text-left"
+            >
+              <div className="flex items-center gap-2">
+                <span className="text-base">🗓️</span>
+                <div>
+                  <p className="text-sm font-black text-white">Advanced Scheduling</p>
+                  <p className="text-[10px] text-white/40">{showAdvanced && form.publishAt ? `Goes live: ${new Date(form.publishAt).toLocaleString('en-IN')}` : 'Set a future date to auto-publish'}</p>
+                </div>
+              </div>
+              <div className={`flex h-5 w-9 items-center rounded-full transition-all ${showAdvanced ? 'justify-end' : 'justify-start'}`} style={{ background: showAdvanced ? G : 'rgba(255,255,255,0.15)', padding: '2px' }}>
+                <span className="h-4 w-4 rounded-full bg-white shadow" />
+              </div>
+            </button>
+            {showAdvanced && (
+              <div className="px-5 pb-5 space-y-3 border-t" style={{ borderColor: 'rgba(251,191,36,0.15)' }}>
+                <p className="text-[10px] text-white/40 pt-3">The deal will be hidden from users until this date &amp; time. Leave it OFF to publish immediately.</p>
+                <div>
+                  <label className={lbl}>📅 Publish Date &amp; Time <span style={{ color: G }}>*</span></label>
+                  <input
+                    type="datetime-local"
+                    className={inp}
+                    style={inpStyle}
+                    value={form.publishAt ? new Date(new Date(form.publishAt).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''}
+                    min={new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16)}
+                    onChange={e => set('publishAt', e.target.value)}
+                  />
+                </div>
+                {form.publishAt && (
+                  <div className="rounded-xl px-4 py-3 text-xs font-bold" style={{ background: 'rgba(251,191,36,0.1)', color: '#FBBF24', border: '1px solid rgba(251,191,36,0.2)' }}>
+                    ⏰ This deal will automatically go live on: {new Date(form.publishAt).toLocaleString('en-IN', { dateStyle: 'full', timeStyle: 'short' })}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
           <div className="space-y-2.5">
-            <button type="submit" className={btnPrimaryCls} style={btnPrimary}>✓ Save Deal</button>
+            <button type="submit" className={btnPrimaryCls} style={btnPrimary}>
+              {showAdvanced && form.publishAt ? '🗓️ Schedule Deal' : '✓ Save Deal'}
+            </button>
             <button type="button" onClick={onCancel} className={btnCancelCls} style={btnCancelStyle}>Cancel</button>
           </div>
         </div>

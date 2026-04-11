@@ -16,6 +16,7 @@ const EMPTY = {
   oldPrice: '', newPrice: '', grabbed: '', stockLabel: 'Only a few left!',
   urgency: 'Ending soon — grab it now!', expiresInSeconds: 21600, popularity: 90, image: '',
   description: '', steps: '', terms: '', link: '',
+  publishAt: '', // empty = publish immediately
 }
 
 function addFocus(e) { Object.assign(e.target.style, inpFocus) }
@@ -55,6 +56,7 @@ function LootForm({ initial, onSave, onCancel }) {
     d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
     return { ...initial, expiresAt: d.toISOString().slice(0, 16) }
   })
+  const [showAdvanced, setShowAdvanced] = useState(!!initial.publishAt)
   
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
   const inputProps = { className: inp, style: inpStyle, onFocus: addFocus, onBlur: remFocus }
@@ -73,6 +75,7 @@ function LootForm({ initial, onSave, onCancel }) {
       expiresInSeconds,
       popularity: Number(form.popularity),
       steps: typeof form.steps === 'string' ? form.steps.split('\n').filter(Boolean) : form.steps,
+      publishAt: showAdvanced && form.publishAt ? new Date(form.publishAt).toISOString() : '',
     })
   }
 
@@ -195,7 +198,46 @@ function LootForm({ initial, onSave, onCancel }) {
           </div>
 
           <div className="space-y-2.5">
-            <button type="submit" className={btnPrimaryCls} style={btnPrimary}>✓ Save Loot Deal</button>
+            {/* Advanced Scheduling */}
+            <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(251,191,36,0.2)', background: 'rgba(251,191,36,0.04)' }}>
+              <button
+                type="button"
+                onClick={() => { setShowAdvanced(v => !v); if (showAdvanced) set('publishAt', '') }}
+                className="w-full flex items-center justify-between px-4 py-3 text-left"
+              >
+                <div className="flex items-center gap-2">
+                  <span>🗓️</span>
+                  <div>
+                    <p className="text-sm font-black text-white">Schedule Publishing</p>
+                    <p className="text-[10px] text-white/40">{showAdvanced && form.publishAt ? `Live: ${new Date(form.publishAt).toLocaleString('en-IN')}` : 'Auto-publish at a future time'}</p>
+                  </div>
+                </div>
+                <div className={`flex h-5 w-9 items-center rounded-full transition-all ${showAdvanced ? 'justify-end' : 'justify-start'}`} style={{ background: showAdvanced ? G : 'rgba(255,255,255,0.15)', padding: '2px' }}>
+                  <span className="h-4 w-4 rounded-full bg-white shadow" />
+                </div>
+              </button>
+              {showAdvanced && (
+                <div className="px-4 pb-4 space-y-2 border-t" style={{ borderColor: 'rgba(251,191,36,0.15)' }}>
+                  <p className="text-[10px] text-white/40 pt-3">Hidden from users until this date &amp; time.</p>
+                  <input
+                    type="datetime-local"
+                    className={inp}
+                    style={inpStyle}
+                    value={form.publishAt ? new Date(new Date(form.publishAt).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''}
+                    min={new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16)}
+                    onChange={e => set('publishAt', e.target.value)}
+                  />
+                  {form.publishAt && (
+                    <div className="rounded-lg px-3 py-2 text-[11px] font-bold" style={{ background: 'rgba(251,191,36,0.1)', color: '#FBBF24' }}>
+                      ⏰ Goes live: {new Date(form.publishAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            <button type="submit" className={btnPrimaryCls} style={btnPrimary}>
+              {showAdvanced && form.publishAt ? '🗓️ Schedule Loot Deal' : '✓ Save Loot Deal'}
+            </button>
             <button type="button" onClick={onCancel} className={btnCancelCls} style={btnCancelStyle}>Cancel</button>
           </div>
         </div>
