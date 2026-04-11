@@ -78,12 +78,12 @@ function LootDeals() {
         <FilterBar {...filterProps} />
 
         {/* Full-width grid */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3">
           {filteredDeals.map((deal) => (
             <LootDealCard key={deal.id} deal={deal} />
           ))}
           {filteredDeals.length === 0 && (
-            <article className="rounded-2xl border border-line bg-white p-8 text-center text-sm font-medium text-muted sm:col-span-2 lg:col-span-3">
+            <article className="rounded-2xl border border-line bg-white p-8 text-center text-sm font-medium text-muted sm:col-span-2 md:col-span-3">
               No loot deals found for current filters.
             </article>
           )}

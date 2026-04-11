@@ -196,11 +196,33 @@ export default function Categories() {
         </div>
       </header>
 
-      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-8">
-        <div className="flex flex-col lg:flex-row gap-8">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-6 md:py-8">
+        <div className="flex flex-col gap-6">
 
-          {/* ── 2. LEFT SIDEBAR (Sticky) ── */}
-          <aside className="lg:w-64 shrink-0">
+          {/* ── SIDEBAR: horizontal scrollable tabs on tablet, vertical on desktop ── */}
+          <div className="w-full">
+            {/* Mobile + Tablet: horizontal scrollable tab strip */}
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 lg:hidden">
+              {sidebarLinks.map(link => (
+                <button
+                  key={link.id}
+                  onClick={() => setActiveTab(link.id)}
+                  className={`flex shrink-0 items-center gap-1.5 px-3 py-2 rounded-full text-xs font-bold transition-all border ${
+                    activeTab === link.id
+                      ? 'bg-gold text-white border-gold shadow-sm'
+                      : 'bg-white text-muted border-line hover:border-gold/40 hover:text-gold'
+                  }`}
+                >
+                  <IconRenderer name={link.icon} className="w-3.5 h-3.5" />
+                  {link.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+            {/* Desktop sidebar — vertical, hidden on tablet and below */}
+            <aside className="hidden lg:block lg:w-56 xl:w-64 shrink-0">
             <div className="sticky top-20 space-y-6">
               {/* Navigation Menu */}
               <nav className="bg-white rounded-2xl border border-line p-2 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
@@ -241,11 +263,11 @@ export default function Categories() {
                   ))}
                 </div>
               </div>
-            </div>
-          </aside>
+              </div>
+            </aside>
 
-          {/* ── 3. MAIN CONTENT ── */}
-          <div className="flex-grow">
+            {/* ── 3. MAIN CONTENT ── */}
+            <div className="flex-grow min-w-0">
 
             {/* 🔥 SECTION 1: Popular Categories */}
             <section className="mb-10 lg:mb-14">
@@ -255,7 +277,7 @@ export default function Categories() {
                   Trending Categories
                 </h2>
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4 gap-y-6 sm:gap-y-8">
+              <div className="grid grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4 gap-y-6 sm:gap-y-8">
                 {popularCategories.map((cat, i) => (
                   <Link
                     key={i}
@@ -313,13 +335,17 @@ export default function Categories() {
                 </div>
               </div>
 
-              {/* ── TOP FILTER BAR (Alphabet) ── */}
-              <div className="flex items-center gap-1.5 mb-8 overflow-x-auto no-scrollbar py-1">
+              {/* ── Alphabet filter: wraps on tablet ── */}
+              <div className="flex flex-wrap items-center gap-1.5 mb-6 md:mb-8">
                 {LETTERS.map(letter => (
                   <button
                     key={letter}
                     onClick={() => setActiveLetter(letter)}
-                    className={`h-8 px-3 rounded-lg flex items-center justify-center text-xs font-semibold whitespace-nowrap transition-all duration-200 ${activeLetter === letter ? 'bg-navy text-white shadow-md' : 'bg-surface border border-line text-muted hover:border-navy/30 hover:text-navy'}`}
+                    className={`h-7 md:h-8 px-2 md:px-3 rounded-lg flex items-center justify-center text-xs font-semibold whitespace-nowrap transition-all duration-200 ${
+                      activeLetter === letter
+                        ? 'bg-navy text-white shadow-md'
+                        : 'bg-surface border border-line text-muted hover:border-navy/30 hover:text-navy'
+                    }`}
                   >
                     {letter === 'ALL' ? 'All' : letter}
                   </button>
@@ -337,7 +363,10 @@ export default function Categories() {
                   ))}
                 </div>
               ) : Object.keys(processedData).length > 0 ? (
-                <div className={viewMode === 'grid' ? "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 gap-y-8 sm:gap-y-10" : "flex flex-col gap-3"}>
+                <div className={viewMode === 'grid'
+                  ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4 gap-y-6 md:gap-y-8'
+                  : 'flex flex-col gap-3'
+                }>
                   {Object.entries(processedData).sort().map(([letter, items]) => (
                     <React.Fragment key={letter}>
                       {activeLetter === 'ALL' && (
@@ -395,6 +424,7 @@ export default function Categories() {
               )}
             </section>
 
+            </div>
           </div>
         </div>
       </div>

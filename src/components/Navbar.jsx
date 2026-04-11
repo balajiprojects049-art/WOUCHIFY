@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useTheme } from '../context/ThemeContext'
 
@@ -38,6 +38,8 @@ function MoonIcon() {
 function Navbar() {
   const [searchText, setSearchText] = useState('')
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const tabletSearchRef = useRef(null)
   const navigate = useNavigate()
   const { theme, toggleTheme } = useTheme()
 
@@ -46,6 +48,18 @@ function Navbar() {
     const query = searchText.trim()
     const route = query.toLowerCase().includes('loot') ? '/loot-deals' : '/deals'
     navigate(query ? `${route}?q=${encodeURIComponent(query)}` : route)
+    setIsSearchOpen(false)
+    setSearchText('')
+  }
+
+  const openSearch = () => {
+    setIsSearchOpen(true)
+    setTimeout(() => tabletSearchRef.current?.focus(), 60)
+  }
+
+  const closeSearch = () => {
+    setIsSearchOpen(false)
+    setSearchText('')
   }
 
   return (
@@ -61,9 +75,7 @@ function Navbar() {
         <button
           onClick={() => {
             navigate('/')
-            setTimeout(() => {
-              window.dispatchEvent(new Event('openAdvertiseForm'))
-            }, 100)
+            setTimeout(() => window.dispatchEvent(new Event('openAdvertiseForm')), 100)
           }}
           className="shrink-0 rounded-lg bg-[#12151C] px-2.5 py-1.5 text-[10px] font-bold text-white shadow-sm transition-all duration-300 hover:scale-105 hover:bg-black hover:shadow-md sm:px-3.5 sm:text-xs"
         >
@@ -72,113 +84,164 @@ function Navbar() {
       </div>
 
       <header className="sticky top-0 z-50 border-b border-line bg-cream transition-colors duration-300">
-      <div className="mx-auto flex h-14 max-w-[1400px] items-center justify-between gap-3 px-3 sm:h-16 sm:px-6 lg:px-8">
-        <div className="flex flex-col items-center sm:items-start">
-          <NavLink to="/" className="text-xl font-black uppercase tracking-tighter text-[#12151C] sm:text-2xl leading-none">
-            WOUCHIFY
-          </NavLink>
-          <span className="hidden text-[8px] font-black uppercase tracking-[0.2em] text-[#ffb400] md:block mt-1">
-            Save More Every Day
-          </span>
+
+        {/* ── Main nav row ── */}
+        <div className="mx-auto flex h-14 max-w-[1400px] items-center justify-between gap-2 px-3 sm:h-16 sm:px-4 lg:px-8">
+
+          {/* Logo */}
+          <div className="flex shrink-0 flex-col">
+            <NavLink to="/" className="text-base font-black uppercase tracking-tighter text-[#12151C] md:text-lg xl:text-2xl leading-none">
+              WOUCHIFY
+            </NavLink>
+            <span className="hidden text-[7px] font-black uppercase tracking-[0.15em] text-[#ffb400] md:block mt-0.5">
+              Save More Every Day
+            </span>
+          </div>
+
+          {/* Nav links — md and up */}
+          <nav className="hidden md:flex items-center gap-3 lg:gap-4 xl:gap-8">
+            {navLinks.map((link) => (
+              <NavLink
+                key={link.label}
+                to={link.to}
+                className={({ isActive }) =>
+                  `group relative py-1.5 text-[11px] lg:text-sm font-bold uppercase tracking-wide lg:tracking-wider transition-colors duration-300 hover:text-ink whitespace-nowrap ${isActive ? 'text-ink' : 'text-muted'}`
+                }
+              >
+                {({ isActive }) => (
+                  <>
+                    {link.label}
+                    <span className={`absolute bottom-0 left-0 block h-[2.5px] w-full rounded-t-full bg-gold transition-transform duration-300 ${isActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`} />
+                  </>
+                )}
+              </NavLink>
+            ))}
+          </nav>
+
+          {/* Right actions */}
+          <div className="flex shrink-0 items-center gap-2">
+
+            {/* Full search box — XL+ desktops only */}
+            <form onSubmit={handleSearchSubmit} className="hidden xl:flex rounded-full border border-line bg-cream px-4 py-2 transition-colors duration-300">
+              <input
+                type="text"
+                placeholder="Search deals"
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                className="w-44 bg-transparent text-sm text-ink font-bold placeholder:font-normal placeholder:text-muted focus:outline-none"
+              />
+            </form>
+
+            {/* Search icon — tablet md→xl: opens the slide-down overlay */}
+            <button
+              onClick={openSearch}
+              className={`hidden md:inline-flex xl:hidden h-8 w-8 items-center justify-center rounded-full border transition-all ${
+                isSearchOpen
+                  ? 'border-gold bg-gold/10 text-gold'
+                  : 'border-line bg-cream text-ink hover:border-gold hover:text-gold'
+              }`}
+              aria-label="Open search"
+            >
+              <svg viewBox="0 0 20 20" className="h-4 w-4 fill-current" aria-hidden="true">
+                <path d="M8.5 2a6.5 6.5 0 1 0 4.04 11.59l3.93 3.92 1.06-1.06-3.92-3.93A6.5 6.5 0 0 0 8.5 2Zm0 1.5a5 5 0 1 1 0 10 5 5 0 0 1 0-10Z" />
+              </svg>
+            </button>
+
+            {/* Theme toggle */}
+            <button
+              id="theme-toggle"
+              onClick={toggleTheme}
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              className="inline-flex h-8 w-8 lg:h-9 lg:w-9 items-center justify-center rounded-full border border-line bg-cream text-ink transition-all duration-300 hover:scale-110 hover:border-gold hover:text-gold"
+            >
+              {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+            </button>
+
+            {/* Mobile: search icon */}
+            <button
+              onClick={openSearch}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-line bg-cream text-ink md:hidden"
+              aria-label="Search"
+            >
+              <svg viewBox="0 0 20 20" className="h-4 w-4 fill-current" aria-hidden="true">
+                <path d="M8.5 2a6.5 6.5 0 1 0 4.04 11.59l3.93 3.92 1.06-1.06-3.92-3.93A6.5 6.5 0 0 0 8.5 2Zm0 1.5a5 5 0 1 1 0 10 5 5 0 0 1 0-10Z" />
+              </svg>
+            </button>
+
+            {/* Mobile: hamburger */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden inline-flex h-8 w-8 items-center justify-center rounded-lg text-ink hover:bg-black/5 transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {isMobileMenuOpen
+                  ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+                  : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16m-7 6h7" />
+                }
+              </svg>
+            </button>
+          </div>
         </div>
 
-        <nav className="hidden items-center gap-6 lg:gap-10 md:flex">
-          {navLinks.map((link) => (
-            <NavLink
-              key={link.label}
-              to={link.to}
-              className={({ isActive }) =>
-                `group relative py-2 text-sm font-bold uppercase tracking-wider transition-colors duration-300 hover:text-ink ${isActive ? 'text-ink' : 'text-muted'}`
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  {link.label}
-                  <span
-                    className={`absolute bottom-0 left-0 block h-[2.5px] w-full rounded-t-full bg-gold transition-transform duration-300 ${
-                      isActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
-                    }`}
-                  />
-                </>
-              )}
-            </NavLink>
-          ))}
-        </nav>
-
-        <div className="flex items-center gap-2 sm:gap-3">
-          <form onSubmit={handleSearchSubmit} className="hidden rounded-full border border-line bg-cream px-4 py-2 md:flex transition-colors duration-300">
-            <input
-              type="text"
-              placeholder="Search deals"
-              value={searchText}
-              onChange={(event) => setSearchText(event.target.value)}
-              className="w-36 lg:w-44 bg-transparent text-sm text-ink font-bold placeholder:font-normal placeholder:text-muted focus:outline-none"
-            />
-          </form>
-
-          {/* Theme toggle */}
-          <button
-            id="theme-toggle"
-            onClick={toggleTheme}
-            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-line bg-cream text-ink transition-all duration-300 hover:scale-110 hover:border-gold hover:text-gold"
+        {/* ── Search Overlay (all screen sizes, slides down) ── */}
+        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isSearchOpen ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}`}>
+          <form
+            onSubmit={handleSearchSubmit}
+            className="flex items-center gap-3 px-4 sm:px-6 lg:px-8 py-3 bg-white border-t border-line/40 shadow-sm"
           >
-            {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
-          </button>
-
-          <button
-            onClick={() => navigate('/deals')}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-line bg-cream text-ink md:hidden"
-            aria-label="Search"
-          >
-            <svg viewBox="0 0 20 20" className="h-4 w-4 fill-current" aria-hidden="true">
+            <svg viewBox="0 0 20 20" className="h-5 w-5 shrink-0 fill-current text-gold" aria-hidden="true">
               <path d="M8.5 2a6.5 6.5 0 1 0 4.04 11.59l3.93 3.92 1.06-1.06-3.92-3.93A6.5 6.5 0 0 0 8.5 2Zm0 1.5a5 5 0 1 1 0 10 5 5 0 0 1 0-10Z" />
             </svg>
-          </button>
-
-          {/* Mobile Hamburger Menu icon */}
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-lg text-ink hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {isMobileMenuOpen ? (
-                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16m-7 6h7" />
-              )}
-            </svg>
-          </button>
-
-        </div>
-      </div>
-
-      {/* Mobile Navigation Dropdown Overlay */}
-      <div 
-        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'max-h-[500px] border-t border-line/40' : 'max-h-0'}`}
-      >
-        <nav className="flex flex-col gap-2 p-4 bg-cream/95 backdrop-blur-xl shadow-inner">
-          {navLinks.map((link) => (
-            <NavLink
-              key={link.label}
-              to={link.to}
-              onClick={() => setIsMobileMenuOpen(false)}
-              className={({ isActive }) =>
-                `block rounded-xl px-4 py-3.5 text-[15px] uppercase tracking-wider font-extrabold transition-all duration-200 border border-transparent ${
-                  isActive ? 'bg-gold text-midnight shadow-md shadow-gold/20' : 'text-ink hover:border-line hover:bg-black/5 dark:hover:bg-white/5'
-                }`
-              }
+            <input
+              ref={tabletSearchRef}
+              type="text"
+              placeholder="Search deals, stores, coupons..."
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              className="flex-1 bg-transparent text-sm font-semibold text-ink placeholder:text-muted focus:outline-none"
+              autoComplete="off"
+            />
+            <button
+              type="submit"
+              className="shrink-0 rounded-lg bg-gold px-4 py-1.5 text-xs font-black text-white hover:bg-[#D4A820] transition-colors"
             >
-              {link.label}
-            </NavLink>
-          ))}
-        </nav>
-      </div>
+              Search
+            </button>
+            <button
+              type="button"
+              onClick={closeSearch}
+              className="shrink-0 h-7 w-7 flex items-center justify-center rounded-full text-muted hover:text-ink hover:bg-gray-100 transition-colors"
+              aria-label="Close search"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </form>
+        </div>
 
-    </header>
+        {/* Mobile nav dropdown */}
+        <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMobileMenuOpen ? 'max-h-[500px] border-t border-line/40' : 'max-h-0'}`}>
+          <nav className="flex flex-col gap-2 p-4 bg-cream/95 backdrop-blur-xl shadow-inner">
+            {navLinks.map((link) => (
+              <NavLink
+                key={link.label}
+                to={link.to}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={({ isActive }) =>
+                  `block rounded-xl px-4 py-3.5 text-[15px] uppercase tracking-wider font-extrabold transition-all duration-200 border border-transparent ${
+                    isActive ? 'bg-gold text-midnight shadow-md shadow-gold/20' : 'text-ink hover:border-line hover:bg-black/5'
+                  }`
+                }
+              >
+                {link.label}
+              </NavLink>
+            ))}
+          </nav>
+        </div>
+      </header>
     </>
   )
 }
 
 export default Navbar
-
