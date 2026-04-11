@@ -167,6 +167,7 @@ export function DataProvider({ children }) {
   const [adminMembers, setAdminMembers] = useState(() => normalizeAdminMembers(loadFromStorage('wouchify_admin_members', defaultAdminMembers)))
   const [auditLog, setAuditLog] = useState(() => loadFromStorage('wouchify_audit_log', []))
   const [analytics, setAnalytics] = useState(() => loadFromStorage('wouchify_analytics', defaultAnalytics))
+  const [advertisements, setAdvertisements] = useState(() => loadFromStorage('wouchify_advertisements', []))
 
   const [dbConnected, setDbConnected] = useState(false)
 
@@ -268,6 +269,21 @@ export function DataProvider({ children }) {
   useEffect(() => { saveToStorage('wouchify_admin_members', adminMembers) }, [adminMembers])
   useEffect(() => { saveToStorage('wouchify_audit_log', auditLog) }, [auditLog])
   useEffect(() => { saveToStorage('wouchify_analytics', analytics) }, [analytics])
+  useEffect(() => { saveToStorage('wouchify_advertisements', advertisements) }, [advertisements])
+
+  // ── ADVERTISEMENTS CRUD ───────────────────────────────────────────────────
+  const addAdvertisement = (ad) => {
+    const newAd = { ...ad, id: generateId() }
+    setAdvertisements(prev => [newAd, ...prev])
+    addAuditLog('CREATE', 'Advertisement', `Added ad: ${ad.title}`)
+  }
+  const updateAdvertisement = (id, updates) => {
+    setAdvertisements(prev => prev.map(a => a.id === id ? { ...a, ...updates } : a))
+  }
+  const deleteAdvertisement = (id) => {
+    setAdvertisements(prev => prev.filter(a => a.id !== id))
+    addAuditLog('DELETE', 'Advertisement', `Deleted ad id: ${id}`)
+  }
 
   // ── BANNERS CRUD ─────────────────────────────────────────────────────────
   const addBanner = (page, banner) => {
@@ -481,6 +497,7 @@ export function DataProvider({ children }) {
     <DataContext.Provider value={{
       // Data
       deals, lootDeals, stores, coupons, giveaways, creditCards, banners, adminSettings, adminMembers, dbConnected, syncDataToDb,
+      advertisements, addAdvertisement, updateAdvertisement, deleteAdvertisement,
       // Deals
       addDeal, updateDeal, deleteDeal, getDealBySlug,
       // Loot Deals
