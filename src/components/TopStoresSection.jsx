@@ -10,16 +10,18 @@ function StoreBadge({ store }) {
 
   if (logoUrl && !logoBroken) {
     return (
-      <img
-        src={logoUrl}
-        alt={store.name}
-        className="h-10 w-10 rounded-full object-cover"
-        onError={() => setLogoBroken(true)}
-      />
+      <div className="h-12 w-12 rounded-xl bg-white border border-line flex items-center justify-center p-1.5 shadow-sm overflow-hidden">
+        <img
+          src={logoUrl}
+          alt={store.name}
+          className="h-full w-full object-contain"
+          onError={() => setLogoBroken(true)}
+        />
+      </div>
     )
   }
   return (
-    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gold/15 text-xs font-bold text-gold">
+    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gold/15 border border-gold/20 text-sm font-bold text-gold">
       {(store.logoText || store.name || '').slice(0, 2).toUpperCase()}
     </div>
   )
