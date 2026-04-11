@@ -54,7 +54,8 @@ function LootForm({ initial, onSave, onCancel }) {
     const expiresMs = startMs + (initial.expiresInSeconds || 21600) * 1000
     const d = new Date(expiresMs)
     d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
-    return { ...initial, expiresAt: d.toISOString().slice(0, 16) }
+    // Spread EMPTY first so all fields (like 'store') are always defined
+    return { ...EMPTY, ...initial, expiresAt: d.toISOString().slice(0, 16) }
   })
   const [showAdvanced, setShowAdvanced] = useState(!!initial.publishAt)
   

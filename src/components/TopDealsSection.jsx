@@ -1,8 +1,18 @@
 import { useMemo, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useData } from '../context/DataContext'
+import { storesData } from '../data/storesData'
+import { resolveStoreLogoUrl } from '../utils/storeLogo'
 import CircularTimer from './CircularTimer'
 import { getDealRemainingSeconds } from '../utils/dealExpiry'
+
+function getStoreLogo(storeName) {
+  const name = (storeName || '').toLowerCase()
+  const matched = storesData.find(s => s.name.toLowerCase() === name)
+    || storesData.find(s => name.includes(s.name.toLowerCase()))
+    || storesData.find(s => s.name.toLowerCase().includes(name))
+  return matched?.logo || resolveStoreLogoUrl(storeName)
+}
 
 function TopDealsSection() {
   const navigate = useNavigate()
@@ -14,7 +24,6 @@ function TopDealsSection() {
     return () => clearInterval(interval)
   }, [])
 
-  // Show top 3 active deals sorted by discount
   const topDeals = useMemo(() => {
     return [...(deals || [])]
       .filter(d => d.active !== false)
@@ -37,6 +46,8 @@ function TopDealsSection() {
         {topDeals.map((deal) => {
           const remainingSeconds = getDealRemainingSeconds(deal, nowMs)
           const isExpired = remainingSeconds <= 0
+          const logoUrl = getStoreLogo(deal.store)
+          const logoText = (deal.store || '').slice(0, 2).toUpperCase()
 
           return (
             <article
@@ -64,7 +75,25 @@ function TopDealsSection() {
                 </div>
               )}
 
-              <h3 className="mt-4 text-lg font-bold text-ink line-clamp-2">{deal.title}</h3>
+              {/* Store name + logo row */}
+              <div className="mt-3 flex items-center gap-2.5">
+                {logoUrl ? (
+                  <div className="h-8 w-8 rounded-lg bg-white border border-line flex items-center justify-center p-1 shadow-sm overflow-hidden flex-shrink-0">
+                    <img src={logoUrl} alt={deal.store} className="h-full w-full object-contain" onError={e => e.target.style.display='none'} />
+                  </div>
+                ) : (
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gold/15 text-[10px] font-black text-gold border border-gold/20 flex-shrink-0">{logoText || 'ST'}</div>
+                )}
+                <div className="min-w-0">
+                  <p className="text-sm font-black text-ink leading-tight truncate">{deal.store || 'Store'}</p>
+                  <p className="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
+                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
+                    Verified Store
+                  </p>
+                </div>
+              </div>
+
+              <h3 className="mt-3 text-lg font-bold text-ink line-clamp-2">{deal.title}</h3>
 
               <div className="mt-3 flex items-center justify-between gap-3 h-14">
                 {!isExpired ? (
