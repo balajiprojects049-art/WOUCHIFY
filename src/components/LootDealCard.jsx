@@ -97,10 +97,10 @@ function LootDealCard({ deal }) {
               <img src={logoUrl} alt={deal.store} className="h-full w-full object-contain" onError={e => e.target.style.display='none'} />
             </div>
           ) : (
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gold/15 text-[10px] font-black text-gold border border-gold/20 flex-shrink-0">{logoText}</div>
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gold/15 text-[10px] font-black text-gold border border-gold/20 flex-shrink-0">{logoText || 'ST'}</div>
           )}
           <div className="min-w-0">
-            <p className="text-sm font-black text-ink leading-tight truncate">{deal.store}</p>
+            <p className="text-sm font-black text-ink leading-tight truncate">{deal.store || 'Store'}</p>
             <p className="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse flex-shrink-0" />
               Verified Store

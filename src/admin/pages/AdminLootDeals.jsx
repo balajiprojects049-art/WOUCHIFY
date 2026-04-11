@@ -12,7 +12,7 @@ import {
 } from '../components/adminStyles'
 
 const EMPTY = {
-  slug: '', title: '', category: 'Electronics', discountPercent: 70,
+  slug: '', title: '', store: '', category: 'Electronics', discountPercent: 70,
   oldPrice: '', newPrice: '', grabbed: '', stockLabel: 'Only a few left!',
   urgency: 'Ending soon — grab it now!', expiresInSeconds: 21600, popularity: 90, image: '',
   description: '', steps: '', terms: '', link: '',
@@ -89,6 +89,10 @@ function LootForm({ initial, onSave, onCancel }) {
               <div className="col-span-2">
                 <label className={lbl}>Deal Title <span style={{ color: G }}>*</span></label>
                 <input {...inputProps} required value={form.title} onChange={e => set('title', e.target.value)} placeholder="e.g. iPhone 15 Mega Loot Drop" />
+              </div>
+              <div>
+                <label className={lbl}>Store Name <span style={{ color: G }}>*</span></label>
+                <input {...inputProps} required value={form.store} onChange={e => set('store', e.target.value)} placeholder="e.g. Amazon, Flipkart, Myntra" />
               </div>
               <div>
                 <label className={lbl}>Category</label>
