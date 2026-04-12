@@ -4,6 +4,7 @@ import ScrollingPageBanner from '../components/ScrollingPageBanner'
 import StoreCard from '../components/StoreCard'
 import SearchBar from '../components/SearchBar'
 import { useData } from '../context/DataContext'
+import SEO from '../components/SEO'
 
 
 const alphabet = ['All', ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')]
@@ -54,6 +55,11 @@ function Stores() {
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-16">
+      <SEO 
+        title="Browse Top Stores & Brands"
+        description="Explore hundreds of top Indian stores and brands on Wouchify. Find the best deals and coupons for Amazon, Flipkart, Myntra, Swiggy, and more."
+        keywords="stores, brands, Amazon, Flipkart, Myntra, Swiggy, Zomato, retail partners"
+      />
       <div className="mb-10">
         <ScrollingPageBanner banners={storesBanners} />
       </div>

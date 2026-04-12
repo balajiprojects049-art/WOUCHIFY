@@ -7,6 +7,7 @@ import TopDealsSection from '../components/TopDealsSection'
 import { useData } from '../context/DataContext'
 import { getDealRemainingSeconds } from '../utils/dealExpiry'
 import AdZone from '../components/AdZone'
+import SEO from '../components/SEO'
 
 function parseDiscount(value) {
   return Number.parseInt((value || '').replace('%+', ''), 10)
@@ -116,6 +117,11 @@ function Deals() {
 
   return (
     <main className="mx-auto max-w-[1400px] px-4 py-10 pb-32 sm:px-6 lg:pb-10">
+      <SEO 
+        title="Best Deals & Discounts"
+        description="Browse thousands of verified deals from your favorite stores. Save more with Wouchify's curated list of price drops and retail offers."
+        keywords="online deals, shopping discounts, price drops, retail offers, Wouchify deals"
+      />
       <div className="mb-8">
         <ScrollingPageBanner banners={dealsBanners} />
       </div>

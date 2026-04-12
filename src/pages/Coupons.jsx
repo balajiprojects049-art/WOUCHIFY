@@ -4,6 +4,7 @@ import FilterBar from '../components/FilterBar'
 import { useData } from '../context/DataContext'
 import { resolveStoreLogoUrl } from '../utils/storeLogo'
 import ShareButton from '../components/ShareButton'
+import SEO from '../components/SEO'
 
 /* ── Animations ──────────────────────────────────────────────────── */
 const css = `
@@ -350,7 +351,12 @@ function Coupons() {
   }))
 
   return (
-    <>
+    <>{/* SEO Component */}
+      <SEO 
+        title="Verified Coupons & Promo Codes"
+        description="Save extra with our list of verified coupon codes and vouchers. Find active promo codes for Amazon, Flipkart, Myntra, Swiggy, and more."
+        keywords="promo codes, coupons, discount vouchers, verified codes, Wouchify coupons"
+      />
       <style>{css}</style>
       <main className="mx-auto max-w-[1400px] px-4 py-10 pb-32 sm:px-6 lg:px-8 lg:pb-10">
         <section className="mb-10">

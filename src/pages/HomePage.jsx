@@ -10,6 +10,7 @@ import NewsTickerSection from '../components/NewsTickerSection'
 import AdZone from '../components/AdZone'
 import CreditCardAdBanner from '../components/CreditCardAdBanner'
 import AdImageBanner from '../components/AdImageBanner'
+import SEO from '../components/SEO'
 
 /**
  * USER JOURNEY (Critical Order):
@@ -29,6 +30,11 @@ function HomePage() {
 
   return (
     <div className="flex flex-col bg-[#F9FAFB]">
+      <SEO 
+        title="Home"
+        description="Save big with Wouchify! Discover verified deals, loot offers, and coupons from top Indian stores like Amazon, Flipkart, Myntra, and more. Your one-stop destination for ultimate savings."
+        keywords="deals, coupons, India, discounts, loot deals, Amazon offers, Flipkart coupons, Wouchify"
+      />
       {/* 1. HERO SECTION */}
       <section className="w-full bg-white">
         <div className={containerCls}>

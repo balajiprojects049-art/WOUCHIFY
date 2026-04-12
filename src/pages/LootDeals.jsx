@@ -4,6 +4,7 @@ import LootDealCard from '../components/LootDealCard'
 import ScrollingPageBanner from '../components/ScrollingPageBanner'
 import { useData } from '../context/DataContext'
 import { getDealRemainingSeconds } from '../utils/dealExpiry'
+import SEO from '../components/SEO'
 
 function parseDiscount(value) {
   return Number.parseInt((value || '').replace('%+', ''), 10)
@@ -69,6 +70,11 @@ function LootDeals() {
 
   return (
     <main>
+      <SEO 
+        title="Exclusive Loot Deals & Flash Sales"
+        description="Grab the hottest loot deals before they expire! Massive discounts, flash sales, and price errors from top retailers, verified daily."
+        keywords="loot deals, flash sales, price errors, lowest price, looting, Wouchify loot"
+      />
       <section className="mx-auto mt-6 max-w-[1400px] px-4 sm:px-6">
         <ScrollingPageBanner banners={lootBanners} />
       </section>

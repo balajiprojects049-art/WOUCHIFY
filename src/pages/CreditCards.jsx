@@ -1,6 +1,7 @@
 import ScrollingPageBanner from '../components/ScrollingPageBanner'
 import { useData } from '../context/DataContext'
 import CreditCardDetailCard from '../components/CreditCardDetailCard'
+import SEO from '../components/SEO'
 
 
 
@@ -14,6 +15,11 @@ function CreditCards() {
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <SEO 
+        title="Best Credit Card Offers & Rewards"
+        description="Compare the best credit cards in India. Find premium shopping cards and lifetime-free cards with exclusive cashback and rewards through Wouchify."
+        keywords="credit cards, rewards, cashback, lifetime free, shopping cards, credit card offers"
+      />
       <section className="mb-14">
         <ScrollingPageBanner banners={activeBanners} />
       </section>
