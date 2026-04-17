@@ -232,6 +232,7 @@ export function DataProvider({ children }) {
           if (res.data.stores) setStores(prev => mergeList(res.data.stores, prev))
           if (res.data.coupons) setCoupons(prev => mergeList(res.data.coupons, prev))
           if (res.data.giveaways) setGiveaways(prev => mergeList(res.data.giveaways, prev))
+          if (res.data.advertisements) setAdvertisements(prev => mergeList(res.data.advertisements, prev))
           if (res.data.adminMembers) setAdminMembers(prev => normalizeAdminMembers(mergeList(res.data.adminMembers, prev)))
           // creditCards is a singleton object {shopping:[],lifetime:[]}, not a list
           // Only load from DB on a fresh device (no local data yet)
@@ -255,7 +256,7 @@ export function DataProvider({ children }) {
   // ── 2) Sync functionality (exposes to Admin Setup) ──
   const syncDataToDb = async () => {
     const payload = {
-      deals, lootDeals, stores, coupons, giveaways, creditCards, banners, adminSettings, adminMembers, auditLog, analytics
+      deals, lootDeals, stores, coupons, giveaways, creditCards, banners, adminSettings, adminMembers, auditLog, analytics, advertisements
     }
     const res = await fetch('/api/sync', {
       method: 'POST',
@@ -368,6 +369,7 @@ export function DataProvider({ children }) {
     })
   }
   const deleteAdvertisement = (id) => {
+    addToDeletedIds(id)
     setAdvertisements(prev => prev.filter(a => a.id !== id))
     removeDb('advertisements', id)
     addAuditLog('DELETE', 'Advertisement', `Deleted ad id: ${id}`)
