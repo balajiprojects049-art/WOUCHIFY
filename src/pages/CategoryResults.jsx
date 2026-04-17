@@ -86,9 +86,9 @@ export default function CategoryResults() {
   const totalCount = filteredDeals.length + filteredLoot.length + filteredCoupons.length
 
   return (
-    <div className="min-h-screen bg-[#FDFDFD]">
+    <div className="min-h-screen bg-cream font-sans transition-colors duration-500">
       {/* Header */}
-      <div className="bg-white border-b border-line pt-6 pb-8">
+      <div className="bg-surface border-b border-line pt-6 pb-8">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
           <nav className="flex items-center gap-2 text-[10px] font-bold text-muted uppercase tracking-widest mb-4">
             <Link to="/" className="hover:text-gold transition-colors">Home</Link>
@@ -102,7 +102,7 @@ export default function CategoryResults() {
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cream border border-line mb-3 shadow-sm">
                  <Tag className="w-3.5 h-3.5 text-gold" />
-                 <span className="text-[10px] font-black text-midnight uppercase tracking-[0.2em]">Category Results</span>
+                 <span className="text-[10px] font-black text-ink uppercase tracking-[0.2em]">Category Results</span>
               </div>
               <h1 className="text-3xl sm:text-4xl font-extrabold text-ink tracking-tight">{categoryName}</h1>
               <p className="mt-2 text-sm font-semibold text-muted">Found {totalCount} total active offers for your selection</p>
@@ -119,7 +119,7 @@ export default function CategoryResults() {
                  <button
                    key={t.id}
                    onClick={() => setTab(t.id)}
-                   className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${tab === t.id ? 'bg-navy text-white shadow-md' : 'text-muted hover:bg-cream hover:text-ink'}`}
+                   className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${tab === t.id ? 'bg-ink text-cream shadow-md' : 'text-muted hover:bg-cream hover:text-ink'}`}
                  >
                    {t.label} <span className="ml-1 opacity-70">({t.count})</span>
                  </button>
@@ -136,7 +136,7 @@ export default function CategoryResults() {
          <aside className="w-full lg:w-64 shrink-0 space-y-6">
             {/* Store Filter */}
             {availableStores.length > 0 && (
-              <div className="bg-white rounded-2xl border border-line p-5 shadow-sm">
+              <div className="bg-surface rounded-2xl border border-line p-5 shadow-sm">
                 <div className="flex items-center gap-2 mb-4">
                   <Store className="w-4 h-4 text-gold" />
                   <h3 className="text-sm font-bold text-ink uppercase tracking-wider">Filter by Store</h3>
@@ -149,7 +149,7 @@ export default function CategoryResults() {
                     placeholder="Search stores..."
                     value={storeSearch}
                     onChange={(e) => setStoreSearch(e.target.value)}
-                    className="w-full h-9 pl-9 pr-3 bg-surface border border-line rounded-lg text-xs font-bold focus:border-gold focus:outline-none transition-all placeholder:text-muted/60 text-ink"
+                    className="w-full h-9 pl-9 pr-3 bg-cream border border-line rounded-lg text-xs font-bold focus:border-gold focus:outline-none transition-all placeholder:text-muted/60 text-ink"
                   />
                   <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted group-focus-within:text-gold transition-colors" />
                 </div>
@@ -162,10 +162,10 @@ export default function CategoryResults() {
                         <button
                           key={store}
                           onClick={() => toggleStore(store)}
-                          className={`w-full flex items-center justify-between p-2 rounded-lg transition-colors duration-200 border border-transparent ${isSelected ? 'bg-gold/10 border-gold/30 text-gold' : 'hover:bg-surface text-ink'}`}
+                          className={`w-full flex items-center justify-between p-2 rounded-lg transition-colors duration-200 border border-transparent ${isSelected ? 'bg-gold/10 border-gold/30 text-gold' : 'hover:bg-cream text-ink'}`}
                         >
                           <div className="flex items-center gap-2.5">
-                            <div className="w-5 h-5 bg-white rounded border border-line flex items-center justify-center overflow-hidden shrink-0 shadow-sm p-0.5">
+                            <div className="w-5 h-5 bg-surface rounded border border-line flex items-center justify-center overflow-hidden shrink-0 shadow-sm p-0.5">
                               <img src={resolveStoreLogoUrl(store)} alt={store} className="w-full h-full object-contain" onError={(e) => { e.target.style.display = 'none' }} />
                             </div>
                             <span className={`text-xs font-semibold ${isSelected ? 'text-gold' : 'text-ink'}`}>{store}</span>
@@ -190,7 +190,7 @@ export default function CategoryResults() {
             )}
 
             {/* Related Categories Links */}
-            <div className="bg-white rounded-2xl border border-line p-5 shadow-sm">
+            <div className="bg-surface rounded-2xl border border-line p-5 shadow-sm">
               <div className="flex items-center gap-2 mb-4">
                 <Compass className="w-4 h-4 text-gold" />
                 <h3 className="text-sm font-bold text-ink uppercase tracking-wider">Related Categories</h3>
@@ -203,7 +203,7 @@ export default function CategoryResults() {
                   placeholder="Search categories..."
                   value={categorySearch}
                   onChange={(e) => setCategorySearch(e.target.value)}
-                  className="w-full h-9 pl-9 pr-3 bg-surface border border-line rounded-lg text-xs font-bold focus:border-gold focus:outline-none transition-all placeholder:text-muted/60 text-ink"
+                  className="w-full h-9 pl-9 pr-3 bg-cream border border-line rounded-lg text-xs font-bold focus:border-gold focus:outline-none transition-all placeholder:text-muted/60 text-ink"
                 />
                 <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted group-focus-within:text-gold transition-colors" />
               </div>
@@ -214,10 +214,10 @@ export default function CategoryResults() {
                     <button
                       key={cat.name}
                       onClick={() => navigate(`/category-results?category=${encodeURIComponent(cat.name)}`)}
-                      className={`w-full flex items-center justify-between p-2.5 rounded-xl transition-all duration-200 group ${categoryName === cat.name ? 'bg-gold/10 text-gold' : 'hover:bg-surface'}`}
+                      className={`w-full flex items-center justify-between p-2.5 rounded-xl transition-all duration-200 group ${categoryName === cat.name ? 'bg-gold/10 text-gold' : 'hover:bg-cream'}`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className={`p-1.5 rounded-lg transition-colors flex-shrink-0 ${categoryName === cat.name ? 'bg-gold text-white shadow-sm' : 'bg-surface text-muted group-hover:bg-line'}`}>
+                        <div className={`p-1.5 rounded-lg transition-colors flex-shrink-0 ${categoryName === cat.name ? 'bg-gold text-white shadow-sm' : 'bg-cream text-muted group-hover:bg-line'}`}>
                           <IconRenderer name={cat.icon} className="w-3.5 h-3.5" />
                         </div>
                         <span className={`text-xs font-semibold text-left line-clamp-1 ${categoryName === cat.name ? 'text-ink' : 'text-muted group-hover:text-ink'}`}>{cat.name}</span>
@@ -271,7 +271,7 @@ export default function CategoryResults() {
                      <Link 
                       key={coupon.id} 
                       to={`/deal/${coupon.slug || coupon.id}`}
-                      className="group bg-white rounded-2xl border border-line p-5 hover:border-gold/50 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 relative overflow-hidden flex flex-col"
+                      className="group bg-surface rounded-2xl border border-line p-5 hover:border-gold/50 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 relative overflow-hidden flex flex-col"
                      >
                        <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-10 group-hover:scale-110 transition-all duration-500">
                           <Tag className="w-16 h-16 text-blue-500" />
@@ -279,7 +279,7 @@ export default function CategoryResults() {
                        <p className="text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-1">{coupon.store}</p>
                        <h3 className="text-base font-bold text-ink mb-1 leading-snug line-clamp-2 group-hover:text-gold transition-colors">{coupon.title}</h3>
                        <div className="mt-auto pt-6 flex items-center justify-between">
-                          <span className="text-[10px] font-black px-3 py-1.5 bg-surface rounded-md text-midnight border border-line group-hover:bg-gold/10 group-hover:border-gold/30 group-hover:text-gold transition-colors">COPY CODE</span>
+                          <span className="text-[10px] font-black px-3 py-1.5 bg-cream rounded-md text-ink border border-line group-hover:bg-gold/10 group-hover:border-gold/30 group-hover:text-gold transition-colors">COPY CODE</span>
                           <ChevronRight className="w-4 h-4 text-muted group-hover:translate-x-1 group-hover:text-gold transition-all" />
                        </div>
                      </Link>
@@ -289,8 +289,8 @@ export default function CategoryResults() {
            )}
 
            {totalCount === 0 && (
-              <div className="py-24 text-center bg-white rounded-3xl border border-line shadow-sm">
-                 <div className="w-16 h-16 bg-surface rounded-2xl flex items-center justify-center mx-auto mb-5">
+              <div className="py-24 text-center bg-surface rounded-3xl border border-line shadow-sm">
+                 <div className="w-16 h-16 bg-cream rounded-2xl flex items-center justify-center mx-auto mb-5">
                    <Filter className="w-8 h-8 text-muted opacity-50" />
                  </div>
                  <h3 className="text-xl font-bold text-ink mb-2 tracking-tight">No Offers Available</h3>

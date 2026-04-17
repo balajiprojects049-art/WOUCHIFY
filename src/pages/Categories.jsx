@@ -164,9 +164,9 @@ export default function Categories() {
   const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
 
   return (
-    <div className="min-h-screen bg-[#FDFDFD] font-sans text-ink">
+    <div className="min-h-screen bg-cream font-sans text-ink transition-colors duration-500">
       {/* ── 1. TOP HEADER SECTION ── */}
-      <header className="bg-white border-b border-line pb-6 pt-4">
+      <header className="bg-surface border-b border-line pb-6 pt-4">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
           <nav className="flex items-center gap-2 text-[10px] font-black text-muted uppercase tracking-[0.2em] mb-4">
             <Link to="/" className="hover:text-gold transition-colors">Home</Link>
@@ -183,7 +183,7 @@ export default function Categories() {
                   Total Categories: <span className="text-ink font-bold">{totalCategories.toLocaleString()}</span>
                 </span>
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-surface border border-line rounded-full text-xs font-semibold text-muted shadow-sm">
-                  <div className="w-1.5 h-1.5 rounded-full bg-midnight" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-gold/50" />
                   Coupons & Offers: <span className="text-ink font-bold">{totalCoupons.toLocaleString()}</span>
                 </span>
               </div>
@@ -210,7 +210,7 @@ export default function Categories() {
                   className={`flex shrink-0 items-center gap-1.5 px-3 py-2 rounded-full text-xs font-bold transition-all border ${
                     activeTab === link.id
                       ? 'bg-gold text-white border-gold shadow-sm'
-                      : 'bg-white text-muted border-line hover:border-gold/40 hover:text-gold'
+                      : 'bg-surface text-muted border-line hover:border-gold/40 hover:text-gold'
                   }`}
                 >
                   <IconRenderer name={link.icon} className="w-3.5 h-3.5" />
@@ -225,16 +225,16 @@ export default function Categories() {
             <aside className="hidden lg:block lg:w-56 xl:w-64 shrink-0">
             <div className="sticky top-20 space-y-6">
               {/* Navigation Menu */}
-              <nav className="bg-white rounded-2xl border border-line p-2 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+              <nav className="bg-surface rounded-2xl border border-line p-2 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
                 <div className="space-y-1">
                   {sidebarLinks.map(link => (
                     <button
                       key={link.id}
                       onClick={() => setActiveTab(link.id)}
-                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-300 group ${activeTab === link.id ? 'bg-gold/10 text-gold shadow-sm' : 'text-muted hover:bg-surface hover:text-ink'}`}
+                      className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-300 group ${activeTab === link.id ? 'bg-gold/10 text-gold shadow-sm' : 'text-muted hover:bg-cream hover:text-ink'}`}
                     >
                       <div className="flex items-center gap-3">
-                        <div className={`p-1.5 rounded-lg transition-colors ${activeTab === link.id ? 'bg-gold text-white shadow-md shadow-gold/20' : 'bg-surface bg-opacity-50 text-muted group-hover:bg-line group-hover:text-ink'}`}>
+                        <div className={`p-1.5 rounded-lg transition-colors ${activeTab === link.id ? 'bg-gold text-white shadow-md shadow-gold/20' : 'bg-cream text-muted group-hover:bg-line group-hover:text-ink'}`}>
                           <IconRenderer name={link.icon} className="w-4 h-4" />
                         </div>
                         <span className={`text-[13px] font-bold tracking-tight ${activeTab === link.id ? 'text-ink' : 'group-hover:text-ink'}`}>{link.label}</span>
@@ -284,11 +284,11 @@ export default function Categories() {
                     to={`/category-results?category=${encodeURIComponent(cat.name)}`}
                     className="group flex flex-col items-center cursor-pointer"
                   >
-                    <div className="w-full relative h-[90px] flex items-center justify-center bg-white rounded-2xl border border-line overflow-hidden transition-all duration-300 group-hover:border-gold group-hover:shadow-[0_8px_20px_rgba(212,168,32,0.15)] group-hover:-translate-y-1">
+                    <div className="w-full relative h-[90px] flex items-center justify-center bg-surface rounded-2xl border border-line overflow-hidden transition-all duration-300 group-hover:border-gold group-hover:shadow-[0_8px_20px_rgba(212,168,32,0.15)] group-hover:-translate-y-1">
                       
                       {/* Default State: Icon */}
                       <div className="absolute inset-0 flex items-center justify-center transition-all duration-400 group-hover:opacity-0 group-hover:scale-50">
-                        <IconRenderer name={cat.icon} className="w-7 h-7 sm:w-8 sm:h-8 text-navy opacity-80" />
+                        <IconRenderer name={cat.icon} className="w-7 h-7 sm:w-8 sm:h-8 text-gold opacity-80" />
                       </div>
 
                       {/* Count badge — mobile/tablet only */}
@@ -323,15 +323,15 @@ export default function Categories() {
                 <div className="flex items-center gap-3">
                   {/* View Toggle */}
                   <div className="flex items-center gap-1 p-1 bg-cream rounded-xl border border-line">
-                    <button onClick={() => setViewMode('grid')} className={`p-1.5 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-white text-gold shadow-sm' : 'text-muted'}`}><LayoutGrid className="w-3.5 h-3.5" /></button>
-                    <button onClick={() => setViewMode('list')} className={`p-1.5 rounded-lg transition-all ${viewMode === 'list' ? 'bg-white text-gold shadow-sm' : 'text-muted'}`}><List className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => setViewMode('grid')} className={`p-1.5 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-surface text-gold shadow-sm' : 'text-muted'}`}><LayoutGrid className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => setViewMode('list')} className={`p-1.5 rounded-lg transition-all ${viewMode === 'list' ? 'bg-surface text-gold shadow-sm' : 'text-muted'}`}><List className="w-3.5 h-3.5" /></button>
                   </div>
 
                   <div className="relative group">
                     <input
                       type="text"
                       placeholder="Filter..."
-                      className="w-44 h-9 pl-8 pr-3 bg-white border border-line rounded-lg focus:border-gold focus:outline-none transition-all text-xs font-bold"
+                      className="w-44 h-9 pl-8 pr-3 bg-surface border border-line rounded-lg focus:border-gold focus:outline-none transition-all text-xs font-bold text-ink"
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
                     />
@@ -348,8 +348,8 @@ export default function Categories() {
                     onClick={() => setActiveLetter(letter)}
                     className={`h-7 md:h-8 px-2 md:px-3 rounded-lg flex items-center justify-center text-xs font-semibold whitespace-nowrap transition-all duration-200 ${
                       activeLetter === letter
-                        ? 'bg-navy text-white shadow-md'
-                        : 'bg-surface border border-line text-muted hover:border-navy/30 hover:text-navy'
+                        ? 'bg-ink text-cream shadow-md'
+                        : 'bg-surface border border-line text-muted hover:border-gold/30 hover:text-gold'
                     }`}
                   >
                     {letter === 'ALL' ? 'All' : letter}
@@ -362,8 +362,8 @@ export default function Categories() {
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 gap-y-8 sm:gap-y-10">
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => (
                     <div key={i} className="flex flex-col">
-                      <div className="h-[100px] bg-cream rounded-2xl border border-line animate-pulse" />
-                      <div className="h-4 w-2/3 mx-auto mt-3.5 bg-cream rounded-full animate-pulse" />
+                      <div className="h-[100px] bg-surface rounded-2xl border border-line animate-pulse" />
+                      <div className="h-4 w-2/3 mx-auto mt-3.5 bg-surface rounded-full animate-pulse" />
                     </div>
                   ))}
                 </div>
@@ -380,7 +380,7 @@ export default function Categories() {
                           <div className="h-[2px] flex-grow bg-gradient-to-r from-transparent via-gold/40 to-gold rounded-full opacity-80" />
                           
                           {/* Premium Circular Letter Badge */}
-                          <div className="mx-4 sm:mx-6 flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-full border-2 border-gold shadow-[0_4px_20px_rgba(212,168,32,0.25)] flex-shrink-0 relative">
+                          <div className="mx-4 sm:mx-6 flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-surface rounded-full border-2 border-gold shadow-[0_4px_20px_rgba(212,168,32,0.25)] flex-shrink-0 relative">
                             {/* Inner Dashed Ring */}
                             <div className="absolute inset-1 sm:inset-1.5 rounded-full border border-dashed border-gold rotate-45"></div>
                             <h3 className="text-xl sm:text-3xl font-black text-gold tracking-widest translate-x-0.5">{letter}</h3>
@@ -396,11 +396,11 @@ export default function Categories() {
                           to={`/category-results?category=${encodeURIComponent(cat.name)}`}
                           className="group flex flex-col items-center cursor-pointer"
                         >
-                          <div className="w-full relative h-[100px] flex items-center justify-center bg-white rounded-2xl border border-line overflow-hidden transition-all duration-300 group-hover:border-gold group-hover:shadow-[0_8px_20px_rgba(212,168,32,0.15)] group-hover:-translate-y-1">
+                          <div className="w-full relative h-[100px] flex items-center justify-center bg-surface rounded-2xl border border-line overflow-hidden transition-all duration-300 group-hover:border-gold group-hover:shadow-[0_8px_20px_rgba(212,168,32,0.15)] group-hover:-translate-y-1">
                             
                             {/* Default State: Icon */}
                             <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 group-hover:opacity-0 group-hover:-translate-y-4">
-                              <IconRenderer name={cat.icon || 'Tag'} className="w-8 h-8 text-navy/80 transition-colors" />
+                              <IconRenderer name={cat.icon || 'Tag'} className="w-8 h-8 text-gold transition-colors" />
                             </div>
 
                             {/* Count badge — mobile/tablet only (hidden on desktop where hover works) */}
@@ -428,7 +428,7 @@ export default function Categories() {
                   ))}
                 </div>
               ) : (
-                <div className="py-20 text-center bg-cream rounded-[40px] border-2 border-dashed border-line">
+                <div className="py-20 text-center bg-surface rounded-[40px] border-2 border-dashed border-line">
                   <Filter className="w-12 h-12 text-muted mx-auto mb-4 opacity-20" />
                   <h3 className="text-xl font-black text-muted">No results found</h3>
                 </div>
@@ -473,7 +473,7 @@ export default function Categories() {
               <Link
                 key={store.name}
                 to={`/store/${store.name.toLowerCase()}`}
-                className="group relative flex items-center justify-center p-4 bg-white rounded-2xl hover:bg-white hover:border-gold hover:scale-105 transition-all duration-500 shadow-xl w-28 h-16 sm:w-32 sm:h-20"
+                className="group relative flex items-center justify-center p-4 bg-surface rounded-2xl hover:bg-surface hover:border-gold hover:scale-105 transition-all duration-500 shadow-xl w-28 h-16 sm:w-32 sm:h-20"
               >
                 <img
                   src={store.logo}
