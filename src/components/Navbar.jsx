@@ -46,8 +46,7 @@ function Navbar() {
   const handleSearchSubmit = (event) => {
     event.preventDefault()
     const query = searchText.trim()
-    const route = query.toLowerCase().includes('loot') ? '/loot-deals' : '/deals'
-    navigate(query ? `${route}?q=${encodeURIComponent(query)}` : route)
+    navigate(query ? `/search?q=${encodeURIComponent(query)}` : '/search')
     setIsSearchOpen(false)
     setSearchText('')
   }

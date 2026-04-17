@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import ScrollingPageBanner from '../components/ScrollingPageBanner'
 import FilterBar from '../components/FilterBar'
 import { useData } from '../context/DataContext'
@@ -316,10 +317,16 @@ function Coupons() {
     link: '/coupons',
   }]
 
+  const [searchParams] = useSearchParams()
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('All')
   const [storeFilter, setStoreFilter] = useState('All Stores')
   const [sortBy, setSortBy] = useState('Latest')
+
+  useEffect(() => {
+    const q = searchParams.get('q') || ''
+    setSearch(q)
+  }, [searchParams])
 
   const filterProps = {
     searchText: search, onSearchChange: setSearch,

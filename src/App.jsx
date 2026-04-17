@@ -21,6 +21,7 @@ import Categories from './pages/Categories'
 import CategoryResults from './pages/CategoryResults'
 import CookiePolicy from './pages/CookiePolicy'
 import Feedback from './pages/Feedback'
+import SearchResults from './pages/SearchResults'
 import AdminLogin from './admin/pages/AdminLogin'
 import AdminDashboard from './admin/pages/AdminDashboard'
 import AdminDeals from './admin/pages/AdminDeals'
@@ -121,6 +122,7 @@ function AppRoutes() {
             <Route path="/cookies" element={<CookiePolicy />} />
             <Route path="/faq" element={<FaqPage />} />
             <Route path="/feedback" element={<Feedback />} />
+            <Route path="/search" element={<SearchResults />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </PublicLayout>

@@ -71,7 +71,7 @@ function HeroSection() {
             return (
               <div className="flex items-center gap-2">
                 <span className="text-sm font-semibold text-muted sm:text-base">
-                  {g.text}! Welcome to Wouchify
+                  {g.emoji} {g.text}! Welcome to Wouchify
                 </span>
               </div>
             )
