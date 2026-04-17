@@ -135,6 +135,19 @@ function generateId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2)
 }
 
+// ── Deletion Tracking — prevents DB from re-adding intentionally deleted items ───
+function addToDeletedIds(...ids) {
+  try {
+    const existing = new Set(JSON.parse(localStorage.getItem('wouchify_deleted_ids') || '[]'))
+    ids.forEach(id => id && existing.add(String(id)))
+    localStorage.setItem('wouchify_deleted_ids', JSON.stringify([...existing]))
+  } catch {}
+}
+function getDeletedIds() {
+  try { return new Set(JSON.parse(localStorage.getItem('wouchify_deleted_ids') || '[]')) }
+  catch { return new Set() }
+}
+
 // ── Context ──────────────────────────────────────────────────────────────────
 const DataContext = createContext(null)
 
@@ -190,43 +203,48 @@ export function DataProvider({ children }) {
       if (res.isConnected) {
         setDbConnected(true)
         if (res.hasData) {
-          // Smart merge: LOCAL data wins if it's newer than DB (user just edited it)
-          // DB data fills in fields that are missing locally only
+          // Smart merge: LOCAL always wins. DB only adds items missing from local.
+          // Items the admin explicitly deleted are tracked and never re-added from DB.
+          const deletedIds = getDeletedIds()
           const mergeList = (dbItems, localItems) => {
-            if (!Array.isArray(dbItems)) return dbItems
-            // Start with all local items (preserves any local-only edits)
+            if (!Array.isArray(dbItems) || !Array.isArray(localItems)) return localItems ?? dbItems
             const merged = [...localItems]
-            // Add any DB items that don't exist locally at all
             dbItems.forEach(dbItem => {
+              const itemId = String(dbItem.slug || dbItem.id || '')
+              // Skip items the admin intentionally deleted
+              if (itemId && deletedIds.has(itemId)) return
               const localIdx = merged.findIndex(l => l.slug === dbItem.slug || l.id === dbItem.id)
               if (localIdx === -1) {
-                // Item only exists in DB — add it
-                merged.push(dbItem)
+                merged.push(dbItem) // Only add if not in local at all
               } else {
-                // Item exists both locally and in DB — local wins (user edited locally)
-                // But fill in any fields that local is missing
+                // Local wins — backfill any fields missing in local from DB
                 const local = merged[localIdx]
                 const result = { ...dbItem }
-                Object.entries(local).forEach(([k, v]) => {
-                  if (v != null && v !== '') result[k] = v
-                })
+                Object.entries(local).forEach(([k, v]) => { if (v != null && v !== '') result[k] = v })
                 merged[localIdx] = result
               }
             })
             return merged
           }
 
-
           if (res.data.deals) setDeals(prev => mergeList(res.data.deals, prev))
           if (res.data.lootDeals) setLootDeals(prev => mergeList(res.data.lootDeals, prev))
           if (res.data.stores) setStores(prev => mergeList(res.data.stores, prev))
           if (res.data.coupons) setCoupons(prev => mergeList(res.data.coupons, prev))
           if (res.data.giveaways) setGiveaways(prev => mergeList(res.data.giveaways, prev))
-          if (res.data.creditCards) setCreditCards(prev => mergeList(res.data.creditCards, prev))
-          if (res.data.banners) setBanners(normalizeBanners(res.data.banners))
-          if (res.data.adminSettings) setAdminSettings(res.data.adminSettings)
           if (res.data.adminMembers) setAdminMembers(prev => normalizeAdminMembers(mergeList(res.data.adminMembers, prev)))
-          // For auditLog & analytics: local state is always fresher (live tracking) — DB is just a backup
+          // creditCards is a singleton object {shopping:[],lifetime:[]}, not a list
+          // Only load from DB on a fresh device (no local data yet)
+          if (res.data.creditCards && !localStorage.getItem('wouchify_credit_cards')) {
+            setCreditCards(res.data.creditCards)
+          }
+          // banners: DB fills in any missing page sections, local edits win
+          if (res.data.banners) setBanners(prev => normalizeBanners({ ...res.data.banners, ...prev }))
+          // adminSettings: only use DB if nothing stored locally yet
+          if (res.data.adminSettings && !localStorage.getItem('wouchify_admin_settings')) {
+            setAdminSettings(res.data.adminSettings)
+          }
+          // auditLog & analytics: local is always fresher — only seed from DB on first load
           if (res.data.auditLog && auditLog.length === 0) setAuditLog(res.data.auditLog)
           if (res.data.analytics && Object.keys(analytics.dealClicks || {}).length === 0) setAnalytics(res.data.analytics)
         }
@@ -408,6 +426,7 @@ export function DataProvider({ children }) {
   }
   const deleteDeal = (slug) => {
     const d = deals.find(x => x.slug === slug)
+    addToDeletedIds(slug)
     setDeals((prev) => prev.filter((d) => d.slug !== slug))
     removeDb('deals', slug)
     addAuditLog('DELETE', 'Deal', `Deleted deal "${d?.title || slug}"`)
@@ -437,6 +456,7 @@ export function DataProvider({ children }) {
   }
   const deleteLootDeal = (slug) => {
     const d = lootDeals.find(x => x.slug === slug)
+    addToDeletedIds(slug)
     setLootDeals((prev) => prev.filter((d) => d.slug !== slug))
     removeDb('lootDeals', slug)
     addAuditLog('DELETE', 'Loot Deal', `Deleted loot deal "${d?.title || slug}"`)
@@ -460,6 +480,7 @@ export function DataProvider({ children }) {
   }
   const deleteStore = (slug) => {
     const s = stores.find(x => x.slug === slug)
+    addToDeletedIds(slug)
     setStores((prev) => prev.filter((s) => s.slug !== slug))
     removeDb('stores', slug)
     addAuditLog('DELETE', 'Store', `Deleted store "${s?.name || slug}"`)
@@ -484,6 +505,7 @@ export function DataProvider({ children }) {
   }
   const deleteCoupon = (id) => {
     const c = coupons.find(x => x.id === id)
+    addToDeletedIds(id)
     setCoupons((prev) => prev.filter((c) => c.id !== id))
     removeDb('coupons', id)
     addAuditLog('DELETE', 'Coupon', `Deleted coupon "${c?.code}" (${c?.store})`)
@@ -506,6 +528,7 @@ export function DataProvider({ children }) {
   }
   const deleteGiveaway = (id) => {
     const g = giveaways.find(x => x.id === id)
+    addToDeletedIds(id)
     setGiveaways((prev) => prev.filter((g) => g.id !== id))
     removeDb('giveaways', id)
     addAuditLog('DELETE', 'Giveaway', `Deleted giveaway "${g?.prize || id}"`)
@@ -558,8 +581,7 @@ export function DataProvider({ children }) {
     const m = { ...member, id: generateId(), active: true }
     setAdminMembers((prev) => {
       const updatedMembers = [m, ...prev]
-      // Persist entire list as individual items (list collection)
-      updatedMembers.forEach(item => persist('adminMembers', item))
+      persist('adminMembers', m) // Only persist the new member — others already in DB
       return updatedMembers
     })
   }
@@ -572,6 +594,7 @@ export function DataProvider({ children }) {
     })
   }
   const deleteAdminMember = (id) => {
+    addToDeletedIds(id)
     setAdminMembers((prev) => {
       const draft = prev.filter((member) => member.id !== id)
       removeDb('adminMembers', id)
