@@ -46,7 +46,7 @@ const TYPE_OPTS = [
 function generateId() { return Date.now().toString(36) + Math.random().toString(36).slice(2) }
 
 export default function AdminBulkImport() {
-  const { addDeal, addCoupon, addLootDeal, addAuditLog } = useData()
+  const { addDeal, addCoupon, addLootDeal, addAuditLog, currentUser } = useData()
   const [type, setType] = useState('deals')
   const [preview, setPreview] = useState(null)
   const [status, setStatus] = useState(null) // { ok, msg }
@@ -72,6 +72,7 @@ export default function AdminBulkImport() {
   const handleImport = () => {
     if (!preview || preview.length === 0) return
     let imported = 0
+    const actor = currentUser?.name || 'System Auto'
     preview.forEach(row => {
       try {
         if (type === 'deals') {
@@ -82,12 +83,14 @@ export default function AdminBulkImport() {
             badge: row.badge || 'HOT', code: row.code || '', expiry: row.expiry || '',
             description: row.description || '', expiresInSeconds: 7200, successRate: 90,
             usageCount: '', steps: [], highlights: [], terms: '', createdAt: new Date().toISOString(),
+            addedBy: actor
           })
         } else if (type === 'coupons') {
           addCoupon({
             store: row.store || '', code: row.code || '', discount: row.discount || '',
             category: row.category || 'All Categories', expiry: row.expiry || '',
             minOrder: row.minorder || '', success: row.success || '', badge: row.badge || 'NEW', active: true,
+            addedBy: actor
           })
         } else if (type === 'lootDeals') {
           addLootDeal({
@@ -96,7 +99,7 @@ export default function AdminBulkImport() {
             discountPercent: Number(row.discountpercent || 0), grabbed: row.grabbed || '',
             stockLabel: row.stocklabel || 'Limited stock!', urgency: row.urgency || 'Ending soon!',
             expiresInSeconds: 21600, popularity: 80, image: '', description: row.description || '',
-            steps: [], terms: '',
+            steps: [], terms: '', addedBy: actor
           })
         }
         imported++

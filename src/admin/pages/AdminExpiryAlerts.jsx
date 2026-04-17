@@ -40,9 +40,10 @@ export default function AdminExpiryAlerts() {
 
   const alerts = useMemo(() => {
     const items = []
+    const nowMs = Date.now()
 
     deals.forEach(d => {
-      const remainingSeconds = getDealRemainingSeconds(d)
+      const remainingSeconds = getDealRemainingSeconds(d, nowMs)
       const level = classifySeconds(remainingSeconds) || classify(d.expiry)
       if (level) {
         const hrs = Math.max(0, Math.round(remainingSeconds / 3600))
@@ -52,10 +53,12 @@ export default function AdminExpiryAlerts() {
     })
 
     lootDeals.forEach(d => {
-      const level = classifySeconds(d.expiresInSeconds)
+      const remainingSeconds = getDealRemainingSeconds(d, nowMs)
+      const level = classifySeconds(remainingSeconds)
       if (level) {
-        const hrs = Math.round(Number(d.expiresInSeconds) / 3600)
-        items.push({ id: d.slug, type: 'Loot Deal', title: d.title, expiryText: `${hrs}h remaining`, level, store: d.category, editPath: `/admin/loot-deals` })
+        const hrs = Math.max(0, Math.round(remainingSeconds / 3600))
+        const expiryText = remainingSeconds <= 0 ? 'Expired' : `${hrs}h remaining`
+        items.push({ id: d.slug, type: 'Loot Deal', title: d.title, expiryText, level, store: d.category, editPath: `/admin/loot-deals` })
       }
     })
 
