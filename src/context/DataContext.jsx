@@ -146,9 +146,8 @@ export function DataProvider({ children }) {
     try {
       const stored = localStorage.getItem('wouchify_deals')
       const cached = stored ? JSON.parse(stored) : null
-      // If localStorage has data, use it (admin-added deals survive refresh)
-      // If localStorage is empty/missing, use the hardcoded seed data
-      if (cached && Array.isArray(cached) && cached.length > 0) return cached
+      // Trust localStorage even if empty — admin may have deleted all deals intentionally
+      if (cached && Array.isArray(cached)) return cached
       return dealsData
     } catch { return dealsData }
   })
@@ -156,7 +155,8 @@ export function DataProvider({ children }) {
     try {
       const stored = localStorage.getItem('wouchify_loot_deals')
       const cached = stored ? JSON.parse(stored) : null
-      if (cached && Array.isArray(cached) && cached.length > 0) return cached
+      // Trust localStorage even if empty — admin may have deleted all loot deals intentionally
+      if (cached && Array.isArray(cached)) return cached
       return lootDealsData
     } catch { return lootDealsData }
   })
@@ -182,19 +182,7 @@ export function DataProvider({ children }) {
 
   const [dbConnected, setDbConnected] = useState(false)
 
-  // ── Auto-Inject Testing Account ──
-  useEffect(() => {
-    setAdminMembers(prev => {
-      if (!prev.some(m => m.email === 'balaji@wouchify.com')) {
-        const testUser = { id: 'am6', name: 'Balaji (Executive)', email: 'balaji@wouchify.com', phone: '+91 98765 00005', department: 'Content Entry', role: 'Operational Executive', active: true, password: 'admin' }
-        const next = [...prev, testUser]
-        saveToStorage('wouchify_admin_members', next)
-        console.log('[Wouchify Dev] Successfully injected Balaji Test Account into local storage.');
-        return next
-      }
-      return prev
-    })
-  }, [])
+  // NOTE: Test accounts are baked into defaultAdminMembers — no runtime injection needed
 
   // ── 1) Connect to Neon Backend on Mount ──
   useEffect(() => {
@@ -237,9 +225,10 @@ export function DataProvider({ children }) {
           if (res.data.creditCards) setCreditCards(prev => mergeList(res.data.creditCards, prev))
           if (res.data.banners) setBanners(normalizeBanners(res.data.banners))
           if (res.data.adminSettings) setAdminSettings(res.data.adminSettings)
-          if (res.data.adminMembers) setAdminMembers(normalizeAdminMembers(res.data.adminMembers))
-          if (res.data.auditLog) setAuditLog(res.data.auditLog)
-          if (res.data.analytics) setAnalytics(res.data.analytics)
+          if (res.data.adminMembers) setAdminMembers(prev => normalizeAdminMembers(mergeList(res.data.adminMembers, prev)))
+          // For auditLog & analytics: local state is always fresher (live tracking) — DB is just a backup
+          if (res.data.auditLog && auditLog.length === 0) setAuditLog(res.data.auditLog)
+          if (res.data.analytics && Object.keys(analytics.dealClicks || {}).length === 0) setAnalytics(res.data.analytics)
         }
       }
     }).catch(() => console.log('⚠️ No DB connected, falling back to pure localStorage mode.'))
@@ -344,15 +333,25 @@ export function DataProvider({ children }) {
 
   // ── ADVERTISEMENTS CRUD ───────────────────────────────────────────────────
   const addAdvertisement = (ad) => {
-    const newAd = { ...ad, id: generateId() }
-    setAdvertisements(prev => [newAd, ...prev])
+    const newAd = { ...ad, id: generateId(), createdAt: new Date().toISOString() }
+    setAdvertisements(prev => {
+      const next = [newAd, ...prev]
+      persist('advertisements', newAd)
+      return next
+    })
     addAuditLog('CREATE', 'Advertisement', `Added ad: ${ad.title}`)
   }
   const updateAdvertisement = (id, updates) => {
-    setAdvertisements(prev => prev.map(a => a.id === id ? { ...a, ...updates } : a))
+    setAdvertisements(prev => {
+      const draft = prev.map(a => a.id === id ? { ...a, ...updates } : a)
+      const updated = draft.find(a => a.id === id)
+      if (updated) persist('advertisements', updated)
+      return draft
+    })
   }
   const deleteAdvertisement = (id) => {
     setAdvertisements(prev => prev.filter(a => a.id !== id))
+    removeDb('advertisements', id)
     addAuditLog('DELETE', 'Advertisement', `Deleted ad id: ${id}`)
   }
 
@@ -492,9 +491,10 @@ export function DataProvider({ children }) {
 
   // ── GIVEAWAYS CRUD ───────────────────────────────────────────────────────
   const addGiveaway = (giveaway) => {
-    const g = { ...giveaway, id: generateId(), active: true, createdAt: new Date().toISOString() }
+    const g = { ...giveaway, id: generateId(), active: true, createdAt: new Date().toISOString(), addedBy: currentUser?.name || 'System Auto' }
     setGiveaways((prev) => [g, ...prev])
     persist('giveaways', g)
+    addAuditLog('CREATE', 'Giveaway', `Created giveaway "${giveaway.prize}"`)
   }
   const updateGiveaway = (id, updates) => {
     setGiveaways((prev) => {
@@ -502,10 +502,13 @@ export function DataProvider({ children }) {
       persist('giveaways', draft.find(x => x.id === id))
       return draft
     })
+    addAuditLog('UPDATE', 'Giveaway', `Updated giveaway ID ${id}`)
   }
   const deleteGiveaway = (id) => {
+    const g = giveaways.find(x => x.id === id)
     setGiveaways((prev) => prev.filter((g) => g.id !== id))
     removeDb('giveaways', id)
+    addAuditLog('DELETE', 'Giveaway', `Deleted giveaway "${g?.prize || id}"`)
   }
 
   // ── CREDIT CARDS CRUD ────────────────────────────────────────────────────
@@ -555,7 +558,8 @@ export function DataProvider({ children }) {
     const m = { ...member, id: generateId(), active: true }
     setAdminMembers((prev) => {
       const updatedMembers = [m, ...prev]
-      persist('adminMembers', m)
+      // Persist entire list as individual items (list collection)
+      updatedMembers.forEach(item => persist('adminMembers', item))
       return updatedMembers
     })
   }
