@@ -149,58 +149,108 @@ export const categoriesData = {
   },
   stores: {
     A: [
+      { name: "Aha", coupons: 12, offers: 34, icon: "Tv" },
+      { name: "AltBalaji", coupons: 8, offers: 25, icon: "Tv" },
+      { name: "Amazon Prime Video", coupons: 45, offers: 112, icon: "Tv" },
       { name: "Amazon", coupons: 1240, offers: 2560, icon: "Store" },
       { name: "Ajio", coupons: 420, offers: 980, icon: "Store" }
     ],
     B: [
+      { name: "Blinkit", coupons: 85, offers: 210, icon: "ShoppingBasket" },
       { name: "BigBasket", coupons: 115, offers: 320, icon: "ShoppingBasket" }
     ],
+    C: [
+      { name: "Croma", coupons: 145, offers: 420, icon: "Monitor" }
+    ],
+    D: [
+      { name: "Disney+ Hotstar", coupons: 42, offers: 95, icon: "Tv" },
+      { name: "Domino's India", coupons: 210, offers: 450, icon: "Utensils" },
+      { name: "Dunzo", coupons: 38, offers: 110, icon: "Bike" },
+      { name: "DMart", coupons: 25, offers: 85, icon: "ShoppingBasket" }
+    ],
+    E: [
+      { name: "EatSure", coupons: 56, offers: 140, icon: "Utensils" }
+    ],
     F: [
+      { name: "Faasos", coupons: 42, offers: 115, icon: "Utensils" },
       { name: "Flipkart", coupons: 890, offers: 1750, icon: "Store" },
       { name: "FirstCry", coupons: 95, offers: 210, icon: "Baby" }
     ],
+    H: [
+      { name: "H&M", coupons: 120, offers: 280, icon: "Shirt" },
+      { name: "Housejoy", coupons: 15, offers: 42, icon: "Home" }
+    ],
     J: [
+      { name: "JioCinema", coupons: 12, offers: 35, icon: "Tv" },
       { name: "JioMart", coupons: 210, offers: 560, icon: "Store" }
     ],
+    L: [
+      { name: "Levi's", coupons: 85, offers: 210, icon: "Shirt" },
+      { name: "Lifestyle", coupons: 145, offers: 320, icon: "Shirt" }
+    ],
     M: [
+      { name: "MX Player", coupons: 8, offers: 22, icon: "Tv" },
       { name: "Myntra", coupons: 540, offers: 1280, icon: "Shirt" },
       { name: "Meesho", coupons: 215, offers: 540, icon: "Store" }
     ],
     N: [
+      { name: "Naaptol", coupons: 45, offers: 120, icon: "ShoppingBag" },
+      { name: "Nature's Basket", coupons: 32, offers: 85, icon: "ShoppingBasket" },
+      { name: "Namdhari's Fresh", coupons: 18, offers: 45, icon: "ShoppingBasket" },
+      { name: "Netflix", coupons: 15, offers: 42, icon: "Tv" },
       { name: "Nykaa", coupons: 145, offers: 320, icon: "Sparkles" }
     ],
     O: [
+      { name: "Ola", coupons: 145, offers: 320, icon: "Car" },
       { name: "OLX", coupons: 45, offers: 110, icon: "Store" }
     ],
     P: [
+      { name: "Pantaloons", coupons: 120, offers: 280, icon: "Shirt" },
+      { name: "Paytm Mall", coupons: 145, offers: 320, icon: "ShoppingBag" },
+      { name: "Poorvika Mobiles", coupons: 56, offers: 140, icon: "Smartphone" },
+      { name: "Purplle", coupons: 95, offers: 210, icon: "Sparkles" },
       { name: "Pepperfry", coupons: 120, offers: 280, icon: "Armchair" }
     ],
     Q: [
       { name: "Quikr", coupons: 45, offers: 110, icon: "Store" }
     ],
     R: [
+      { name: "Rapido", coupons: 85, offers: 210, icon: "Bike" },
+      { name: "Reliance Smart", coupons: 56, offers: 140, icon: "ShoppingBasket" },
       { name: "Reliance Digital", coupons: 215, offers: 540, icon: "Monitor" }
     ],
     S: [
+      { name: "SonyLIV", coupons: 25, offers: 65, icon: "Tv" },
+      { name: "ShopClues", coupons: 95, offers: 210, icon: "ShoppingBag" },
+      { name: "Shoppers Stop", coupons: 145, offers: 320, icon: "Shirt" },
+      { name: "Sun NXT", coupons: 12, offers: 38, icon: "Tv" },
+      { name: "Spencer's Retail", coupons: 42, offers: 115, icon: "Store" },
+      { name: "Swiggy Instamart", coupons: 120, offers: 280, icon: "ShoppingBasket" },
       { name: "Snapdeal", coupons: 145, offers: 320, icon: "Store" },
       { name: "Swiggy", coupons: 210, offers: 450, icon: "Utensils" }
     ],
     T: [
+      { name: "Tata Neu", coupons: 85, offers: 210, icon: "ShoppingBag" },
       { name: "Tata CLiQ", coupons: 145, offers: 320, icon: "Store" }
     ],
     U: [
+      { name: "Uber Eats India", coupons: 45, offers: 110, icon: "Utensils" },
+      { name: "Uber India", coupons: 120, offers: 280, icon: "Car" },
       { name: "Udaan", coupons: 45, offers: 110, icon: "Store" }
     ],
     V: [
+      { name: "Vijay Sales", coupons: 145, offers: 320, icon: "Smartphone" },
       { name: "Voonik", coupons: 120, offers: 280, icon: "Store" }
     ],
     Y: [
       { name: "Yepme", coupons: 145, offers: 320, icon: "Store" }
     ],
     Z: [
-      { name: "zivame", coupons: 210, offers: 450, icon: "Sparkles" },
-      { name: "zomato", coupons: 145, offers: 320, icon: "Utensils" },
-      { name: "zepto", coupons: 45, offers: 110, icon: "ShoppingBasket" }
+      { name: "Zee5", coupons: 32, offers: 85, icon: "Tv" },
+      { name: "Zara", coupons: 120, offers: 280, icon: "Shirt" },
+      { name: "Zepto", coupons: 45, offers: 110, icon: "ShoppingBasket" },
+      { name: "Zivame", coupons: 210, offers: 450, icon: "Sparkles" },
+      { name: "Zomato", coupons: 145, offers: 320, icon: "Utensils" }
     ]
   },
   brands: {
