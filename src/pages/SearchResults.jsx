@@ -10,14 +10,14 @@ import SEO from '../components/SEO'
 // Horizontal Coupon Card for search results (simplified version of the one in Coupons.jsx)
 function SearchCouponCard({ item }) {
   return (
-    <div className="flex items-center gap-4 rounded-2xl border border-line bg-white p-4 shadow-sm transition-all hover:shadow-md">
+    <div className="flex items-center gap-4 rounded-2xl border border-line bg-surface p-4 shadow-sm transition-all hover:shadow-md">
       <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gold/10 text-xl">🎟️</div>
       <div className="min-w-0 flex-1">
-        <p className="text-[10px] font-black uppercase tracking-widest text-gold">{item.store}</p>
+        <p className="text-[10px] font-black uppercase tracking-widest text-gold text-opacity-80">{item.store}</p>
         <h3 className="truncate text-sm font-bold text-ink">{item.discount}</h3>
         <p className="truncate text-xs text-muted">Code: <span className="font-mono font-bold text-ink">{item.code}</span></p>
       </div>
-      <Link to="/coupons" className="shrink-0 rounded-lg bg-cream px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-ink hover:bg-gold/20">View All</Link>
+      <Link to="/coupons" className="shrink-0 rounded-lg bg-cream px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-ink transition-colors hover:bg-gold/20">View All</Link>
     </div>
   )
 }
@@ -38,11 +38,11 @@ export default function SearchResults() {
 
     const d = deals.filter(x => x.title.toLowerCase().includes(query) || x.store.toLowerCase().includes(query))
     const l = lootDeals.filter(x => x.title.toLowerCase().includes(query) || x.category.toLowerCase().includes(query))
-    const s = stores.filter(x => x.name.toLowerCase().includes(query) || x.category?.toLowerCase().includes(query))
+    const s = stores.filter(x => x.name.toLowerCase().includes(query) || (x.category && x.category.toLowerCase().includes(query)))
     const c = coupons.filter(x => x.store.toLowerCase().includes(query) || x.code.toLowerCase().includes(query) || x.discount.toLowerCase().includes(query))
     
     const allCards = [...(creditCards.shopping || []), ...(creditCards.lifetime || [])]
-    const cc = allCards.filter(x => x.name.toLowerCase().includes(query) || x.bank?.toLowerCase().includes(query))
+    const cc = allCards.filter(x => x.name.toLowerCase().includes(query) || (x.bank && x.bank.toLowerCase().includes(query)))
 
     return {
       deals: d, loot: l, stores: s, coupons: c, cards: cc,
@@ -66,10 +66,10 @@ export default function SearchResults() {
 
       {isEmpty ? (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-3xl bg-cream text-6xl shadow-inner">🔍</div>
+          <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-3xl bg-cream text-6xl shadow-inner border border-line">🔍</div>
           <p className="text-xl font-bold text-ink">We couldn't find what you were looking for.</p>
           <p className="mt-2 text-muted">Try searching for stores like "Amazon", items like "iPhone", or "Coupons".</p>
-          <Link to="/" className="mt-8 rounded-xl bg-midnight px-8 py-3 text-sm font-black text-white hover:scale-105 transition-all">Back to Home</Link>
+          <Link to="/" className="mt-8 rounded-xl bg-ink px-8 py-3 text-sm font-black text-surface hover:scale-105 transition-all">Back to Home</Link>
         </div>
       ) : (
         <div className="space-y-20">

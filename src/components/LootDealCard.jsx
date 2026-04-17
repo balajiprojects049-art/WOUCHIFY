@@ -45,10 +45,10 @@ function LootDealCard({ deal }) {
   const logoText = (deal.store || '').slice(0, 2).toUpperCase()
 
   return (
-    <article className={`group flex flex-col rounded-2xl border bg-white overflow-hidden transition-all duration-300 ${
+    <article className={`group flex flex-col rounded-2xl border bg-surface overflow-hidden transition-all duration-300 ${
       isExpired
         ? 'opacity-60 grayscale border-line/30'
-        : 'border-line/50 shadow-[0_4px_20px_rgba(0,0,0,0.06)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1.5'
+        : 'border-line/50 shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_16px_40px_rgba(0,0,0,0.25)] hover:-translate-y-1.5'
     }`}>
 
       {/* Image */}
@@ -62,7 +62,7 @@ function LootDealCard({ deal }) {
         />
 
         {/* Discount badge */}
-        <div className="absolute top-3 right-3 rounded-xl bg-[#C89B1E] px-3 py-1.5 text-xs font-black text-[#12151C] shadow-lg">
+        <div className="absolute top-3 right-3 rounded-xl bg-gold px-3 py-1.5 text-xs font-black text-surface shadow-lg">
           {deal.discountPercent}% OFF
         </div>
 
@@ -110,10 +110,10 @@ function LootDealCard({ deal }) {
 
         {/* Category + Badge row */}
         <div className="flex items-center justify-between">
-          <span className="rounded-full bg-amber-50 border border-amber-200 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-amber-600">
+          <span className="rounded-full bg-gold/10 border border-gold/20 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-gold">
             {deal.category}
           </span>
-          <span className="rounded-full bg-slate-900 px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-amber-400">
+          <span className="rounded-full bg-ink px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-gold">
             LOOT DEAL
           </span>
         </div>
@@ -136,7 +136,7 @@ function LootDealCard({ deal }) {
             </p>
           )}
           {savings && (
-            <span className="rounded-lg bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[10px] font-black text-emerald-600">
+            <span className="rounded-lg bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 text-[10px] font-black text-emerald-500">
               {savings}
             </span>
           )}
@@ -144,19 +144,19 @@ function LootDealCard({ deal }) {
 
         {/* Social proof bar */}
         {deal.grabbed && (
-          <div className="flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-100 px-3 py-2">
+          <div className="flex items-center gap-2 rounded-xl bg-emerald-500/5 border border-emerald-500/10 px-3 py-2">
             <span className="relative flex h-2 w-2 shrink-0">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
             </span>
-            <span className="text-[11px] font-black text-emerald-700">{deal.grabbed} people already grabbed this deal!</span>
+            <span className="text-[11px] font-black text-emerald-500/80">{deal.grabbed} people already grabbed this deal!</span>
           </div>
         )}
 
         {/* Flipboard Countdown Timer */}
         {!isExpired ? (
-          <div className="flex items-center gap-2 bg-[#1F1F22] rounded-xl px-3 py-2.5 border border-[#C89B1E]/20">
-            <span className="text-[9px] font-black uppercase tracking-widest text-[#C89B1E]/60 flex-shrink-0">⏱ Ends in</span>
+          <div className="flex items-center gap-2 bg-black/40 rounded-xl px-3 py-2.5 border border-gold/20">
+            <span className="text-[9px] font-black uppercase tracking-widest text-gold/60 flex-shrink-0">⏱ Ends in</span>
             <div className="flex items-center gap-1 ml-auto">
               {days > 0 && (<><LFlipUnit value={days} label="D" /><LColon /></>)}
               <LFlipUnit value={hours} label="H" />
@@ -167,7 +167,7 @@ function LootDealCard({ deal }) {
             </div>
           </div>
         ) : (
-          <div className="rounded-xl bg-red-50 border border-red-200 px-3 py-2 text-center">
+          <div className="rounded-xl bg-ink px-3 py-2 text-center border border-line">
             <span className="text-xs font-black tracking-widest text-red-500 uppercase">Deal Expired</span>
           </div>
         )}
@@ -176,7 +176,7 @@ function LootDealCard({ deal }) {
         <div className="flex items-center gap-2 pt-1">
           <Link
             to={`/loot-deal/${deal.slug}`}
-            className="flex-1 relative overflow-hidden inline-flex items-center justify-center rounded-xl py-3 text-xs font-black uppercase tracking-[0.15em] bg-[#C89B1E] text-[#12151C] shadow-lg shadow-amber-500/20 transition-all duration-300 hover:bg-[#D4A820] hover:-translate-y-0.5"
+            className="flex-1 relative overflow-hidden inline-flex items-center justify-center rounded-xl py-3 text-xs font-black uppercase tracking-[0.15em] bg-gold text-surface shadow-lg shadow-gold/20 transition-all duration-300 hover:bg-gold/90 hover:-translate-y-0.5"
           >
             <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
             ⚡ Grab Loot Deal
@@ -195,16 +195,16 @@ function LootDealCard({ deal }) {
 function LFlipUnit({ value, label, urgent }) {
   return (
     <div className="flex flex-col items-center">
-      <div className={`flex h-8 w-8 items-center justify-center rounded-lg font-black text-sm font-mono ${urgent ? 'bg-red-500 text-white' : 'bg-[#C89B1E]/20 text-[#C89B1E]'}`}>
+      <div className={`flex h-8 w-8 items-center justify-center rounded-lg font-black text-sm font-mono ${urgent ? 'bg-red-500 text-white' : 'bg-gold/10 text-gold'}`}>
         {String(value).padStart(2, '0')}
       </div>
-      <span className="text-[7px] font-bold uppercase text-[#C89B1E]/60 mt-0.5">{label}</span>
+      <span className="text-[7px] font-bold uppercase text-gold/60 mt-0.5">{label}</span>
     </div>
   )
 }
 
 function LColon() {
-  return <span className="text-[#C89B1E]/40 font-black text-sm mb-3">:</span>
+  return <span className="text-gold/40 font-black text-sm mb-3">:</span>
 }
 
 export default LootDealCard

@@ -27,7 +27,7 @@ function ScrollingPageBanner({ banners }) {
   if (!banners || banners.length === 0) return null
 
   return (
-    <div className="group relative overflow-hidden rounded-[2rem] border border-line bg-white shadow-[0_20px_50px_rgba(0,0,0,0.15)] transition-all duration-500 hover:shadow-[0_30px_70px_rgba(0,0,0,0.25)]">
+    <div className="group relative overflow-hidden rounded-[2rem] border border-line bg-surface shadow-[0_20px_50px_rgba(0,0,0,0.15)] transition-all duration-500 hover:shadow-[0_30px_70px_rgba(0,0,0,0.25)]">
       <div className="relative h-56 sm:h-72 lg:h-96">
         {banners.map((banner, index) => (
           (() => {

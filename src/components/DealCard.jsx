@@ -57,14 +57,14 @@ function DealCard({ deal, remainingSeconds }) {
 
 
   return (
-    <article className={`group flex flex-col rounded-2xl border bg-white overflow-hidden transition-all duration-300 ${
+    <article className={`group flex flex-col rounded-2xl border bg-surface overflow-hidden transition-all duration-300 ${
       isExpired
         ? 'opacity-60 grayscale border-line/30'
-        : 'border-line/50 shadow-[0_4px_20px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] hover:-translate-y-1'
+        : 'border-line/50 shadow-[0_4px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.25)] hover:-translate-y-1'
     }`}>
 
       {/* ── Image Banner ── */}
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden bg-cream">
         <img
           loading="lazy"
           src={deal.image}
@@ -74,7 +74,7 @@ function DealCard({ deal, remainingSeconds }) {
         />
 
         {/* Discount pill */}
-        <div className="absolute top-3 right-3 rounded-xl bg-[#C89B1E] px-3 py-1.5 text-xs font-black text-[#12151C] shadow-lg">
+        <div className="absolute top-3 right-3 rounded-xl bg-gold px-3 py-1.5 text-xs font-black text-surface shadow-lg">
           {deal.discountLabel}
         </div>
 
@@ -112,14 +112,14 @@ function DealCard({ deal, remainingSeconds }) {
             )}
             <div>
               <p className="text-sm font-black text-ink leading-tight">{deal.store}</p>
-              <p className="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
+              <p className="text-[10px] text-emerald-500 font-bold flex items-center gap-1">
                 <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 Verified Store
               </p>
             </div>
           </div>
           {/* Category chip */}
-          <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-slate-500">
+          <span className="rounded-full bg-gold/5 border border-gold/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-gold">
             {deal.category}
           </span>
         </div>
@@ -140,7 +140,7 @@ function DealCard({ deal, remainingSeconds }) {
             </p>
           )}
           {savings && savings !== deal.discountLabel && (
-            <span className="rounded-lg bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[10px] font-black text-emerald-600">
+            <span className="rounded-lg bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 text-[10px] font-black text-emerald-500">
               {savings}
             </span>
           )}
@@ -148,8 +148,8 @@ function DealCard({ deal, remainingSeconds }) {
 
         {/* ── Flipboard Timer ── */}
         {!isExpired ? (
-          <div className="flex items-center gap-2 bg-[#1F1F22] rounded-xl px-3 py-2.5 border border-[#C89B1E]/20">
-            <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 flex-shrink-0">Ends in</span>
+          <div className="flex items-center gap-2 bg-black/40 rounded-xl px-3 py-2.5 border border-gold/20">
+            <span className="text-[9px] font-black uppercase tracking-widest text-muted flex-shrink-0">Ends in</span>
             <div className="flex items-center gap-1 ml-auto">
               {days > 0 && (
                 <>
@@ -165,7 +165,7 @@ function DealCard({ deal, remainingSeconds }) {
             </div>
           </div>
         ) : (
-          <div className="rounded-xl bg-red-50 border border-red-200 px-3 py-2 text-center">
+          <div className="rounded-xl bg-ink px-3 py-2 text-center border border-line">
             <span className="text-xs font-black tracking-widest text-red-500 uppercase">Deal Expired</span>
           </div>
         )}
@@ -176,8 +176,8 @@ function DealCard({ deal, remainingSeconds }) {
             to={isExpired ? '#' : `/deal/${deal.slug}`}
             className={`flex-1 relative overflow-hidden inline-flex items-center justify-center rounded-xl py-3 text-xs font-black uppercase tracking-[0.15em] transition-all duration-300 ${
               isExpired
-                ? 'bg-gray-100 text-gray-400 cursor-not-allowed pointer-events-none'
-                : 'bg-[#C89B1E] text-[#12151C] shadow-lg shadow-amber-500/20 hover:bg-[#D4A820] hover:-translate-y-0.5'
+                ? 'bg-cream text-muted border border-line cursor-not-allowed pointer-events-none'
+                : 'bg-gold text-surface shadow-lg shadow-gold/20 hover:bg-gold/90 hover:-translate-y-0.5'
             }`}
           >
             {!isExpired && (
@@ -199,16 +199,16 @@ function DealCard({ deal, remainingSeconds }) {
 function FlipUnit({ value, label, urgent }) {
   return (
     <div className="flex flex-col items-center">
-      <div className={`flex h-8 w-8 items-center justify-center rounded-lg font-black text-sm font-mono tracking-tight ${urgent ? 'bg-red-500 text-white' : 'bg-[#C89B1E]/20 text-[#C89B1E]'}`}>
+      <div className={`flex h-8 w-8 items-center justify-center rounded-lg font-black text-sm font-mono tracking-tight ${urgent ? 'bg-red-500 text-white' : 'bg-gold/10 text-gold'}`}>
         {String(value).padStart(2, '0')}
       </div>
-      <span className="text-[7px] font-bold uppercase text-[#C89B1E]/60 mt-0.5">{label}</span>
+      <span className="text-[7px] font-bold uppercase text-gold/60 mt-0.5">{label}</span>
     </div>
   )
 }
 
 function Colon() {
-  return <span className="text-[#C89B1E]/40 font-black text-sm mb-3">:</span>
+  return <span className="text-gold/40 font-black text-sm mb-3">:</span>
 }
 
 export default DealCard

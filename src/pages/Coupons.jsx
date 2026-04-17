@@ -144,8 +144,8 @@ function CouponCard({ item, index, dealLink }) {
   }
 
   return (
-    <article className={`group relative flex w-full overflow-hidden rounded-2xl bg-white border transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.10)] ${
-      isExpired ? 'opacity-60 grayscale border-gray-200' : 'border-[#C89B1E]/20 shadow-[0_2px_12px_rgba(0,0,0,0.06)]'
+    <article className={`group relative flex w-full overflow-hidden rounded-2xl bg-surface border transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.15)] ${
+      isExpired ? 'opacity-60 grayscale border-line' : 'border-gold/20 shadow-[0_2px_12px_rgba(0,0,0,0.1)]'
     }`}>
 
       {/* Gold top accent line */}
@@ -169,23 +169,23 @@ function CouponCard({ item, index, dealLink }) {
           </div>
 
           {/* Store name */}
-          <h3 className="truncate text-base font-black text-[#12151C] sm:text-lg group-hover:text-[#C89B1E] transition-colors">
+          <h3 className="truncate text-base font-black text-ink sm:text-lg group-hover:text-gold transition-colors">
             {item.store}
           </h3>
 
           {/* Discount description */}
-          <p className="mt-0.5 line-clamp-1 text-sm font-semibold text-slate-600">{item.discount}</p>
+          <p className="mt-0.5 line-clamp-1 text-sm font-semibold text-muted">{item.discount}</p>
 
           {/* Meta row */}
           <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
             {item.minOrder && (
-              <span className="flex items-center gap-1 text-[11px] font-medium text-slate-400">
+              <span className="flex items-center gap-1 text-[11px] font-medium text-muted">
                 <span>🛒</span> Min: {item.minOrder}
               </span>
             )}
             {dynamicExpiryText && (
               <span className={`flex items-center gap-1 text-[11px] font-bold ${
-                isExpired ? 'text-red-500' : isUrgent ? 'text-orange-500' : 'text-slate-400'
+                isExpired ? 'text-red-500' : isUrgent ? 'text-orange-500' : 'text-muted'
               }`}>
                 <span>⏰</span> {dynamicExpiryText}
               </span>
@@ -201,10 +201,10 @@ function CouponCard({ item, index, dealLink }) {
 
       {/* ── Dashed divider ───────────────────────────── */}
       <div className="relative flex shrink-0 flex-col items-center justify-center py-4 px-0.5">
-        <div className="absolute -top-3 h-6 w-6 rounded-full bg-[#F5F5F0]" />
-        <div className="h-full border-l-2 border-dashed border-[#C89B1E]/25" />
-        <span className="absolute rotate-90 text-[11px] text-[#C89B1E]/30">✂</span>
-        <div className="absolute -bottom-3 h-6 w-6 rounded-full bg-[#F5F5F0]" />
+        <div className="absolute -top-3 h-6 w-6 rounded-full bg-cream" />
+        <div className="h-full border-l-2 border-dashed border-gold/25" />
+        <span className="absolute rotate-90 text-[11px] text-gold/30">✂</span>
+        <div className="absolute -bottom-3 h-6 w-6 rounded-full bg-cream" />
       </div>
 
       {/* ── RIGHT: code reveal ───────────────────────── */}
@@ -214,8 +214,8 @@ function CouponCard({ item, index, dealLink }) {
         {!revealed ? (
           <>
             {/* Blurred code preview */}
-            <div className="relative w-full overflow-hidden rounded-xl border border-[#C89B1E]/20 bg-[#FFF8E7] px-3 py-2.5">
-              <p className="select-none text-center text-xs font-black tracking-[0.35em] text-[#C89B1E]/30 blur-[5px]">
+            <div className="relative w-full overflow-hidden rounded-xl border border-gold/20 bg-cream px-3 py-2.5">
+              <p className="select-none text-center text-xs font-black tracking-[0.35em] text-gold/30 blur-[5px]">
                 {item.code || 'XXXXXX'}
               </p>
               <div className="absolute inset-0 rounded-xl" style={{
@@ -228,7 +228,7 @@ function CouponCard({ item, index, dealLink }) {
             {/* Reveal button */}
             <button
               onClick={handleReveal}
-              className="relative w-full overflow-hidden rounded-xl border border-[#C89B1E] bg-[#C89B1E] py-2.5 text-[11px] font-black text-white shadow-sm shadow-amber-200 transition-all duration-200 hover:bg-[#D4A820] hover:scale-105 active:scale-95"
+              className="relative w-full overflow-hidden rounded-xl border border-gold bg-gold py-2.5 text-[11px] font-black text-surface shadow-sm shadow-gold/20 transition-all duration-200 hover:bg-gold/90 hover:scale-105 active:scale-95"
             >
               <span className="relative flex items-center justify-center gap-1.5">
                 <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
@@ -242,8 +242,8 @@ function CouponCard({ item, index, dealLink }) {
         ) : (
           <>
             {/* Revealed code box */}
-            <div className="reveal-anim w-full rounded-xl border border-[#C89B1E]/40 bg-[#FFF8E7] px-3 py-2.5">
-              <p className="slide-up text-center text-[11px] font-black tracking-[0.2em] text-[#C89B1E]">
+            <div className="reveal-anim w-full rounded-xl border border-gold/40 bg-cream px-3 py-2.5">
+              <p className="slide-up text-center text-[11px] font-black tracking-[0.2em] text-gold">
                 {item.code}
               </p>
             </div>
@@ -255,7 +255,7 @@ function CouponCard({ item, index, dealLink }) {
                 className={`w-full rounded-xl py-2 text-[11px] font-black shadow-sm transition-all duration-200 hover:scale-105 active:scale-95 ${
                   copied
                     ? 'bg-emerald-500 text-white shadow-emerald-200'
-                    : 'bg-[#C89B1E] text-white shadow-amber-200 hover:bg-[#D4A820]'
+                    : 'bg-gold text-surface shadow-gold/20 hover:bg-gold/90'
                 }`}
               >
                 {copied ? '✓ Copied!' : 'Copy Code'}
@@ -278,7 +278,7 @@ function CouponCard({ item, index, dealLink }) {
                 title={`${item.store} Coupon — ${item.discount}`}
                 text={`Use code ${item.code} for ${item.discount} at ${item.store}`}
                 url={dealLink || window.location.href}
-                className="w-full justify-center border-slate-200 bg-slate-50 text-slate-500 hover:border-slate-300 hover:text-slate-700"
+                className="w-full justify-center border-line bg-cream text-muted hover:border-gold/30 hover:text-ink"
               />
             </div>
           </>
@@ -389,7 +389,7 @@ function Coupons() {
                 <CouponCard key={coupon.id || coupon.code} item={coupon} index={i} dealLink={coupon.resolvedLink} />
               ))}
               {filtered.length === 0 && (
-                <div className="rounded-3xl border border-line bg-white p-16 text-center">
+                <div className="rounded-3xl border border-line bg-surface p-16 text-center shadow-inner">
                   <p className="text-4xl mb-3">🎟️</p>
                   <p className="font-bold text-ink">No coupons found</p>
                   <p className="mt-1 text-sm text-muted">Try adjusting the filters</p>

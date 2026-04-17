@@ -1,6 +1,6 @@
 function SearchBar({ value, onChange, placeholder = 'Search...', className = '' }) {
   return (
-    <div className={`flex items-center gap-2 rounded-xl border border-line bg-white px-3 py-2 shadow-sm ${className}`}>
+    <div className={`flex items-center gap-2 rounded-xl border border-line bg-cream px-3 py-2 shadow-sm ${className}`}>
       <svg viewBox="0 0 20 20" className="h-4 w-4 text-muted" aria-hidden="true">
         <path
           fill="currentColor"

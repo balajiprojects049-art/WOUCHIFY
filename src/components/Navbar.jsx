@@ -165,7 +165,7 @@ function Navbar() {
               
               {/* Desktop Suggestions Dropdown */}
               {showSuggestions && suggestions && (
-                <div className="absolute top-full right-0 mt-2 w-80 max-h-[480px] overflow-y-auto rounded-2xl border border-line bg-white/95 p-2 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-2 duration-200 z-[60]">
+                <div className="absolute top-full right-0 mt-2 w-80 max-h-[480px] overflow-y-auto rounded-2xl border border-line bg-surface/95 p-2 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-2 duration-200 z-[60]">
                   <SearchMenu suggestions={suggestions} itemClick={(path) => { navigate(path); setShowSuggestions(false); setSearchText('') }} />
                 </div>
               )}
@@ -224,7 +224,7 @@ function Navbar() {
 
         {/* ── Search Overlay (all screen sizes, slides down) ── */}
         <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isSearchOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}`}>
-          <div className="bg-white border-t border-line/40 shadow-xl">
+          <div className="bg-surface border-t border-line/40 shadow-xl">
             <form
               onSubmit={handleSearchSubmit}
               className="flex items-center gap-3 px-4 sm:px-6 lg:px-8 py-3"
@@ -328,10 +328,10 @@ function SearchMenu({ suggestions, itemClick }) {
           <p className="px-2 pb-1 text-[10px] font-black uppercase tracking-widest text-gold">Loot Deals</p>
           {suggestions.loot.map(d => (
             <button key={d.slug} onClick={() => itemClick(`/loot-deal/${d.slug}`)} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-gold/5">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-base">🔥</span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gold/10 text-base">🔥</span>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-bold text-ink">{d.title}</p>
-                <p className="text-[10px] text-emerald-600 font-bold">{d.newPrice}</p>
+                <p className="text-[10px] text-emerald-500 font-bold">{d.newPrice}</p>
               </div>
             </button>
           ))}

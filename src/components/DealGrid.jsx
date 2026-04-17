@@ -9,7 +9,7 @@ function DealGrid({ deals, nowMs }) {
       ))}
 
       {deals.length === 0 && (
-        <article className="rounded-2xl border border-line bg-white p-8 text-center text-sm font-medium text-muted sm:col-span-2 md:col-span-3 xl:col-span-4">
+        <article className="rounded-2xl border border-line bg-surface p-8 text-center text-sm font-medium text-muted sm:col-span-2 md:col-span-3 xl:col-span-4">
           No deals found for current filters.
         </article>
       )}

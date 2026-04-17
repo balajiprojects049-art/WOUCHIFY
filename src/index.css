@@ -112,10 +112,13 @@ html.dark textarea::placeholder {
 /* 4. MAKE PRIMARY BUTTONS GOLD IN DARK MODE */
 html.dark button[class*="bg-navy"],
 html.dark button[class*="bg-black"],
+html.dark button[class*="bg-ink"],
 html.dark a[class*="bg-navy"],
 html.dark a[class*="bg-black"],
+html.dark a[class*="bg-ink"],
 html.dark span[class*="bg-navy"],
-html.dark span[class*="bg-black"] {
+html.dark span[class*="bg-black"],
+html.dark span[class*="bg-ink"] {
   background-color: var(--color-gold) !important;
   color: #12151C !important;
   /* highly legible dark color */

@@ -89,7 +89,7 @@ function LootDeals() {
             <LootDealCard key={deal.id} deal={deal} />
           ))}
           {filteredDeals.length === 0 && (
-            <article className="rounded-2xl border border-line bg-white p-8 text-center text-sm font-medium text-muted sm:col-span-2 md:col-span-3">
+            <article className="rounded-2xl border border-line bg-surface p-8 text-center text-sm font-medium text-muted sm:col-span-2 md:col-span-3 shadow-inner">
               No loot deals found for current filters.
             </article>
           )}

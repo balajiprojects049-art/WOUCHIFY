@@ -54,26 +54,26 @@ function DealDetail() {
   return (
     <main className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6 lg:px-8">
       {/* Breadcrumb Navigation */}
-      <nav className="mb-6 flex items-center gap-2 text-sm text-muted">
+      <nav className="mb-4 flex items-center gap-2 text-[11px] sm:text-xs text-muted">
         <Link to="/" className="hover:text-ink transition-colors">Home</Link>
-        <svg className="h-4 w-4 text-line" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+        <svg className="h-3 w-3 text-line" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
         <Link to="/deals" className="hover:text-ink transition-colors">Deals</Link>
-        <svg className="h-4 w-4 text-line" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+        <svg className="h-3 w-3 text-line" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
         <span className="text-ink font-medium truncate max-w-[200px]">{deal.title}</span>
       </nav>
 
       {/* Main Deal Container - Professional Card Layout */}
-      <section className="rounded-2xl bg-white shadow-[0_2px_12px_rgba(0,0,0,0.04)] ring-1 ring-black/5 overflow-hidden">
+      <section className="rounded-2xl bg-surface shadow-[0_2px_12px_rgba(0,0,0,0.1)] ring-1 ring-line/10 overflow-hidden">
         <div className="flex flex-col lg:flex-row">
           
           {/* Left Column: Visuals & Trust Badges */}
-          <div className="lg:w-5/12 bg-gray-50/50 p-6 sm:p-10 flex flex-col items-center border-b lg:border-b-0 lg:border-r border-line/40">
+          <div className="lg:w-[42%] bg-cream p-5 sm:p-7 flex flex-col items-center border-b lg:border-b-0 lg:border-r border-line/40">
             {/* Image Box */}
-            <div className="relative w-full aspect-[4/3] max-w-sm rounded-xl overflow-hidden bg-white shadow-sm ring-1 ring-black/5 p-4 flex items-center justify-center group">
+            <div className="relative w-full aspect-[16/11] max-w-sm rounded-xl overflow-hidden bg-white/90 shadow-sm p-3 flex items-center justify-center group border border-line/20">
               <img
                 src={deal.image}
                 alt={deal.title}
-                className="h-full w-full object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-105"
+                className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-105"
                 onError={e => e.target.style.display = 'none'}
               />
               {/* Discount Tag Top Left */}
@@ -86,19 +86,19 @@ function DealDetail() {
 
             {/* Trust Signals */}
             <div className="mt-6 w-full max-w-sm grid grid-cols-2 gap-3">
-              <div className="flex flex-col items-center justify-center p-3 rounded-lg bg-emerald-50 border border-emerald-100">
-                <div className="flex items-center gap-1.5 text-emerald-700">
+              <div className="flex flex-col items-center justify-center p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
+                <div className="flex items-center gap-1.5 text-emerald-400">
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                   <span className="text-xs font-bold">Verified Deal</span>
                 </div>
-                <span className="text-[10px] text-emerald-600/70 mt-0.5">Checked today</span>
+                <span className="text-[10px] text-emerald-400/80 mt-0.5">Checked today</span>
               </div>
-              <div className="flex flex-col items-center justify-center p-3 rounded-lg bg-blue-50 border border-blue-100">
-                <div className="flex items-center gap-1.5 text-blue-700">
+              <div className="flex flex-col items-center justify-center p-3 rounded-lg bg-blue-500/10 border border-blue-500/30">
+                <div className="flex items-center gap-1.5 text-blue-300">
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" /></svg>
                   <span className="text-xs font-bold">{deal.successRate}% Success</span>
                 </div>
-                <span className="text-[10px] text-blue-600/70 mt-0.5">{deal.usageCount} utilized</span>
+                <span className="text-[10px] text-blue-300/80 mt-0.5">{deal.usageCount} utilized</span>
               </div>
             </div>
             
@@ -116,30 +116,30 @@ function DealDetail() {
           <div className="lg:w-7/12 p-6 sm:p-10 flex flex-col justify-center">
             
             {/* Header Area */}
-            <div className="flex items-center justify-between mb-4">
-              <Link to={storePath} className="inline-flex items-center gap-1.5 text-sm font-semibold text-gold hover:text-gold/80 transition-colors">
+            <div className="flex items-center justify-between mb-3">
+              <Link to={storePath} className="inline-flex items-center gap-1.5 text-xs font-semibold text-gold hover:text-gold/80 transition-colors">
                 <span className="uppercase tracking-wider">{deal.store}</span>
-                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
               </Link>
               <button 
                 onClick={() => setSaved(p => !p)} 
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${saved ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200' : 'bg-gray-50 text-muted hover:bg-gray-100 ring-1 ring-black/5'}`}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold transition-colors ${saved ? 'bg-emerald-500/10 text-emerald-500 ring-1 ring-emerald-500/20' : 'bg-cream text-muted hover:bg-surface ring-1 ring-line'}`}
               >
-                <svg className="h-3.5 w-3.5" fill={saved ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
+                <svg className="h-3 w-3" fill={saved ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
                 {saved ? 'Saved' : 'Save'}
               </button>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-ink tracking-tight leading-tight mb-3">
+            <h1 className="text-xl sm:text-2xl font-black text-ink tracking-tight leading-tight mb-2">
               {deal.title}
             </h1>
             
-            <p className="text-sm text-muted/90 leading-relaxed mb-8">
+            <p className="text-xs sm:text-sm text-muted/90 leading-relaxed mb-6 line-clamp-2">
               {deal.description}
             </p>
 
             {/* Price & Action Area */}
-            <div className="bg-gray-50 border border-line/50 rounded-xl p-5 mb-6">
+            <div className="bg-cream border border-line rounded-xl p-4 mb-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <p className="text-xs font-medium text-muted mb-1">Deal Price</p>
@@ -153,10 +153,10 @@ function DealDetail() {
                     href={deal.link || deal.url || '#'}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex w-full items-center justify-center gap-2 rounded-lg bg-ink px-8 py-3.5 text-sm font-bold text-white shadow hover:bg-ink/90 transition-all font-sans"
+                    className="flex w-full items-center justify-center gap-2 rounded-lg bg-navy px-6 py-3 text-sm font-black text-white shadow hover:shadow-lg transition-all font-sans"
                   >
                     Get Deal Now
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
                   </a>
                 </div>
               </div>
@@ -164,14 +164,14 @@ function DealDetail() {
 
             {/* Coupon Code Section (If applicable) */}
             {deal.code && (
-              <div className="flex flex-col sm:flex-row items-center justify-between p-4 rounded-xl border border-dashed border-gold/50 bg-gold/5 gap-4">
+              <div className="flex flex-col sm:flex-row items-center justify-between p-3 rounded-xl border border-dashed border-gold/50 bg-gold/5 gap-3">
                 <div className="flex flex-col w-full text-center sm:text-left">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-gold">Use Code at Checkout</span>
-                  <span className="text-lg font-black text-ink tracking-widest">{deal.code}</span>
+                  <span className="text-[9px] font-bold uppercase tracking-wider text-gold">Use Code at Checkout</span>
+                  <span className="text-base font-black text-ink tracking-widest">{deal.code}</span>
                 </div>
                 <button
                   onClick={handleCopy}
-                  className={`w-full sm:w-auto shrink-0 px-6 py-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 ${copied ? 'bg-emerald-600 text-white shadow-sm' : 'bg-gold text-midnight hover:bg-gold/90 shadow-[0_2px_10px_rgba(212,168,32,0.2)]'}`}
+                  className={`w-full sm:w-auto shrink-0 px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 ${copied ? 'bg-emerald-600 text-white shadow-sm' : 'bg-gold text-midnight hover:bg-gold/90 shadow-[0_2px_10px_rgba(212,168,32,0.1)]'}`}
                 >
                   {copied ? (
                     <>
@@ -196,7 +196,7 @@ function DealDetail() {
         
         {/* Deal Terms and Info */}
         <section className="lg:col-span-2">
-          <div className="bg-white rounded-2xl shadow-sm ring-1 ring-black/5 p-6 sm:p-8">
+          <div className="bg-surface rounded-2xl shadow-sm ring-1 ring-line/10 p-6 sm:p-8">
             <h2 className="text-lg font-bold text-ink border-b border-line/40 pb-3 mb-5">Offer Details & Guidelines</h2>
             
             {Array.isArray(deal.steps) && deal.steps.length > 0 && (
@@ -240,7 +240,7 @@ function DealDetail() {
                  <svg className="h-5 w-5 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                  Terms & Conditions
                </h3>
-               <p className="text-sm text-muted/90 leading-relaxed bg-gray-50/50 p-4 rounded-xl border border-line/30">
+               <p className="text-sm text-muted/90 leading-relaxed bg-cream p-4 rounded-xl border border-line">
                  {deal.terms || 'Standard terms and conditions apply. Offer subject to change without prior notice. Verify at merchant site.'}
                </p>
             </div>
@@ -249,7 +249,7 @@ function DealDetail() {
 
         {/* Sidebar Info & Safety */}
         <aside className="lg:col-span-1 space-y-6">
-          <div className="bg-white rounded-2xl shadow-sm ring-1 ring-black/5 p-6">
+          <div className="bg-surface rounded-2xl shadow-sm ring-1 ring-line/10 p-6">
              <h3 className="text-sm font-semibold text-ink mb-4">Quick Information</h3>
              <ul className="space-y-4">
                 <li className="flex justify-between items-center text-sm">
@@ -273,11 +273,11 @@ function DealDetail() {
              </ul>
           </div>
           
-          <div className="bg-blue-50/50 rounded-2xl border border-blue-100 p-5 flex gap-3">
-             <svg className="h-6 w-6 text-blue-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+          <div className="bg-blue-500/5 rounded-2xl border border-blue-500/10 p-5 flex gap-3">
+             <svg className="h-6 w-6 text-blue-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
              <div>
-                <h4 className="text-sm font-semibold text-blue-900 mb-1">Safe & Trusted Links</h4>
-                <p className="text-xs text-blue-800/80 leading-relaxed">
+                <h4 className="text-sm font-semibold text-blue-400 mb-1">Safe & Trusted Links</h4>
+                <p className="text-xs text-blue-400/70 leading-relaxed">
                    Links on Wouchify are verified for safety. We only partner with reputed, official stores.
                 </p>
              </div>
