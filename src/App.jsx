@@ -20,6 +20,7 @@ import Coupons from './pages/Coupons'
 import Categories from './pages/Categories'
 import CategoryResults from './pages/CategoryResults'
 import CookiePolicy from './pages/CookiePolicy'
+import Feedback from './pages/Feedback'
 import AdminLogin from './admin/pages/AdminLogin'
 import AdminDashboard from './admin/pages/AdminDashboard'
 import AdminDeals from './admin/pages/AdminDeals'
@@ -119,6 +120,7 @@ function AppRoutes() {
             <Route path="/terms" element={<TermsOfUse />} />
             <Route path="/cookies" element={<CookiePolicy />} />
             <Route path="/faq" element={<FaqPage />} />
+            <Route path="/feedback" element={<Feedback />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </PublicLayout>
