@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Navigate, useParams } from 'react-router-dom'
 import CountdownTimer from '../components/CountdownTimer'
 import LootDealCard from '../components/LootDealCard'
@@ -5,8 +6,13 @@ import { useData } from '../context/DataContext'
 
 function LootDealDetail() {
   const { lootDealId } = useParams()
-  const { lootDeals } = useData()
+  const { lootDeals, trackDealClick } = useData()
   const deal = lootDeals.find(d => d.slug === (lootDealId || '').toLowerCase() || d.id === lootDealId)
+
+  useEffect(() => {
+    if (deal) trackDealClick(deal.slug)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deal?.slug])
 
   const relatedDeals = lootDeals
     .filter((item) => deal && item.id !== deal.id && item.category === deal.category)

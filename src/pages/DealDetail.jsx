@@ -6,8 +6,13 @@ import { getDealRemainingSeconds } from '../utils/dealExpiry'
 
 function DealDetail() {
   const { dealSlug } = useParams()
-  const { deals, getStoreBySlug } = useData()
+  const { deals, getStoreBySlug, trackDealClick } = useData()
   const deal = deals.find(d => d.slug === (dealSlug || '').toLowerCase())
+
+  useEffect(() => {
+    if (deal) trackDealClick(deal.slug)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deal?.slug])
   const [nowMs, setNowMs] = useState(Date.now())
   const [saved, setSaved] = useState(false)
   const [copied, setCopied] = useState(false)

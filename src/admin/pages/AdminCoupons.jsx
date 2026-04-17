@@ -184,15 +184,15 @@ function CouponForm({ initial, onSave, onCancel, storeOptions }) {
 }
 
 export default function AdminCoupons() {
-  const { coupons, stores, addCoupon, updateCoupon, deleteCoupon } = useData()
+  const { coupons, stores, addCoupon, updateCoupon, deleteCoupon, analytics } = useData()
   const [mode, setMode] = useState(null)
   const [editing, setEditing] = useState(null)
   const [search, setSearch] = useState('')
   const [confirm, setConfirm] = useState(null)
 
   const filtered = coupons.filter(c =>
-    c.store.toLowerCase().includes(search.toLowerCase()) ||
-    c.code.toLowerCase().includes(search.toLowerCase())
+    (c.store?.toLowerCase() || '').includes(search.toLowerCase()) ||
+    (c.code?.toLowerCase() || '').includes(search.toLowerCase())
   )
 
   const handleSave = (data) => {
@@ -238,7 +238,14 @@ export default function AdminCoupons() {
                   onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
                   onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                 >
-                  <td className="px-5 py-4 font-semibold text-white">{c.store}</td>
+                  <td className="px-5 py-4">
+                    <p className="font-semibold text-white">{c.store}</p>
+                    <div className="mt-1">
+                      <span className="text-[9px] font-medium text-[#3B82F6]/90 bg-[#3B82F6]/10 border border-[#3B82F6]/20 px-1.5 py-0.5 rounded">
+                        Added By: {c.addedBy || 'System Admin'}
+                      </span>
+                    </div>
+                  </td>
                   <td className="px-5 py-4">
                     <span className="rounded-lg px-3 py-1.5 text-xs font-black tracking-wider" style={badgePillStyle}>{c.code}</span>
                   </td>
@@ -255,7 +262,7 @@ export default function AdminCoupons() {
                   <td className="px-5 py-4 text-xs font-semibold text-white/50">
                     <div className="inline-flex items-center gap-1.5 rounded-lg bg-white/5 px-2.5 py-1.5 border border-white/10" title="Total Coupon Reveals">
                       <span className="text-[10px]">🎟️</span>
-                      <span style={{ color: G }}>{c.usageCount || 0}</span>
+                      <span style={{ color: G }}>{analytics?.couponCopies?.[c.id] || 0}</span>
                     </div>
                   </td>
                   <td className="px-5 py-4">

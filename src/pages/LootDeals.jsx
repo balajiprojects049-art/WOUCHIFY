@@ -33,8 +33,8 @@ function LootDeals() {
     const minDiscountValue = parseDiscount(minDiscount)
 
     const filtered = lootDeals.filter((deal) => {
-      // Auto-hide if mathematically expired
-      if (getDealRemainingSeconds(deal, nowMs) <= 0) return false
+      // Auto-hide if mathematically expired (but treat missing expiry as evergreen)
+      if (deal.expiresInSeconds !== undefined && getDealRemainingSeconds(deal, nowMs) <= 0) return false
 
       const query = searchText.trim().toLowerCase()
       const matchesSearch = !query || (deal.title || '').toLowerCase().includes(query) || (deal.category || '').toLowerCase().includes(query)
@@ -54,7 +54,7 @@ function LootDeals() {
       }
       return second.popularity - first.popularity
     })
-  }, [category, storeFilter, minDiscount, searchText, sortBy, lootDeals])
+  }, [category, storeFilter, minDiscount, searchText, sortBy, lootDeals, nowMs])
 
   const filterProps = {
     searchText, onSearchChange: setSearchText,

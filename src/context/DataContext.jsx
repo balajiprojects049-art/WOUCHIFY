@@ -85,7 +85,12 @@ const defaultAdminSettings = {
 }
 
 const defaultAdminMembers = [
-  { id: 'am1', name: 'Admin User', email: 'admin@wouchify.com', role: 'Owner', active: true },
+  { id: 'am1', name: 'Admin User', email: 'admin@wouchify.com', phone: '', department: 'Management', role: 'Owner', active: true, password: 'admin' },
+  { id: 'am2', name: 'Manager User', email: 'manager@wouchify.com', phone: '+91 98765 00001', department: 'Operations', role: 'Manager', active: true, password: 'admin' },
+  { id: 'am3', name: 'Ops Leader', email: 'ops@wouchify.com', phone: '+91 98765 00002', department: 'Operations', role: 'Operational Manager', active: true, password: 'admin' },
+  { id: 'am4', name: 'Content Editor', email: 'editor@wouchify.com', phone: '+91 98765 00003', department: 'Content & Marketing', role: 'Editors', active: true, password: 'admin' },
+  { id: 'am5', name: 'Support Agent', email: 'support@wouchify.com', phone: '+91 98765 00004', department: 'Customer Support', role: 'Support', active: true, password: 'admin' },
+  { id: 'am6', name: 'Balaji (Executive)', email: 'balaji@wouchify.com', phone: '+91 98765 00005', department: 'Content Entry', role: 'Operational Executive', active: true, password: 'admin' }
 ]
 
 // ── Default Analytics ───────────────────────────────────────────────────────
@@ -168,8 +173,23 @@ export function DataProvider({ children }) {
   const [auditLog, setAuditLog] = useState(() => loadFromStorage('wouchify_audit_log', []))
   const [analytics, setAnalytics] = useState(() => loadFromStorage('wouchify_analytics', defaultAnalytics))
   const [advertisements, setAdvertisements] = useState(() => loadFromStorage('wouchify_advertisements', []))
+  const [currentUser, setCurrentUser] = useState(() => loadFromStorage('wouchify_current_admin', null))
 
   const [dbConnected, setDbConnected] = useState(false)
+
+  // ── Auto-Inject Testing Account ──
+  useEffect(() => {
+    setAdminMembers(prev => {
+      if (!prev.some(m => m.email === 'balaji@wouchify.com')) {
+        const testUser = { id: 'am6', name: 'Balaji (Executive)', email: 'balaji@wouchify.com', phone: '+91 98765 00005', department: 'Content Entry', role: 'Operational Executive', active: true, password: 'admin' }
+        const next = [...prev, testUser]
+        saveToStorage('wouchify_admin_members', next)
+        console.log('[Wouchify Dev] Successfully injected Balaji Test Account into local storage.');
+        return next
+      }
+      return prev
+    })
+  }, [])
 
   // ── 1) Connect to Neon Backend on Mount ──
   useEffect(() => {
@@ -177,23 +197,32 @@ export function DataProvider({ children }) {
       if (res.isConnected) {
         setDbConnected(true)
         if (res.hasData) {
-          // Smart merge: DB data wins but preserve any local-only fields
-          // (e.g. 'store' field added before DB had the column)
+          // Smart merge: LOCAL data wins if it's newer than DB (user just edited it)
+          // DB data fills in fields that are missing locally only
           const mergeList = (dbItems, localItems) => {
             if (!Array.isArray(dbItems)) return dbItems
-            return dbItems.map(dbItem => {
-              const local = localItems.find(l => l.slug === dbItem.slug || l.id === dbItem.id)
-              if (!local) return dbItem
-              // Spread local first, then DB overrides — but keep local non-empty fields if DB lacks them
-              const merged = { ...dbItem }
-              Object.entries(local).forEach(([k, v]) => {
-                if ((merged[k] === undefined || merged[k] === null || merged[k] === '') && v != null && v !== '') {
-                  merged[k] = v
-                }
-              })
-              return merged
+            // Start with all local items (preserves any local-only edits)
+            const merged = [...localItems]
+            // Add any DB items that don't exist locally at all
+            dbItems.forEach(dbItem => {
+              const localIdx = merged.findIndex(l => l.slug === dbItem.slug || l.id === dbItem.id)
+              if (localIdx === -1) {
+                // Item only exists in DB — add it
+                merged.push(dbItem)
+              } else {
+                // Item exists both locally and in DB — local wins (user edited locally)
+                // But fill in any fields that local is missing
+                const local = merged[localIdx]
+                const result = { ...dbItem }
+                Object.entries(local).forEach(([k, v]) => {
+                  if (v != null && v !== '') result[k] = v
+                })
+                merged[localIdx] = result
+              }
             })
+            return merged
           }
+
 
           if (res.data.deals) setDeals(prev => mergeList(res.data.deals, prev))
           if (res.data.lootDeals) setLootDeals(prev => mergeList(res.data.lootDeals, prev))
@@ -227,7 +256,7 @@ export function DataProvider({ children }) {
   // ── Database single-item persistence bridge ──
   const persist = (collection, item) => {
     if (!item) return
-    fetch(`/api/collection/${collection}`, {
+    fetch(`/api/${collection}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(item),
@@ -241,7 +270,7 @@ export function DataProvider({ children }) {
     })
   }
   const removeDb = (collection, id) => {
-    const endpoint = id ? `/api/collection/${collection}/${id}` : `/api/collection/${collection}`
+    const endpoint = id ? `/api/${collection}/${id}` : `/api/${collection}`
     fetch(endpoint, { method: 'DELETE' }).then((res) => {
       if (!res.ok) {
         console.error(`DB delete failed for ${id ? `${collection}/${id}` : collection}: HTTP ${res.status}`)
@@ -254,7 +283,7 @@ export function DataProvider({ children }) {
 
 
   const addAuditLog = (action, entity, detail) => {
-    const entry = buildLog(action, entity, detail)
+    const entry = buildLog(action, entity, detail, currentUser?.name || 'System Auto')
     setAuditLog(prev => [entry, ...prev].slice(0, 500)) // keep last 500
     persist('auditLog', entry)
   }
@@ -273,6 +302,16 @@ export function DataProvider({ children }) {
     setAuditLog([])
     saveToStorage('wouchify_audit_log', [])
     removeDb('auditLog')
+  }
+
+  // ── Auth helpers ────────────────────────────────────────────────────────────
+  const loginAdmin = (member) => {
+    setCurrentUser(member)
+    saveToStorage('wouchify_current_admin', member)
+  }
+  const logoutAdmin = () => {
+    setCurrentUser(null)
+    saveToStorage('wouchify_current_admin', null)
   }
 
   // Persist to localStorage on every change
@@ -345,7 +384,12 @@ export function DataProvider({ children }) {
 
   // ── DEALS CRUD ───────────────────────────────────────────────────────────
   const addDeal = (deal) => {
-    const d = { ...deal, slug: deal.slug || generateId(), createdAt: new Date().toISOString() }
+    const d = {
+      ...deal,
+      slug: deal.slug || generateId(),
+      createdAt: deal.createdAt || new Date().toISOString(), // preserve if editing
+      addedBy: deal.addedBy || currentUser?.name || 'System Auto'
+    }
     setDeals((prev) => [d, ...prev])
     persist('deals', d)
     addAuditLog('CREATE', 'Deal', `Created deal "${deal.title}"`)
@@ -368,7 +412,13 @@ export function DataProvider({ children }) {
 
   // ── LOOT DEALS CRUD ─────────────────────────────────────────────────────
   const addLootDeal = (deal) => {
-    const d = { ...deal, id: generateId(), slug: deal.slug || generateId(), createdAt: new Date().toISOString() }
+    const d = {
+      ...deal,
+      id: generateId(),
+      slug: deal.slug || generateId(),
+      createdAt: deal.createdAt || new Date().toISOString(), // preserve if editing
+      addedBy: deal.addedBy || currentUser?.name || 'System Auto'
+    }
     setLootDeals((prev) => [d, ...prev])
     persist('lootDeals', d)
     addAuditLog('CREATE', 'Loot Deal', `Created loot deal "${deal.title}"`)
@@ -391,7 +441,7 @@ export function DataProvider({ children }) {
 
   // ── STORES CRUD ──────────────────────────────────────────────────────────
   const addStore = (store) => {
-    const s = { ...store, slug: store.slug || generateId(), offers: store.offers || [] }
+    const s = { ...store, slug: store.slug || generateId(), offers: store.offers || [], addedBy: currentUser?.name || 'System Auto' }
     setStores((prev) => [s, ...prev])
     persist('stores', s)
     addAuditLog('CREATE', 'Store', `Created store "${store.name}"`)
@@ -414,7 +464,7 @@ export function DataProvider({ children }) {
 
   // ── COUPONS CRUD ─────────────────────────────────────────────────────────
   const addCoupon = (coupon) => {
-    const c = { ...coupon, id: generateId(), active: true, createdAt: new Date().toISOString() }
+    const c = { ...coupon, id: generateId(), active: true, createdAt: new Date().toISOString(), addedBy: currentUser?.name || 'System Auto' }
     setCoupons((prev) => [c, ...prev])
     persist('coupons', c)
     addAuditLog('CREATE', 'Coupon', `Created coupon "${coupon.code}" for ${coupon.store}`)
@@ -425,7 +475,7 @@ export function DataProvider({ children }) {
       persist('coupons', draft.find(x => x.id === id))
       return draft
     })
-    if (!updates.active === false && Object.keys(updates).length > 1)
+    if (Object.keys(updates).length > 1)
       addAuditLog('UPDATE', 'Coupon', `Updated coupon ID ${id}`)
   }
   const deleteCoupon = (id) => {
@@ -455,7 +505,7 @@ export function DataProvider({ children }) {
 
   // ── CREDIT CARDS CRUD ────────────────────────────────────────────────────
   const addCreditCard = (card) => {
-    const newCard = { ...card, id: generateId(), active: true }
+    const newCard = { ...card, id: generateId(), active: true, addedBy: currentUser?.name || 'System Auto' }
     setCreditCards((prev) => {
       const typeKey = card.type === 'lifetime' ? 'lifetime' : 'shopping'
       const updatedCards = {
@@ -525,6 +575,8 @@ export function DataProvider({ children }) {
       // Data
       deals, lootDeals, publishedDeals, publishedLootDeals, stores, coupons, giveaways, creditCards, banners, adminSettings, adminMembers, dbConnected, syncDataToDb,
       advertisements, addAdvertisement, updateAdvertisement, deleteAdvertisement,
+      // Auth
+      currentUser, loginAdmin, logoutAdmin,
       // Deals
       addDeal, updateDeal, deleteDeal, getDealBySlug,
       // Loot Deals

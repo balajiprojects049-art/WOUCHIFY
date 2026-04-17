@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import CouponCard from '../components/CouponCard'
 import StoreFilterBar from '../components/StoreFilterBar'
@@ -8,8 +8,13 @@ import { resolveStoreLogoUrl } from '../utils/storeLogo'
 
 function StoreDetail() {
   const { storeName } = useParams()
-  const { stores, coupons } = useData()
+  const { stores, coupons, trackPageView } = useData()
   const store = (stores || []).find(s => s.slug === (storeName || '').toLowerCase())
+
+  useEffect(() => {
+    if (store) trackPageView(store.slug)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [store?.slug])
 
   const [searchText, setSearchText] = useState('')
   const [offerType, setOfferType] = useState('All')

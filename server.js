@@ -274,5 +274,19 @@ app.delete('/api/:collection', async (req, res) => {
   }
 })
 
+app.post('/api/admin/forgot-password', async (req, res) => {
+  const { email } = req.body
+  const code = Math.floor(100000 + Math.random() * 900000).toString()
+  
+  console.log('\n======================================================')
+  console.log(` 📧 [WOUCHIFY MAILER] RESET PASSWORD INITIATED`)
+  console.log(` 🎯 TARGET EMAIL : ${email}`)
+  console.log(` 🔐 SECURE OTP   : \x1b[32m${code}\x1b[0m`) 
+  console.log(` (Note: Implement Nodemailer or SMTP here for production)`)
+  console.log('======================================================\n')
+  
+  res.json({ success: true, expectedOtp: code })
+})
+
 const PORT = 5000
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`))

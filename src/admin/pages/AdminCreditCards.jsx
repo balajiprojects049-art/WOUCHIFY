@@ -4,7 +4,8 @@ import { useData } from '../../context/DataContext'
 import ImageUpload from '../components/ImageUpload'
 import {
   G, inp, lbl, cardStyle, btnPrimary, btnPrimaryCls, btnCancelCls, btnCancelStyle,
-  backLinkCls, confirmDialogStyle, inpStyle, inpFocus, badgePillStyle
+  backLinkCls, confirmDialogStyle, inpStyle, inpFocus, badgePillStyle,
+  searchInpCls, searchInpStyle
 } from '../components/adminStyles'
 
 const EMPTY = { bank: '', card: '', cashback: '', partners: '', rewards: '', applyUrl: '', type: 'shopping', cardImage: '', bankLogo: '', active: true }
@@ -183,8 +184,10 @@ export default function AdminCreditCards() {
   const [editing, setEditing] = useState(null)
   const [confirm, setConfirm] = useState(null)
   const [tab, setTab] = useState('shopping')
+  const [search, setSearch] = useState('')
 
   const allCards = tab === 'shopping' ? (creditCards.shopping || []) : (creditCards.lifetime || [])
+  const filtered = allCards.filter(c => (c.card?.toLowerCase() || '').includes(search.toLowerCase()) || (c.bank?.toLowerCase() || '').includes(search.toLowerCase()))
 
   const handleSave = (data) => {
     if (mode === 'add') addCreditCard(data)
@@ -214,6 +217,10 @@ export default function AdminCreditCards() {
             </button>
           ))}
         </div>
+        <div className="relative flex-1 sm:max-w-xs">
+          <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by bank or card..." className={searchInpCls} style={searchInpStyle} />
+        </div>
         <button onClick={() => { setMode('add'); setEditing(null) }} className="shrink-0 rounded-xl px-6 py-2.5 text-sm font-black transition-all hover:opacity-90" style={btnPrimary}>
           + Add Card
         </button>
@@ -229,7 +236,7 @@ export default function AdminCreditCards() {
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {allCards.map((c) => (
+          {filtered.map((c) => (
             <div key={c.id} className="overflow-hidden rounded-2xl transition-all"
               style={{ border: c.active ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(239,68,68,0.2)', background: 'rgba(255,255,255,0.03)', opacity: c.active ? 1 : 0.7 }}>
               {c.cardImage ? (
@@ -256,6 +263,11 @@ export default function AdminCreditCards() {
                 </div>
                 <p className="text-xs text-white/40 mt-2">{c.cashback}</p>
                 <p className="text-sm font-bold mt-1" style={{ color: G }}>{c.rewards}</p>
+                <div className="mt-2 text-left">
+                  <span className="text-[10px] font-medium text-[#C084FC]/90 bg-[#C084FC]/10 border border-[#C084FC]/20 px-1.5 py-0.5 rounded">
+                    Added By: {c.addedBy || 'System Admin'}
+                  </span>
+                </div>
                 <div className="mt-4 flex gap-2">
                   <button onClick={() => { setEditing(c); setMode('edit') }} className="flex-1 rounded-xl py-2 text-xs font-bold text-white/70 hover:text-white transition-colors" style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)' }}>Edit</button>
                   <button onClick={() => setConfirm(c.id)} className="rounded-xl px-4 py-2 text-xs font-bold text-red-400 hover:text-red-300 transition-colors" style={{ background: 'rgba(239,68,68,0.08)' }}>Delete</button>
@@ -265,7 +277,7 @@ export default function AdminCreditCards() {
           ))}
         </div>
       )}
-      <p className="mt-4 text-xs text-white/30">{allCards.length} {tab} cards</p>
+      <p className="mt-4 text-xs text-white/30">{filtered.length} of {allCards.length} {tab} cards</p>
     </AdminLayout>
   )
 }

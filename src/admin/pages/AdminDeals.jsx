@@ -4,7 +4,7 @@ import { useData } from '../../context/DataContext'
 import ImageUpload from '../components/ImageUpload'
 import SearchableSelect from '../components/SearchableSelect'
 import { CATEGORY_SECTIONS } from '../../utils/categories'
-import { formatExpiryFromSeconds } from '../../utils/dealExpiry'
+import { formatExpiryFromSeconds, getDealRemainingSeconds } from '../../utils/dealExpiry'
 import {
   G, inp, lbl, sel, cardStyle, tableWrapStyle, thStyle, trBorderStyle,
   searchInpCls, searchInpStyle, btnPrimary, btnPrimaryCls, btnCancelCls, btnCancelStyle,
@@ -55,13 +55,15 @@ function ConfirmDialog({ onConfirm, onCancel, message = 'This will immediately r
   )
 }
 
-function DealForm({ initial, onSave, onCancel }) {
+function DealForm({ initial, onSave, onCancel, role }) {
+  const isEditor = role === 'Operational Executive'
+  
   const [form, setForm] = useState(() => {
     const startMs = initial.createdAt ? new Date(initial.createdAt).getTime() : Date.now()
     const expiresMs = startMs + (initial.expiresInSeconds || 86400) * 1000
     const d = new Date(expiresMs)
     d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
-    return { ...initial, expiresAt: d.toISOString().slice(0, 16) }
+    return { ...initial, expiresAt: d.toISOString().slice(0, 16), status: isEditor ? 'Draft' : initial.status || 'Active' }
   })
   const [showAdvanced, setShowAdvanced] = useState(!!initial.publishAt)
   
@@ -132,8 +134,8 @@ function DealForm({ initial, onSave, onCancel }) {
                 </select>
               </div>
               <div>
-                <label className={lbl}>Status (Auto update tracking)</label>
-                <select {...selectProps} value={form.status} onChange={e => set('status', e.target.value)}>
+                <label className={lbl}>Status (Auto update tracking) {isEditor && <span className="text-red-400 font-normal lowercase">(Locked to Draft for Executive)</span>}</label>
+                <select {...selectProps} value={form.status} onChange={e => set('status', e.target.value)} disabled={isEditor}>
                   {STATUSES.map(s => <option key={s} value={s} className="bg-[#0C1018]">{s}</option>)}
                 </select>
               </div>
@@ -314,7 +316,7 @@ function DealForm({ initial, onSave, onCancel }) {
 }
 
 export default function AdminDeals() {
-  const { deals, addDeal, updateDeal, deleteDeal } = useData()
+  const { deals, addDeal, updateDeal, deleteDeal, currentUser, analytics } = useData()
   const [mode, setMode] = useState(null)
   const [editing, setEditing] = useState(null)
   const [search, setSearch] = useState('')
@@ -322,8 +324,14 @@ export default function AdminDeals() {
   const [confirm, setConfirm] = useState(null)
   const [selected, setSelected] = useState([])
 
+  const role = currentUser?.role || 'Support'
+  const canPublish = ['Owner', 'Manager', 'Operational Manager'].includes(role)
+  const canDelete = ['Owner', 'Manager', 'Operational Manager'].includes(role)
+  const canEdit = ['Owner', 'Manager', 'Operational Manager', 'Operational Executive'].includes(role)
+
   const filtered = deals.filter(d => {
-    const matchesSearch = d.title.toLowerCase().includes(search.toLowerCase()) || d.store.toLowerCase().includes(search.toLowerCase())
+    const term = search.toLowerCase()
+    const matchesSearch = (d.title?.toLowerCase() || '').includes(term) || (d.store?.toLowerCase() || '').includes(term)
     if (!matchesSearch) return false
     
     // Auto detect expired for filtering
@@ -369,7 +377,7 @@ export default function AdminDeals() {
       <div className="mb-5">
         <button onClick={() => { setMode(null); setEditing(null) }} className={backLinkCls}>← Back to Deals</button>
       </div>
-      <DealForm initial={editing || EMPTY_DEAL} onSave={handleSave} onCancel={() => { setMode(null); setEditing(null) }} />
+      <DealForm initial={editing || EMPTY_DEAL} onSave={handleSave} onCancel={() => { setMode(null); setEditing(null) }} role={role} />
     </AdminLayout>
   )
 
@@ -389,7 +397,9 @@ export default function AdminDeals() {
               {['All', 'Active', 'Expired', 'Draft'].map(s => <option key={s} value={s} className="bg-[#0C1018]">{s}</option>)}
             </select>
           </div>
-          <button onClick={() => { setMode('add'); setEditing(null) }} className="shrink-0 rounded-xl px-6 py-2.5 text-sm font-black transition-all hover:opacity-90 shadow-[0_4px_20px_rgba(0,212,126,0.25)]" style={{ background: G, color: '#070B12' }}>+ Add New Deal</button>
+          {canEdit && (
+            <button onClick={() => { setMode('add'); setEditing(null) }} className="shrink-0 rounded-xl px-6 py-2.5 text-sm font-black transition-all hover:opacity-90 shadow-[0_4px_20px_rgba(0,212,126,0.25)]" style={{ background: G, color: '#070B12' }}>+ Add New Deal</button>
+          )}
         </div>
 
         {/* Bulk Actions Row */}
@@ -398,8 +408,12 @@ export default function AdminDeals() {
             <span className="text-sm font-bold text-white px-2">{selected.length} Selected</span>
             <div className="flex items-center gap-2 border-l border-white/10 pl-4">
               <button onClick={() => handleBulkAction('mark_featured')} className="rounded-lg px-3 py-1.5 text-xs font-bold text-white/80 transition-all hover:bg-white/10">⭐ Feature</button>
-              <button onClick={() => handleBulkAction('mark_expired')} className="rounded-lg px-3 py-1.5 text-xs font-bold text-white/80 transition-all hover:bg-white/10">⏳ Expire</button>
-              <button onClick={() => handleBulkAction('delete')} className="rounded-lg px-3 py-1.5 text-xs font-bold text-red-400 transition-all hover:bg-red-500/20">🗑️ Delete</button>
+              {canPublish && (
+                <button onClick={() => handleBulkAction('mark_expired')} className="rounded-lg px-3 py-1.5 text-xs font-bold text-white/80 transition-all hover:bg-white/10">⏳ Expire</button>
+              )}
+              {canDelete && (
+                <button onClick={() => handleBulkAction('delete')} className="rounded-lg px-3 py-1.5 text-xs font-bold text-red-400 transition-all hover:bg-red-500/20">🗑️ Delete</button>
+              )}
             </div>
             <button onClick={() => setSelected([])} className="ml-auto text-xs font-bold text-white/40 hover:text-white px-2">Cancel</button>
           </div>
@@ -421,7 +435,8 @@ export default function AdminDeals() {
               {filtered.length === 0 && <tr><td colSpan={5} className="px-5 py-12 text-center text-sm text-white/30">No deals matched your criteria.</td></tr>}
               {filtered.map((deal) => {
                 const isSelected = selected.includes(deal.slug)
-                const isDead = deal.expiresInSeconds <= 0 || deal.status === 'Expired'
+                const remaining = deal.expiresInSeconds === undefined ? 1 : getDealRemainingSeconds(deal)
+                const isDead = remaining <= 0 || deal.status === 'Expired'
                 
                 return (
                 <tr key={deal.slug} className={`transition-colors ${isSelected ? 'bg-white/5' : ''}`} style={trBorderStyle}
@@ -443,6 +458,9 @@ export default function AdminDeals() {
                         <div className="flex items-center gap-2 mt-1">
                           <span className="rounded bg-white/5 px-1.5 py-0.5 text-[9px] font-bold text-white/40">{deal.category}</span>
                           <span className="text-[10px] text-white/30">{deal.store}</span>
+                          <span className="text-[9px] font-medium text-[#00D47E]/90 bg-[#00D47E]/10 border border-[#00D47E]/20 px-1.5 py-0.5 rounded ml-1">
+                            Added By: {deal.addedBy || 'System Admin'}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -461,13 +479,17 @@ export default function AdminDeals() {
                   <td className="px-5 py-4 text-xs font-semibold text-white/50">
                     <div className="inline-flex items-center gap-1.5 rounded-lg bg-white/5 px-2.5 py-1.5 border border-white/10" title="Total Page Views/Clicks">
                       <span className="text-[10px]">👁️</span>
-                      <span style={{ color: G }}>{deal.usageCount || 0}</span>
+                      <span style={{ color: G }}>{analytics?.dealClicks?.[deal.slug] || 0}</span>
                     </div>
                   </td>
                   <td className="px-5 py-4">
                     <div className="flex items-center justify-end gap-2">
-                      <button onClick={() => { setEditing(deal); setMode('edit') }} className={editBtnCls} style={editBtnStyle}>Edit</button>
-                      <button onClick={() => setConfirm(deal.slug)} className={delBtnCls} style={delBtnStyle}>Delete</button>
+                      {canEdit && (
+                        <button onClick={() => { setEditing(deal); setMode('edit') }} className={editBtnCls} style={editBtnStyle}>Edit</button>
+                      )}
+                      {canDelete && (
+                        <button onClick={() => setConfirm(deal.slug)} className={delBtnCls} style={delBtnStyle}>Delete</button>
+                      )}
                     </div>
                   </td>
                 </tr>

@@ -93,16 +93,18 @@ function StoreForm({ initial, onSave, onCancel }) {
               </div>
               <div>
                 <label className={lbl}>Category</label>
-                <select {...selectProps} value={form.category} onChange={e => set('category', e.target.value)}>
-                  <option value="Shopping" className="bg-[#0C1018]">Shopping</option>
-                  {CATEGORY_SECTIONS.map((section) => (
-                    <optgroup key={section.id} label={`── ${section.label.toUpperCase()} ──`}>
-                      {Object.values(section.data).flat().map(c => (
-                        <option key={`${section.id}-${c}`} value={c} className="bg-[#0C1018]">{c}</option>
-                      ))}
-                    </optgroup>
+                <input 
+                  list="categoryList"
+                  {...inputProps} 
+                  value={form.category} 
+                  onChange={e => set('category', e.target.value)} 
+                  placeholder="Type or select category..."
+                />
+                <datalist id="categoryList">
+                  {CATEGORY_SECTIONS.flatMap(section => Object.values(section.data).flat()).map(c => (
+                    <option key={c} value={c} />
                   ))}
-                </select>
+                </datalist>
               </div>
               <div>
                 <label className={lbl}>URL Slug <span className="normal-case font-normal text-[10px] text-white/20">(auto if blank)</span></label>
@@ -170,13 +172,13 @@ function StoreForm({ initial, onSave, onCancel }) {
 }
 
 export default function AdminStores() {
-  const { stores, addStore, updateStore, deleteStore } = useData()
+  const { stores, addStore, updateStore, deleteStore, analytics } = useData()
   const [mode, setMode] = useState(null)
   const [editing, setEditing] = useState(null)
   const [search, setSearch] = useState('')
   const [confirm, setConfirm] = useState(null)
 
-  const filtered = stores.filter(s => s.name.toLowerCase().includes(search.toLowerCase())).sort((a, b) => a.name.localeCompare(b.name))
+  const filtered = stores.filter(s => (s.name?.toLowerCase() || '').includes(search.toLowerCase())).sort((a, b) => (a.name || '').localeCompare(b.name || ''))
   const handleSave = (data) => {
     if (mode === 'add') addStore(data)
     else updateStore(editing.slug, data)
@@ -222,8 +224,13 @@ export default function AdminStores() {
                     <div className="flex items-center gap-3">
                       <div className="shrink-0"><AdminStoreLogo store={s} size="h-9 w-9" fallbackTextSize="text-xs" /></div>
                       <div>
-                        <p className="font-semibold text-white text-sm">{s.name}</p>
-                        <p className="text-[11px] text-white/30">{s.highlight?.slice(0, 40)}</p>
+                        <p className="font-semibold text-white text-sm mb-0.5">{s.name}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <p className="text-[11px] text-white/30 line-clamp-1 max-w-[150px]">{s.highlight?.slice(0, 40)}</p>
+                          <span className="text-[9px] font-medium text-[#C084FC]/90 bg-[#C084FC]/10 border border-[#C084FC]/20 px-1.5 py-0.5 rounded">
+                            Added By: {s.addedBy || 'System Admin'}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </td>
@@ -235,7 +242,7 @@ export default function AdminStores() {
                   <td className="px-5 py-4 text-xs font-semibold text-white/50">
                     <div className="inline-flex items-center gap-1.5 rounded-lg bg-white/5 px-2.5 py-1.5 border border-white/10" title="Total Store Views">
                       <span className="text-[10px]">👁️</span>
-                      <span style={{ color: G }}>{s.usageCount || 0}</span>
+                      <span style={{ color: G }}>{analytics?.pageViews?.[s.slug] || 0}</span>
                     </div>
                   </td>
                   <td className="px-5 py-4">

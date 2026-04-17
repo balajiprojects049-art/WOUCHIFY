@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { resolveStoreLogoUrl } from '../utils/storeLogo'
+import { useData } from '../context/DataContext'
 
 function getDynamicExpiry(expiryString, createdAtStr) {
   if (!createdAtStr || !expiryString) return expiryString
@@ -24,6 +25,7 @@ function CouponCard({ store, offer }) {
   const [isCopied, setIsCopied] = useState(false)
   const [showDetailsCard, setShowDetailsCard] = useState(false)
   const [logoBroken, setLogoBroken] = useState(false)
+  const { trackCouponCopy } = useData()
 
   const logoUrl = useMemo(() => resolveStoreLogoUrl(store), [store])
 
@@ -94,7 +96,7 @@ function CouponCard({ store, offer }) {
             </div>
 
             <button
-              onClick={() => setIsFlipped(true)}
+              onClick={() => { setIsFlipped(true); if (isCoupon) trackCouponCopy(offer.id) }}
               className="mt-auto inline-flex h-10 w-full items-center justify-center rounded-xl bg-gold px-3 text-sm font-bold text-midnight transition-all duration-300 hover:brightness-95"
             >
               {isCoupon ? 'Get This Coupon' : 'Get This Deal'}

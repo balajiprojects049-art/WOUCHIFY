@@ -107,7 +107,7 @@ export default function AdminLayout({ children, title }) {
   const [profileOpen, setProfileOpen] = useState(false)
   const profileRef = useRef(null)
   const navigate = useNavigate()
-  const { adminSettings, adminMembers } = useData()
+  const { adminSettings, currentUser, logoutAdmin } = useData()
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -118,11 +118,41 @@ export default function AdminLayout({ children, title }) {
     return () => document.removeEventListener('mousedown', handler)
   }, [])
 
-  const handleLogout = () => navigate('/admin')
-  const owner = adminMembers?.find(m => m.role === 'Owner') || adminMembers?.[0]
+  useEffect(() => {
+    if (!currentUser) {
+      navigate('/admin')
+    }
+  }, [currentUser, navigate])
+
+  const handleLogout = () => {
+    if (logoutAdmin) logoutAdmin()
+    navigate('/admin')
+  }
+
+  // --- Dynamic Permissions Logic --- //
+  const role = String(currentUser?.role || 'Operational Executive').toLowerCase().trim()
+  
+  // Safe parsing
+  const isManager = role === 'manager' || role === 'owner' // owner retained globally out of caution
+  const isOpManager = role === 'operational manager' || role === 'operationalmanager' 
+  const isOpExec = role === 'operational executive' || role === 'editors'
+
+  const canSeeContent = isManager || isOpManager || isOpExec
+  const canSeeSettings = isManager
+  const canSeeMembers = isManager
+  const canSeeTools = isManager || isOpManager
+
+  const filteredNavItems = navItems.filter(item => {
+    if (['Settings'].includes(item.label) && !canSeeSettings) return false
+    if (['Members'].includes(item.label) && !canSeeMembers) return false
+    if (!['Dashboard', 'Settings', 'Members'].includes(item.label) && !canSeeContent) return false
+    return true
+  })
+
+  const filteredToolItems = toolItems.filter(() => canSeeTools)
 
   return (
-    <div className="flex min-h-screen" style={{ background: '#070B12' }}>
+    <div className="flex h-screen w-full overflow-hidden" style={{ background: '#070B12' }}>
 
       {/* Mobile overlay */}
       {sidebarOpen && (
@@ -135,7 +165,7 @@ export default function AdminLayout({ children, title }) {
 
       {/* ── Sidebar ── */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-64 shrink-0 flex-col lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`fixed inset-y-0 left-0 z-50 flex w-64 shrink-0 flex-col lg:static lg:h-full lg:translate-x-0 transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
         style={{ background: '#0C1018', borderRight: '1px solid rgba(255,255,255,0.06)' }}
       >
         {/* Logo */}
@@ -158,7 +188,7 @@ export default function AdminLayout({ children, title }) {
 
         {/* Nav */}
         <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-4">
-          {navItems.map(({ label, to, Icon }) => (
+          {filteredNavItems.map(({ label, to, Icon }) => (
             <NavLink key={to} to={to} onClick={() => setSidebarOpen(false)}
               className={({ isActive }) => `flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 ${isActive ? 'active-nav' : 'inactive-nav'}`}
             >
@@ -172,12 +202,14 @@ export default function AdminLayout({ children, title }) {
           ))}
 
           {/* Tools divider */}
-          <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', margin: '0.75rem 0.5rem 0.5rem' }} />
-          <p className="px-4 pb-1 text-[9px] font-black uppercase tracking-widest text-white/20">Tools</p>
-          {toolItems.map(({ label, to, Icon }) => (
-            <NavLink key={to} to={to} onClick={() => setSidebarOpen(false)}
-              className={({ isActive }) => `flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 ${isActive ? 'active-nav' : 'inactive-nav'}`}
-            >
+          {filteredToolItems.length > 0 && (
+            <>
+              <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', margin: '0.75rem 0.5rem 0.5rem' }} />
+              <p className="px-4 pb-1 text-[9px] font-black uppercase tracking-widest text-white/20">Tools</p>
+              {filteredToolItems.map(({ label, to, Icon }) => (
+                <NavLink key={to} to={to} onClick={() => setSidebarOpen(false)}
+                  className={({ isActive }) => `flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200 ${isActive ? 'active-nav' : 'inactive-nav'}`}
+                >
               {({ isActive }) => (
                 <>
                   <span style={isActive ? { color: G } : { color: 'rgba(255,255,255,0.4)' }}><Icon /></span>
@@ -186,6 +218,8 @@ export default function AdminLayout({ children, title }) {
               )}
             </NavLink>
           ))}
+            </>
+          )}
         </nav>
 
         {/* Logout */}
@@ -195,13 +229,13 @@ export default function AdminLayout({ children, title }) {
             className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold text-red-400 transition-all hover:bg-red-500/10"
           >
             <Icons.Logout />
-            Logout
+            Logout ({currentUser?.name || 'Admin'})
           </button>
         </div>
       </aside>
 
       {/* ── Main ── */}
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="relative flex min-w-0 flex-1 flex-col h-full overflow-hidden">
 
         {/* Header */}
         <header
@@ -243,12 +277,12 @@ export default function AdminLayout({ children, title }) {
                   <img src={adminSettings.avatar} alt="Admin" className="h-8 w-8 rounded-xl object-cover" style={{ border: '1px solid rgba(0,212,126,0.3)' }} />
                 ) : (
                   <div className="flex h-8 w-8 items-center justify-center rounded-xl text-sm font-black" style={{ background: 'rgba(0,212,126,0.15)', border: '1px solid rgba(0,212,126,0.25)', color: G }}>
-                    {(adminSettings?.siteName || 'A').charAt(0).toUpperCase()}
+                    {(currentUser?.name || adminSettings?.siteName || 'A').charAt(0).toUpperCase()}
                   </div>
                 )}
                 <div className="hidden sm:block text-left">
-                  <p className="text-[11px] font-black text-white leading-none">{owner?.name || 'Admin'}</p>
-                  <p className="text-[9px] text-white/35 mt-0.5">{owner?.role || 'Owner'}</p>
+                  <p className="text-[11px] font-black text-white leading-none">{currentUser?.name || 'Loading...'}</p>
+                  <p className="text-[9px] text-white/35 mt-0.5">{currentUser?.role || 'Verifying Access'}</p>
                 </div>
                 <svg viewBox="0 0 20 20" className="h-3 w-3 fill-white/30 hidden sm:block"><path fillRule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 11.168l3.71-3.938a.75.75 0 1 1 1.08 1.04l-4.25 4.5a.75.75 0 0 1-1.08 0l-4.25-4.5a.75.75 0 0 1 .02-1.06z" clipRule="evenodd" /></svg>
               </button>
@@ -265,30 +299,34 @@ export default function AdminLayout({ children, title }) {
                         <img src={adminSettings.avatar} alt="" className="h-12 w-12 rounded-xl object-cover" style={{ border: '2px solid rgba(0,212,126,0.4)' }} />
                       ) : (
                         <div className="flex h-12 w-12 items-center justify-center rounded-xl text-lg font-black" style={{ background: 'rgba(0,212,126,0.15)', border: '2px solid rgba(0,212,126,0.3)', color: G }}>
-                          {(adminSettings?.siteName || 'A').charAt(0).toUpperCase()}
+                          {(currentUser?.name || adminSettings?.siteName || 'A').charAt(0).toUpperCase()}
                         </div>
                       )}
                       <div>
-                        <p className="text-sm font-black text-white">{owner?.name || 'Admin User'}</p>
-                        <p className="text-[10px] font-bold mt-0.5" style={{ color: G }}>{owner?.role || 'Owner'}</p>
-                        <p className="text-[10px] text-white/35">{owner?.email || adminSettings?.supportEmail || ''}</p>
+                        <p className="text-sm font-black text-white">{currentUser?.name || 'Loading'}</p>
+                        <p className="text-[10px] font-bold mt-0.5" style={{ color: G }}>{currentUser?.role || 'Verifying'}</p>
+                        <p className="text-[10px] text-white/35 max-w-[120px] truncate">{currentUser?.email || adminSettings?.supportEmail || ''}</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Quick links */}
-                  {[
-                    { label: 'Edit Profile', to: '/admin/settings', icon: '⚙️' },
-                    { label: 'Manage Members', to: '/admin/members', icon: '👥' },
-                  ].map(item => (
-                    <button key={item.to} onClick={() => { navigate(item.to); setProfileOpen(false) }}
+                  {canSeeSettings && (
+                    <button onClick={() => { navigate('/admin/settings'); setProfileOpen(false) }}
                       className="w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold text-white/60 hover:text-white transition-colors"
-                      style={{ ':hover': { background: 'rgba(255,255,255,0.05)' } }}
                       onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
                       onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                      <span>{item.icon}</span>{item.label}
+                      <span>⚙️</span>Edit Profile
                     </button>
-                  ))}
+                  )}
+                  {canSeeMembers && (
+                    <button onClick={() => { navigate('/admin/members'); setProfileOpen(false) }}
+                      className="w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold text-white/60 hover:text-white transition-colors"
+                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                      <span>👥</span>Manage Members
+                    </button>
+                  )}
 
                   <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', margin: '4px 0' }} />
                   <button onClick={() => { handleLogout(); setProfileOpen(false) }}

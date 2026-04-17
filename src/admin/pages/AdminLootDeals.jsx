@@ -4,6 +4,7 @@ import { useData } from '../../context/DataContext'
 import ImageUpload from '../components/ImageUpload'
 import SearchableSelect from '../components/SearchableSelect'
 import { CATEGORY_SECTIONS } from '../../utils/categories'
+import { getDealRemainingSeconds } from '../../utils/dealExpiry'
 import {
   G, inp, lbl, cardStyle, tableWrapStyle, thStyle, trBorderStyle,
   searchInpCls, searchInpStyle, btnPrimary, btnPrimaryCls, btnCancelCls, btnCancelStyle,
@@ -65,15 +66,19 @@ function LootForm({ initial, onSave, onCancel }) {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    const createdAtMs = form.createdAt ? new Date(form.createdAt).getTime() : Date.now()
+    // Always stamp createdAt at save-time for new deals (no existing createdAt)
+    const nowIso = new Date().toISOString()
+    const createdAt = form.createdAt || nowIso
+    const createdAtMs = new Date(createdAt).getTime()
     const expiresAtMs = new Date(form.expiresAt).getTime()
     const expiresInSeconds = Math.max(0, Math.round((expiresAtMs - createdAtMs) / 1000))
     
     const slug = form.slug || form.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
     onSave({
       ...form, slug,
+      createdAt,        // ← always persisted so timer survives page reload
+      expiresInSeconds, // ← calculated from real createdAt → real expiresAt
       discountPercent: Number(form.discountPercent),
-      expiresInSeconds,
       popularity: Number(form.popularity),
       steps: typeof form.steps === 'string' ? form.steps.split('\n').filter(Boolean) : form.steps,
       publishAt: showAdvanced && form.publishAt ? new Date(form.publishAt).toISOString() : '',
@@ -252,13 +257,13 @@ function LootForm({ initial, onSave, onCancel }) {
 }
 
 export default function AdminLootDeals() {
-  const { lootDeals, addLootDeal, updateLootDeal, deleteLootDeal } = useData()
+  const { lootDeals, addLootDeal, updateLootDeal, deleteLootDeal, analytics } = useData()
   const [mode, setMode] = useState(null)
   const [editing, setEditing] = useState(null)
   const [search, setSearch] = useState('')
   const [confirm, setConfirm] = useState(null)
 
-  const filtered = lootDeals.filter(d => d.title.toLowerCase().includes(search.toLowerCase()))
+  const filtered = lootDeals.filter(d => (d.title?.toLowerCase() || '').includes(search.toLowerCase()))
   const handleSave = (data) => {
     if (mode === 'add') addLootDeal(data)
     else updateLootDeal(editing.slug, data)
@@ -288,14 +293,17 @@ export default function AdminLootDeals() {
           <table className="w-full text-sm min-w-[500px]">
             <thead>
               <tr style={thStyle}>
-                {['Deal', 'Category', 'Discount', 'New Price', 'Visits', 'Actions'].map((h, i) => (
-                  <th key={h} className={`px-5 py-3.5 text-[10px] font-black uppercase tracking-widest text-white/30 ${i === 5 ? 'text-right' : 'text-left'} ${i === 1 || i === 2 ? 'hidden sm:table-cell' : ''}`}>{h}</th>
+                {['Deal', 'Category', 'Status', 'Discount', 'New Price', 'Visits', 'Actions'].map((h, i) => (
+                  <th key={h} className={`px-5 py-3.5 text-[10px] font-black uppercase tracking-widest text-white/30 ${i === 6 ? 'text-right' : 'text-left'} ${i === 1 || i === 3 ? 'hidden sm:table-cell' : ''}`}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {filtered.length === 0 && <tr><td colSpan={5} className="px-5 py-12 text-center text-sm text-white/30">No loot deals yet.</td></tr>}
-              {filtered.map((d) => (
+              {filtered.length === 0 && <tr><td colSpan={7} className="px-5 py-12 text-center text-sm text-white/30">No loot deals yet.</td></tr>}
+              {filtered.map((d) => {
+                const remaining = d.expiresInSeconds === undefined ? 1 : getDealRemainingSeconds(d)
+                const isDead = remaining <= 0 || d.status === 'Expired'
+                return (
                 <tr key={d.slug} style={trBorderStyle}
                   onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
                   onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
@@ -303,13 +311,27 @@ export default function AdminLootDeals() {
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
                       {d.image
-                        ? <img src={d.image} alt="" className="h-9 w-9 rounded-lg object-cover shrink-0" style={{ border: '1px solid rgba(255,255,255,0.10)' }} onError={e => e.target.style.display = 'none'} />
+                        ? <img src={d.image} alt="" className={`h-9 w-9 rounded-lg object-cover shrink-0 ${isDead ? 'opacity-50 grayscale' : ''}`} style={{ border: '1px solid rgba(255,255,255,0.10)' }} onError={e => e.target.style.display = 'none'} />
                         : <div className="flex h-9 w-9 items-center justify-center rounded-lg shrink-0 text-sm font-black" style={{ background: 'rgba(251,191,36,0.12)', color: '#FBBF24' }}>⚡</div>
                       }
-                      <p className="font-semibold text-white text-sm">{d.title}</p>
+                      <div>
+                        <p className={`font-semibold text-sm ${isDead ? 'text-white/40 line-through' : 'text-white'}`}>{d.title}</p>
+                        <div className="mt-1">
+                          <span className="text-[9px] font-medium text-[#FBBF24]/90 bg-[#FBBF24]/10 border border-[#FBBF24]/20 px-1.5 py-0.5 rounded">
+                            Added By: {d.addedBy || 'System Admin'}
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </td>
                   <td className="px-5 py-4 text-white/50 hidden sm:table-cell">{d.category}</td>
+                  <td className="px-5 py-4 text-sm">
+                    {isDead ? (
+                      <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-red-500/20 text-red-500">Expired</span>
+                    ) : (
+                      <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-[#00D47E]/20 text-[#00D47E]">Active</span>
+                    )}
+                  </td>
                   <td className="px-5 py-4 hidden sm:table-cell">
                     <span className="rounded-full px-2.5 py-1 text-[10px] font-black text-red-400" style={{ background: 'rgba(239,68,68,0.12)' }}>{d.discountPercent}% OFF</span>
                   </td>
@@ -317,7 +339,7 @@ export default function AdminLootDeals() {
                   <td className="px-5 py-4 text-xs font-semibold text-white/50">
                     <div className="inline-flex items-center gap-1.5 rounded-lg bg-white/5 px-2.5 py-1.5 border border-white/10" title="Total Page Views">
                       <span className="text-[10px]">👁️</span>
-                      <span style={{ color: G }}>{d.usageCount || 0}</span>
+                      <span style={{ color: G }}>{analytics?.dealClicks?.[d.slug] || 0}</span>
                     </div>
                   </td>
                   <td className="px-5 py-4">
@@ -327,7 +349,7 @@ export default function AdminLootDeals() {
                     </div>
                   </td>
                 </tr>
-              ))}
+              )})}
             </tbody>
           </table>
         </div>
