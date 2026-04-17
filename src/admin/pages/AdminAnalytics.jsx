@@ -1,7 +1,8 @@
 import { useMemo } from 'react'
 import AdminLayout from '../layout/AdminLayout'
 import { useData } from '../../context/DataContext'
-import { G, cardStyle, badgePillStyle } from '../components/adminStyles'
+import { G, cardStyle } from '../components/adminStyles'
+import { getDealRemainingSeconds } from '../../utils/dealExpiry'
 
 const ACTION_COLOR = {
   CREATE: { bg: 'rgba(0,212,126,0.12)', color: '#00D47E', label: 'Created' },
@@ -49,8 +50,16 @@ export default function AdminAnalytics() {
   const totalCards = (creditCards.shopping || []).length + (creditCards.lifetime || []).length
   const totalContent = totalDeals + totalLoot + totalStores + totalCoupons + totalGiveaways + totalCards
 
-  // Active vs inactive
-  const activeDeals = deals.filter(d => !d.expiry?.toLowerCase().includes('expired')).length
+  // Active deals: mathematically not expired (same logic as user panel)
+  const nowMs = Date.now()
+  const activeDeals = deals.filter(d => {
+    if (d.expiresInSeconds === undefined) return true // evergreen
+    return getDealRemainingSeconds(d, nowMs) > 0
+  }).length
+  const activeLoot = lootDeals.filter(d => {
+    if (d.expiresInSeconds === undefined) return true
+    return getDealRemainingSeconds(d, nowMs) > 0
+  }).length
   const activeCoupons = coupons.filter(c => c.active).length
 
   // Top deals by clicks
@@ -195,9 +204,9 @@ export default function AdminAnalytics() {
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 mb-6">
         {[
           { label: 'Active Deals', value: activeDeals, total: totalDeals, color: G },
+          { label: 'Active Loot Deals', value: activeLoot, total: totalLoot, color: '#60A5FA' },
           { label: 'Active Coupons', value: activeCoupons, total: totalCoupons, color: '#FBBF24' },
           { label: 'Stores Listed', value: totalStores, total: totalStores, color: '#A78BFA' },
-          { label: 'Giveaways Live', value: giveaways.filter(g => g.active).length, total: totalGiveaways, color: '#F472B6' },
         ].map(s => (
           <div key={s.label} className="rounded-2xl p-4" style={cardStyle}>
             <p className="text-[10px] font-black uppercase tracking-widest text-white/30 mb-2">{s.label}</p>
