@@ -14,7 +14,7 @@ const AdImageBanner = () => {
   const banner = activeBanners[0]
 
   return (
-    <section className="w-full bg-[#F9FAFB] py-6 sm:py-10">
+    <section className="w-full bg-cream py-6 sm:py-10">
       <div className="mx-auto w-full max-w-[1500px] px-4 md:px-8 lg:px-12">
         
         {/* Section Heading */}
@@ -25,7 +25,7 @@ const AdImageBanner = () => {
               Advertisement
             </h2>
           </div>
-          <span className="rounded bg-slate-200 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-slate-500">
+          <span className="rounded bg-line px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-muted">
             Sponsored Ad
           </span>
         </div>

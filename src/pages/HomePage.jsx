@@ -29,7 +29,7 @@ function HomePage() {
   const containerCls = "mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8"
 
   return (
-    <div className="flex flex-col bg-[#F9FAFB]">
+    <div className="flex flex-col bg-cream transition-colors duration-500">
       <SEO 
         title="Home"
         description="Save big with Wouchify! Discover verified deals, loot offers, and coupons from top Indian stores like Amazon, Flipkart, Myntra, and more. Your one-stop destination for ultimate savings."
@@ -63,8 +63,8 @@ function HomePage() {
         </div>
       </section>
 
-      {/* 4. RECENTLY ADDED DEALS (White Background for contrast) */}
-      <section className={`${sectionCls} bg-white border-y border-line/30`}>
+      {/* 4. RECENTLY ADDED DEALS (Using bg-surface for subtle contrast in dark) */}
+      <section className={`${sectionCls} bg-surface border-y border-line/30`}>
         <div className={containerCls}>
           <div className="flex items-center gap-3 mb-8">
             <span className="h-8 w-1.5 rounded-full bg-gold" />
@@ -85,8 +85,8 @@ function HomePage() {
         </div>
       </section>
 
-      {/* 6. LOOT DEALS (White Section for High Urgency) */}
-      <section className={`${sectionCls} bg-white border-y border-line/30`}>
+      {/* 6. LOOT DEALS (Using bg-surface for subtle contrast in dark) */}
+      <section className={`${sectionCls} bg-surface border-y border-line/30`}>
         <div className={containerCls}>
           <div className="flex items-center gap-3 mb-8">
             <span className="h-8 w-1.5 rounded-full bg-gold" />

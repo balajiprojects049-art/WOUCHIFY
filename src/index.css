@@ -151,19 +151,30 @@ html.dark [class*="shadow"] {
   --tw-shadow-color: rgba(0, 0, 0, 0.4);
 }
 
-/* 9. Smooth colour transitions everywhere */
-*,
-*::before,
-*::after {
-  transition-property: background-color, border-color, color, fill, stroke;
-  transition-duration: 0.3s;
-  transition-timing-function: ease;
-}
-
-/* 10. Scrollbar in dark mode */
+/* 9. Scrollbar in dark mode */
 html.dark ::-webkit-scrollbar {
   background: #0F1117;
 }
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: #272B36;
+  border-radius: 8px;
+}
+
+/* 10. Secondary background fallback */
+html.dark .bg-\[\#F9FAFB\],
+html.dark .bg-slate-50,
+html.dark .bg-gray-50 {
+  background-color: var(--color-cream) !important;
+}
+
+/* 11. Subtle borders */
+html.dark .border-line\/10,
+html.dark .border-line\/30 {
+  border-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+/* 12. Smooth colour transitions everywhere */
 
 html.dark ::-webkit-scrollbar-thumb {
   background: #272B36;
@@ -176,32 +187,13 @@ html.dark .bg-cream.text-gold {
   color: var(--color-gold) !important;
 }
 
-/* 8. Shadow softening & borders in dark mode */
-html.dark [class*="shadow"] {
-  --tw-shadow-color: rgba(0, 0, 0, 0.5);
-}
-
-html.dark .border-line {
-  border-color: rgba(255, 255, 255, 0.06) !important;
-}
-
-/* 9. Smooth colour transitions everywhere */
+/* 12. Smooth colour transitions everywhere */
 *,
 *::before,
 *::after {
   transition-property: background-color, border-color, color, fill, stroke, box-shadow;
   transition-duration: 0.3s;
   transition-timing-function: ease;
-}
-
-/* 10. Scrollbar in dark mode */
-html.dark ::-webkit-scrollbar {
-  background: #0F1117;
-}
-
-html.dark ::-webkit-scrollbar-thumb {
-  background: #272B36;
-  border-radius: 8px;
 }
 
 @keyframes slideInUp {
