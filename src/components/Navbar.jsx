@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate, Link } from 'react-router-dom'
 import { useTheme } from '../context/ThemeContext'
+import { useData } from '../context/DataContext'
 
 const navLinks = [
   { label: 'Home', to: '/' },
@@ -39,15 +40,44 @@ function Navbar() {
   const [searchText, setSearchText] = useState('')
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  
   const tabletSearchRef = useRef(null)
   const navigate = useNavigate()
   const { theme, toggleTheme } = useTheme()
+  const { deals, lootDeals, stores, coupons, creditCards } = useData()
+
+  // ── Smart suggest logic ──
+  const suggestions = useMemo(() => {
+    const q = searchText.trim().toLowerCase()
+    if (q.length < 2) return null
+
+    const foundPages = navLinks.filter(l => l.label.toLowerCase().includes(q))
+    const foundDeals = deals.filter(d => d.title.toLowerCase().includes(q)).slice(0, 3)
+    const foundLoot = lootDeals.filter(d => d.title.toLowerCase().includes(q)).slice(0, 2)
+    const foundStores = stores.filter(s => s.name.toLowerCase().includes(q)).slice(0, 3)
+    const foundCoupons = coupons.filter(c => c.store.toLowerCase().includes(q) || c.code.toLowerCase().includes(q)).slice(0, 2)
+    
+    const hasResults = foundPages.length || foundDeals.length || foundLoot.length || foundStores.length || foundCoupons.length
+    return hasResults ? { pages: foundPages, deals: foundDeals, loot: foundLoot, stores: foundStores, coupons: foundCoupons } : null
+  }, [searchText, deals, lootDeals, stores, coupons])
 
   const handleSearchSubmit = (event) => {
-    event.preventDefault()
+    if (event) event.preventDefault()
     const query = searchText.trim()
-    navigate(query ? `/search?q=${encodeURIComponent(query)}` : '/search')
+    if (!query) return
+
+    const qLower = query.toLowerCase()
+    // Smart routing for keywords
+    if (qLower === 'coupons') navigate('/coupons')
+    else if (qLower === 'deals') navigate('/deals')
+    else if (qLower === 'loot' || qLower === 'loot deals') navigate('/loot-deals')
+    else if (qLower === 'stores') navigate('/stores')
+    else if (qLower === 'cards' || qLower === 'credit cards') navigate('/credit-cards')
+    else navigate(`/search?q=${encodeURIComponent(query)}`)
+
     setIsSearchOpen(false)
+    setShowSuggestions(false)
     setSearchText('')
   }
 
@@ -121,15 +151,25 @@ function Navbar() {
           <div className="flex shrink-0 items-center gap-2">
 
             {/* Full search box — XL+ desktops only */}
-            <form onSubmit={handleSearchSubmit} className="hidden xl:flex rounded-full border border-line bg-cream px-4 py-2 transition-colors duration-300">
-              <input
-                type="text"
-                placeholder="Search deals"
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                className="w-44 bg-transparent text-sm text-ink font-bold placeholder:font-normal placeholder:text-muted focus:outline-none"
-              />
-            </form>
+            <div className="hidden xl:block relative">
+              <form onSubmit={handleSearchSubmit} className="flex rounded-full border border-line bg-cream px-4 py-2 transition-colors duration-300 focus-within:border-gold">
+                <input
+                  type="text"
+                  placeholder="Search deals, stores..."
+                  value={searchText}
+                  onFocus={() => setShowSuggestions(true)}
+                  onChange={(e) => { setSearchText(e.target.value); setShowSuggestions(true) }}
+                  className="w-44 bg-transparent text-sm text-ink font-bold placeholder:font-normal placeholder:text-muted focus:outline-none"
+                />
+              </form>
+              
+              {/* Desktop Suggestions Dropdown */}
+              {showSuggestions && suggestions && (
+                <div className="absolute top-full right-0 mt-2 w-80 max-h-[480px] overflow-y-auto rounded-2xl border border-line bg-white/95 p-2 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-2 duration-200 z-[60]">
+                  <SearchMenu suggestions={suggestions} itemClick={(path) => { navigate(path); setShowSuggestions(false); setSearchText('') }} />
+                </div>
+              )}
+            </div>
 
             {/* Search icon — tablet md→xl: opens the slide-down overlay */}
             <button
@@ -183,40 +223,49 @@ function Navbar() {
         </div>
 
         {/* ── Search Overlay (all screen sizes, slides down) ── */}
-        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isSearchOpen ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}`}>
-          <form
-            onSubmit={handleSearchSubmit}
-            className="flex items-center gap-3 px-4 sm:px-6 lg:px-8 py-3 bg-white border-t border-line/40 shadow-sm"
-          >
-            <svg viewBox="0 0 20 20" className="h-5 w-5 shrink-0 fill-current text-gold" aria-hidden="true">
-              <path d="M8.5 2a6.5 6.5 0 1 0 4.04 11.59l3.93 3.92 1.06-1.06-3.92-3.93A6.5 6.5 0 0 0 8.5 2Zm0 1.5a5 5 0 1 1 0 10 5 5 0 0 1 0-10Z" />
-            </svg>
-            <input
-              ref={tabletSearchRef}
-              type="text"
-              placeholder="Search deals, stores, coupons..."
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              className="flex-1 bg-transparent text-sm font-semibold text-ink placeholder:text-muted focus:outline-none"
-              autoComplete="off"
-            />
-            <button
-              type="submit"
-              className="shrink-0 rounded-lg bg-gold px-4 py-1.5 text-xs font-black text-white hover:bg-[#D4A820] transition-colors"
+        <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isSearchOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0 pointer-events-none'}`}>
+          <div className="bg-white border-t border-line/40 shadow-xl">
+            <form
+              onSubmit={handleSearchSubmit}
+              className="flex items-center gap-3 px-4 sm:px-6 lg:px-8 py-3"
             >
-              Search
-            </button>
-            <button
-              type="button"
-              onClick={closeSearch}
-              className="shrink-0 h-7 w-7 flex items-center justify-center rounded-full text-muted hover:text-ink hover:bg-gray-100 transition-colors"
-              aria-label="Close search"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+              <svg viewBox="0 0 20 20" className="h-5 w-5 shrink-0 fill-current text-gold" aria-hidden="true">
+                <path d="M8.5 2a6.5 6.5 0 1 0 4.04 11.59l3.93 3.92 1.06-1.06-3.92-3.93A6.5 6.5 0 0 0 8.5 2Zm0 1.5a5 5 0 1 1 0 10 5 5 0 0 1 0-10Z" />
               </svg>
-            </button>
-          </form>
+              <input
+                ref={tabletSearchRef}
+                type="text"
+                placeholder="Search deals, stores, coupons..."
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                className="flex-1 bg-transparent text-sm font-semibold text-ink placeholder:text-muted focus:outline-none"
+                autoComplete="off"
+              />
+              <button
+                type="submit"
+                className="shrink-0 rounded-lg bg-gold px-4 py-1.5 text-xs font-black text-white hover:bg-[#D4A820] transition-colors"
+              >
+                Search
+              </button>
+              <button
+                type="button"
+                onClick={closeSearch}
+                className="shrink-0 h-7 w-7 flex items-center justify-center rounded-full text-muted hover:text-ink hover:bg-gray-100 transition-colors"
+                aria-label="Close search"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </form>
+
+            {/* Suggestions list for tablet/mobile overlay */}
+            {isSearchOpen && suggestions && (
+              <div className="px-4 pb-6 overflow-y-auto max-h-[400px]">
+                <SearchMenu suggestions={suggestions} itemClick={(path) => { navigate(path); closeSearch() }} />
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Mobile nav dropdown */}
@@ -242,6 +291,68 @@ function Navbar() {
         </div>
       </header>
     </>
+  )
+}
+
+function SearchMenu({ suggestions, itemClick }) {
+  return (
+    <div className="space-y-4">
+      {suggestions.pages?.length > 0 && (
+        <section>
+          <p className="px-2 pb-1 text-[10px] font-black uppercase tracking-widest text-gold">Pages</p>
+          {suggestions.pages.map(p => (
+            <button key={p.to} onClick={() => itemClick(p.to)} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-gold/5">
+              <span className="text-sm font-bold text-ink">{p.label}</span>
+            </button>
+          ))}
+        </section>
+      )}
+
+      {suggestions.stores?.length > 0 && (
+        <section>
+          <p className="px-2 pb-1 text-[10px] font-black uppercase tracking-widest text-gold text-opacity-60">Brand Stores</p>
+          {suggestions.stores.map(s => (
+            <button key={s.slug} onClick={() => itemClick(`/store/${s.slug}`)} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-gold/5">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cream font-bold text-[10px] text-ink">{s.name.slice(0, 2).toUpperCase()}</div>
+              <div>
+                <p className="text-sm font-bold text-ink">{s.name}</p>
+                <p className="text-[10px] text-muted">{s.category}</p>
+              </div>
+            </button>
+          ))}
+        </section>
+      )}
+
+      {suggestions.loot?.length > 0 && (
+        <section>
+          <p className="px-2 pb-1 text-[10px] font-black uppercase tracking-widest text-gold">Loot Deals</p>
+          {suggestions.loot.map(d => (
+            <button key={d.slug} onClick={() => itemClick(`/loot-deal/${d.slug}`)} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-gold/5">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-base">🔥</span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-bold text-ink">{d.title}</p>
+                <p className="text-[10px] text-emerald-600 font-bold">{d.newPrice}</p>
+              </div>
+            </button>
+          ))}
+        </section>
+      )}
+
+      {suggestions.deals?.length > 0 && (
+        <section>
+          <p className="px-2 pb-1 text-[10px] font-black uppercase tracking-widest text-gold">Top Deals</p>
+          {suggestions.deals.map(d => (
+            <button key={d.slug} onClick={() => itemClick(`/deal/${d.slug}`)} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-gold/5">
+              <svg className="h-4 w-4 text-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M11 3a1 1 0 1 0-2 0v1a1 1 0 1 0 2 0V3zM5.884 5.558a1 1 0 1 0-1.458-1.366l-.708.707a1 1 0 0 0 1.458 1.366l.708-.707zM16.282 5.558a1 1 0 1 1-1.458-1.366l.708.707a1 1 0 0 1-1.458 1.366l-.708-.707zM5 10a5 5 0 1 1 10 0 5 5 0 0 1-10 0zm6 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" /></svg>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-bold text-ink">{d.title}</p>
+                <p className="text-[10px] text-muted">{d.store}</p>
+              </div>
+            </button>
+          ))}
+        </section>
+      )}
+    </div>
   )
 }
 
