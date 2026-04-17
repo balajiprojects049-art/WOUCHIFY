@@ -161,8 +161,13 @@ export function DataProvider({ children }) {
     } catch { return lootDealsData }
   })
   const [stores, setStores] = useState(() => {
-    const cached = loadFromStorage('wouchify_stores', storesData)
-    return cached.length < storesData.length ? storesData : cached
+    try {
+      const stored = localStorage.getItem('wouchify_stores')
+      const cached = stored ? JSON.parse(stored) : null
+      // Always trust localStorage — if admin deleted a store, respect that
+      if (cached && Array.isArray(cached)) return cached
+      return storesData // first load only
+    } catch { return storesData }
   })
   const [coupons, setCoupons] = useState(() => loadFromStorage('wouchify_coupons', defaultCoupons))
   const [giveaways, setGiveaways] = useState(() => loadFromStorage('wouchify_giveaways', defaultGiveaways))
@@ -226,10 +231,10 @@ export function DataProvider({ children }) {
 
           if (res.data.deals) setDeals(prev => mergeList(res.data.deals, prev))
           if (res.data.lootDeals) setLootDeals(prev => mergeList(res.data.lootDeals, prev))
-          if (res.data.stores) setStores(res.data.stores)
-          if (res.data.coupons) setCoupons(res.data.coupons)
-          if (res.data.giveaways) setGiveaways(res.data.giveaways)
-          if (res.data.creditCards) setCreditCards(res.data.creditCards)
+          if (res.data.stores) setStores(prev => mergeList(res.data.stores, prev))
+          if (res.data.coupons) setCoupons(prev => mergeList(res.data.coupons, prev))
+          if (res.data.giveaways) setGiveaways(prev => mergeList(res.data.giveaways, prev))
+          if (res.data.creditCards) setCreditCards(prev => mergeList(res.data.creditCards, prev))
           if (res.data.banners) setBanners(normalizeBanners(res.data.banners))
           if (res.data.adminSettings) setAdminSettings(res.data.adminSettings)
           if (res.data.adminMembers) setAdminMembers(normalizeAdminMembers(res.data.adminMembers))
