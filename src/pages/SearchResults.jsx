@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { Component, useEffect, useMemo, useState } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { useData } from '../context/DataContext'
 import DealCard from '../components/DealCard'
@@ -6,6 +6,41 @@ import LootDealCard from '../components/LootDealCard'
 import StoreCard from '../components/StoreCard'
 import CreditCardDetailCard from '../components/CreditCardDetailCard'
 import SEO from '../components/SEO'
+
+// ── Error Boundary — prevents any crash in Search from killing the whole page ──
+class SearchErrorBoundary extends Component {
+  constructor(props) {
+    super(props)
+    this.state = { hasError: false, error: null }
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error }
+  }
+  componentDidCatch(error, info) {
+    console.error('[SearchResults] Render error caught by boundary:', error, info)
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex flex-col items-center justify-center min-h-[60vh] py-20 text-center px-4">
+          <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-3xl bg-cream text-6xl shadow-inner border border-line">⚠️</div>
+          <p className="text-xl font-bold text-ink">Something went wrong with your search.</p>
+          <p className="mt-2 text-muted">Please try a different keyword or go back to the homepage.</p>
+          <div className="flex gap-3 mt-8">
+            <button
+              onClick={() => { this.setState({ hasError: false, error: null }); window.history.back() }}
+              className="rounded-xl border border-line bg-cream px-6 py-3 text-sm font-black text-ink hover:scale-105 transition-all"
+            >
+              ← Go Back
+            </button>
+            <Link to="/" className="rounded-xl bg-ink px-8 py-3 text-sm font-black text-surface hover:scale-105 transition-all">Home</Link>
+          </div>
+        </div>
+      )
+    }
+    return this.props.children
+  }
+}
 
 // Horizontal Coupon Card for search results (simplified version of the one in Coupons.jsx)
 function SearchCouponCard({ item }) {
@@ -36,23 +71,35 @@ export default function SearchResults() {
   const results = useMemo(() => {
     if (!query) return { deals: [], loot: [], stores: [], coupons: [], cards: [], total: 0 }
 
-    const d = deals.filter(x => x.title.toLowerCase().includes(query) || x.store.toLowerCase().includes(query))
-    const l = lootDeals.filter(x => x.title.toLowerCase().includes(query) || x.category.toLowerCase().includes(query))
-    const s = stores.filter(x => x.name.toLowerCase().includes(query) || (x.category && x.category.toLowerCase().includes(query)))
-    const c = coupons.filter(x => x.store.toLowerCase().includes(query) || x.code.toLowerCase().includes(query) || x.discount.toLowerCase().includes(query))
-    
-    const allCards = [...(creditCards.shopping || []), ...(creditCards.lifetime || [])]
-    const cc = allCards.filter(x => x.name.toLowerCase().includes(query) || (x.bank && x.bank.toLowerCase().includes(query)))
+    try {
+      const safeDeals = Array.isArray(deals) ? deals : []
+      const safeLoot = Array.isArray(lootDeals) ? lootDeals : []
+      const safeStores = Array.isArray(stores) ? stores : []
+      const safeCoupons = Array.isArray(coupons) ? coupons : []
+      const safeCards = creditCards && typeof creditCards === 'object' && !Array.isArray(creditCards)
+        ? [...(Array.isArray(creditCards.shopping) ? creditCards.shopping : []), ...(Array.isArray(creditCards.lifetime) ? creditCards.lifetime : [])]
+        : []
 
-    return {
-      deals: d, loot: l, stores: s, coupons: c, cards: cc,
-      total: d.length + l.length + s.length + c.length + cc.length
+      const d = safeDeals.filter(x => x?.title?.toLowerCase().includes(query) || x?.store?.toLowerCase().includes(query))
+      const l = safeLoot.filter(x => x?.title?.toLowerCase().includes(query) || x?.category?.toLowerCase().includes(query))
+      const s = safeStores.filter(x => x?.name?.toLowerCase().includes(query) || x?.category?.toLowerCase().includes(query))
+      const c = safeCoupons.filter(x => x?.store?.toLowerCase().includes(query) || x?.code?.toLowerCase().includes(query) || x?.discount?.toLowerCase().includes(query))
+      const cc = safeCards.filter(x => x?.name?.toLowerCase().includes(query) || x?.bank?.toLowerCase().includes(query))
+
+      return {
+        deals: d, loot: l, stores: s, coupons: c, cards: cc,
+        total: d.length + l.length + s.length + c.length + cc.length
+      }
+    } catch (err) {
+      console.error('[SearchResults] useMemo filter error:', err)
+      return { deals: [], loot: [], stores: [], coupons: [], cards: [], total: 0 }
     }
   }, [query, deals, lootDeals, stores, coupons, creditCards])
 
   const isEmpty = results.total === 0
 
   return (
+    <SearchErrorBoundary>
     <main className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
       <SEO title={`Search results for "${query}"`} />
 
@@ -142,5 +189,6 @@ export default function SearchResults() {
         </div>
       )}
     </main>
+    </SearchErrorBoundary>
   )
 }

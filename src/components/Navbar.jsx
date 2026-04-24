@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { NavLink, useNavigate, Link } from 'react-router-dom'
 import { useTheme } from '../context/ThemeContext'
 import { useData } from '../context/DataContext'
@@ -43,23 +43,45 @@ function Navbar() {
   const [showSuggestions, setShowSuggestions] = useState(false)
   
   const tabletSearchRef = useRef(null)
+  const desktopSearchRef = useRef(null)
   const navigate = useNavigate()
   const { theme, toggleTheme } = useTheme()
   const { deals, lootDeals, stores, coupons, creditCards } = useData()
+
+  // Close desktop suggestions when clicking outside
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (desktopSearchRef.current && !desktopSearchRef.current.contains(e.target)) {
+        setShowSuggestions(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   // ── Smart suggest logic ──
   const suggestions = useMemo(() => {
     const q = searchText.trim().toLowerCase()
     if (q.length < 2) return null
 
-    const foundPages = navLinks.filter(l => l.label.toLowerCase().includes(q))
-    const foundDeals = deals.filter(d => d.title.toLowerCase().includes(q)).slice(0, 3)
-    const foundLoot = lootDeals.filter(d => d.title.toLowerCase().includes(q)).slice(0, 2)
-    const foundStores = stores.filter(s => s.name.toLowerCase().includes(q)).slice(0, 3)
-    const foundCoupons = coupons.filter(c => c.store.toLowerCase().includes(q) || c.code.toLowerCase().includes(q)).slice(0, 2)
-    
-    const hasResults = foundPages.length || foundDeals.length || foundLoot.length || foundStores.length || foundCoupons.length
-    return hasResults ? { pages: foundPages, deals: foundDeals, loot: foundLoot, stores: foundStores, coupons: foundCoupons } : null
+    try {
+      const safeDeals = Array.isArray(deals) ? deals : []
+      const safeLoot = Array.isArray(lootDeals) ? lootDeals : []
+      const safeStores = Array.isArray(stores) ? stores : []
+      const safeCoupons = Array.isArray(coupons) ? coupons : []
+
+      const foundPages = navLinks.filter(l => l.label.toLowerCase().includes(q))
+      const foundDeals = safeDeals.filter(d => d?.title?.toLowerCase().includes(q)).slice(0, 3)
+      const foundLoot = safeLoot.filter(d => d?.title?.toLowerCase().includes(q)).slice(0, 2)
+      const foundStores = safeStores.filter(s => s?.name?.toLowerCase().includes(q)).slice(0, 3)
+      const foundCoupons = safeCoupons.filter(c => c?.store?.toLowerCase().includes(q) || c?.code?.toLowerCase().includes(q)).slice(0, 2)
+
+      const hasResults = foundPages.length || foundDeals.length || foundLoot.length || foundStores.length || foundCoupons.length
+      return hasResults ? { pages: foundPages, deals: foundDeals, loot: foundLoot, stores: foundStores, coupons: foundCoupons } : null
+    } catch (err) {
+      console.error('[Navbar] Suggestions error:', err)
+      return null
+    }
   }, [searchText, deals, lootDeals, stores, coupons])
 
   const handleSearchSubmit = (event) => {
@@ -151,7 +173,7 @@ function Navbar() {
           <div className="flex shrink-0 items-center gap-2">
 
             {/* Full search box — XL+ desktops only */}
-            <div className="hidden xl:block relative">
+            <div className="hidden xl:block relative" ref={desktopSearchRef}>
               <form onSubmit={handleSearchSubmit} className="flex rounded-full border border-line bg-cream px-4 py-2 transition-colors duration-300 focus-within:border-gold">
                 <input
                   type="text"

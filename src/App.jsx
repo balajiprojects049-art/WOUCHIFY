@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { Component, useEffect } from 'react'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { DataProvider } from './context/DataContext'
 import Navbar from './components/Navbar'
@@ -48,6 +48,46 @@ function ScrollToTop() {
   }, [pathname])
 
   return null
+}
+
+// ── Global Error Boundary ── catches any uncaught render error in the whole app ──
+class AppErrorBoundary extends Component {
+  constructor(props) {
+    super(props)
+    this.state = { hasError: false }
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true }
+  }
+  componentDidCatch(error, info) {
+    console.error('[AppErrorBoundary] Uncaught error:', error, info)
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ minHeight: '100vh', background: '#FDFAF4', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem', textAlign: 'center', fontFamily: 'system-ui, sans-serif' }}>
+          <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>⚠️</div>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 900, color: '#12151C', marginBottom: '0.5rem' }}>Something went wrong</h1>
+          <p style={{ color: '#6B7280', marginBottom: '2rem' }}>The page encountered an error. Please go back or return to the homepage.</p>
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <button
+              onClick={() => { this.setState({ hasError: false }); window.history.back() }}
+              style={{ padding: '0.75rem 1.5rem', borderRadius: '0.75rem', border: '1px solid #E5E7EB', background: '#FDFAF4', fontWeight: 800, cursor: 'pointer', fontSize: '0.875rem' }}
+            >
+              ← Go Back
+            </button>
+            <button
+              onClick={() => { this.setState({ hasError: false }); window.location.href = '/' }}
+              style={{ padding: '0.75rem 2rem', borderRadius: '0.75rem', background: '#12151C', color: '#fff', fontWeight: 800, cursor: 'pointer', fontSize: '0.875rem', border: 'none' }}
+            >
+              🏠 Home
+            </button>
+          </div>
+        </div>
+      )
+    }
+    return this.props.children
+  }
 }
 
 import AdZone from './components/AdZone'
@@ -133,9 +173,11 @@ function AppRoutes() {
 
 function App() {
   return (
-    <DataProvider>
-      <AppRoutes />
-    </DataProvider>
+    <AppErrorBoundary>
+      <DataProvider>
+        <AppRoutes />
+      </DataProvider>
+    </AppErrorBoundary>
   )
 }
 
