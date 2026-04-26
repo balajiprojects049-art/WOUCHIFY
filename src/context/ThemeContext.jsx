@@ -9,6 +9,9 @@ export function ThemeProvider({ children }) {
 
   useEffect(() => {
     const root = document.documentElement
+    // Clear the inline background color set by index.html script to let CSS handle it
+    root.style.backgroundColor = ''
+    
     if (theme === 'dark') {
       root.classList.add('dark')
     } else {

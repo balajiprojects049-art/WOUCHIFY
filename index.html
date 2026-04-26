@@ -29,8 +29,26 @@
 
     <!-- Theme Color -->
     <meta name="theme-color" content="#12151C" />
+
+    <script>
+      (function() {
+        try {
+          var theme = localStorage.getItem('wouchify-theme');
+          var supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+          if (!theme && supportDarkMode) theme = 'dark';
+          
+          var root = document.documentElement;
+          if (theme === 'dark') {
+            root.classList.add('dark');
+            root.style.backgroundColor = '#0F1117';
+          } else {
+            root.style.backgroundColor = '#F7F4EE';
+          }
+        } catch (e) {}
+      })();
+    </script>
   </head>
-  <body class="bg-[#0D0F14]">
+  <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
