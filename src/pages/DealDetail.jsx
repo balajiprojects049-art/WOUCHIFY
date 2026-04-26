@@ -16,6 +16,27 @@ function DealDetail() {
   const [nowMs, setNowMs] = useState(Date.now())
   const [saved, setSaved] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [shareCopied, setShareCopied] = useState(false)
+
+  const handleShare = async () => {
+    const shareData = {
+      title: deal.title,
+      text: deal.description,
+      url: window.location.href,
+    }
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData)
+      } else {
+        await navigator.clipboard.writeText(window.location.href)
+        setShareCopied(true)
+        setTimeout(() => setShareCopied(false), 2000)
+      }
+    } catch (err) {
+      console.error('Error sharing:', err)
+    }
+  }
 
   const handleCopy = () => {
     if (!deal.code) return
@@ -121,13 +142,22 @@ function DealDetail() {
                 <span className="uppercase tracking-wider">{deal.store}</span>
                 <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
               </Link>
-              <button 
-                onClick={() => setSaved(p => !p)} 
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold transition-colors ${saved ? 'bg-emerald-500/10 text-emerald-500 ring-1 ring-emerald-500/20' : 'bg-cream text-muted hover:bg-surface ring-1 ring-line'}`}
-              >
-                <svg className="h-3 w-3" fill={saved ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
-                {saved ? 'Saved' : 'Save'}
-              </button>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={handleShare}
+                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold transition-colors ${shareCopied ? 'bg-emerald-500/10 text-emerald-500 ring-1 ring-emerald-500/20' : 'bg-cream text-muted hover:bg-surface ring-1 ring-line'}`}
+                >
+                  <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                  {shareCopied ? 'Copied' : 'Share'}
+                </button>
+                <button 
+                  onClick={() => setSaved(p => !p)} 
+                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold transition-colors ${saved ? 'bg-emerald-500/10 text-emerald-500 ring-1 ring-emerald-500/20' : 'bg-cream text-muted hover:bg-surface ring-1 ring-line'}`}
+                >
+                  <svg className="h-3 w-3" fill={saved ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
+                  {saved ? 'Saved' : 'Save'}
+                </button>
+              </div>
             </div>
 
             <h1 className="text-xl sm:text-2xl font-black text-ink tracking-tight leading-tight mb-2">

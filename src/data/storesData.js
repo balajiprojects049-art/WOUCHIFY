@@ -75,10 +75,6 @@ export const storesData = [
     highlight: 'Beauty Bonanza', description: 'Deals on top cosmetic brands.', website: 'https://www.nykaa.com', offers: []
   },
   {
-    slug: 'olx', name: 'OLX', category: 'Other', logoText: 'OX', cashback: 'No hidden fees',
-    highlight: 'Classified Deals', description: 'Buy & sell cars, properties, phones.', website: 'https://www.olx.in', offers: []
-  },
-  {
     slug: 'pepperfry', name: 'Pepperfry', category: 'Home', logoText: 'PF', cashback: 'Up to 6% rewards',
     highlight: 'Furniture Sale', description: 'Premium furniture at discounted rates.', website: 'https://www.pepperfry.com', offers: []
   },

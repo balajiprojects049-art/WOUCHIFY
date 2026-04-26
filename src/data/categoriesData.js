@@ -201,8 +201,7 @@ export const categoriesData = {
       { name: "Nykaa", coupons: 145, offers: 320, icon: "Sparkles" }
     ],
     O: [
-      { name: "Ola", coupons: 145, offers: 320, icon: "Car" },
-      { name: "OLX", coupons: 45, offers: 110, icon: "Store" }
+      { name: "Ola", coupons: 145, offers: 320, icon: "Car" }
     ],
     P: [
       { name: "Pantaloons", coupons: 120, offers: 280, icon: "Shirt" },
@@ -454,7 +453,7 @@ export const categoriesData = {
     ]
   },
   travel: {
-    FlightsDomestic: {
+    Planes: {
       A: [
         { name: "Air India", coupons: 45, offers: 110, icon: "Plane" },
         { name: "Air India Express", coupons: 120, offers: 280, icon: "Plane" },
@@ -462,41 +461,30 @@ export const categoriesData = {
         { name: "Alliance Air", coupons: 145, offers: 320, icon: "Plane" }
       ],
       C: [{ name: "Cleartrip", coupons: 210, offers: 450, icon: "Plane" }],
-      E: [{ name: "EaseMyTrip", coupons: 145, offers: 320, icon: "Plane" }],
+      E: [
+        { name: "EaseMyTrip", coupons: 145, offers: 320, icon: "Plane" },
+        { name: "Emirates", coupons: 145, offers: 320, icon: "Plane" },
+        { name: "Etihad Airways", coupons: 210, offers: 450, icon: "Plane" },
+        { name: "Expedia", coupons: 145, offers: 320, icon: "Plane" }
+      ],
       G: [{ name: "Goibibo", coupons: 210, offers: 450, icon: "Plane" }],
       I: [
         { name: "IndiGo", coupons: 145, offers: 320, icon: "Plane" },
         { name: "Ixigo", coupons: 210, offers: 450, icon: "Plane" }
       ],
+      K: [{ name: "Kayak", coupons: 145, offers: 320, icon: "Plane" }],
+      L: [{ name: "Lufthansa", coupons: 210, offers: 450, icon: "Plane" }],
       M: [{ name: "MakeMyTrip", coupons: 145, offers: 320, icon: "Plane" }],
       P: [{ name: "Paytm", coupons: 210, offers: 450, icon: "Plane" }],
+      Q: [{ name: "Qatar Airways", coupons: 145, offers: 320, icon: "Plane" }],
       S: [
+        { name: "Singapore Airlines", coupons: 210, offers: 450, icon: "Plane" },
+        { name: "Skyscanner", coupons: 145, offers: 320, icon: "Plane" },
         { name: "SpiceJet", coupons: 145, offers: 320, icon: "Plane" },
         { name: "Star Air", coupons: 210, offers: 450, icon: "Plane" }
       ]
     },
-    FlightsInternational: {
-      A: [
-        { name: "Air India", coupons: 45, offers: 110, icon: "Globe" },
-        { name: "Air India Express", coupons: 120, offers: 280, icon: "Globe" }
-      ],
-      B: [{ name: "British Airways", coupons: 215, offers: 540, icon: "Globe" }],
-      E: [
-        { name: "Emirates", coupons: 145, offers: 320, icon: "Globe" },
-        { name: "Etihad Airways", coupons: 210, offers: 450, icon: "Globe" },
-        { name: "Expedia", coupons: 145, offers: 320, icon: "Globe" }
-      ],
-      I: [{ name: "IndiGo", coupons: 210, offers: 450, icon: "Globe" }],
-      K: [{ name: "Kayak", coupons: 145, offers: 320, icon: "Globe" }],
-      L: [{ name: "Lufthansa", coupons: 210, offers: 450, icon: "Globe" }],
-      Q: [{ name: "Qatar Airways", coupons: 145, offers: 320, icon: "Globe" }],
-      S: [
-        { name: "Singapore Airlines", coupons: 210, offers: 450, icon: "Globe" },
-        { name: "Skyscanner", coupons: 145, offers: 320, icon: "Globe" },
-        { name: "SpiceJet", coupons: 210, offers: 450, icon: "Globe" }
-      ]
-    },
-    Bus: {
+    Buses: {
       A: [
         { name: "APSRTC", coupons: 45, offers: 110, icon: "Bus" },
         { name: "AbhiBus", coupons: 120, offers: 280, icon: "Bus" }
@@ -512,7 +500,7 @@ export const categoriesData = {
         { name: "TSRTC", coupons: 145, offers: 320, icon: "Bus" }
       ]
     },
-    Train: {
+    Trains: {
       C: [
         { name: "Cleartrip", coupons: 45, offers: 110, icon: "Train" },
         { name: "ConfirmTkt", coupons: 120, offers: 280, icon: "Train" }
@@ -527,19 +515,26 @@ export const categoriesData = {
       T: [{ name: "Trainman", coupons: 145, offers: 320, icon: "Train" }],
       Y: [{ name: "Yatra", coupons: 210, offers: 450, icon: "Train" }]
     },
-    Cabs: {
+    Cars: {
       M: [
         { name: "Mega Cabs", coupons: 45, offers: 110, icon: "Car" },
         { name: "Meru", coupons: 120, offers: 280, icon: "Car" }
       ],
       O: [{ name: "Ola", coupons: 215, offers: 540, icon: "Car" }],
-      R: [
-        { name: "Rapido", coupons: 145, offers: 320, icon: "Bike" },
-        { name: "Revv", coupons: 210, offers: 450, icon: "Car" }
-      ],
+      R: [{ name: "Revv", coupons: 210, offers: 450, icon: "Car" }],
       S: [{ name: "Savaari", coupons: 145, offers: 320, icon: "Car" }],
       U: [{ name: "Uber", coupons: 210, offers: 450, icon: "Car" }],
       Z: [{ name: "Zoomcar", coupons: 145, offers: 320, icon: "Car" }]
+    },
+    Bikes: {
+      R: [{ name: "Rapido", coupons: 145, offers: 320, icon: "Bike" }],
+      O: [{ name: "Ola Bikes", coupons: 120, offers: 280, icon: "Bike" }],
+      U: [{ name: "Uber Moto", coupons: 95, offers: 210, icon: "Bike" }]
+    },
+    Auto: {
+      O: [{ name: "Ola Auto", coupons: 145, offers: 320, icon: "Car" }],
+      U: [{ name: "Uber Auto", coupons: 120, offers: 280, icon: "Car" }],
+      R: [{ name: "Rapido Auto", coupons: 95, offers: 210, icon: "Car" }]
     }
   },
   banks: {

@@ -38,7 +38,7 @@ export const STORE_CATEGORIES_BY_LETTER = {
   L: ["Levi's", 'Lifestyle'],
   M: ['MX Player', 'Meesho', 'Myntra'],
   N: ['Naaptol', "Nature's Basket", "Namdhari's Fresh", 'Netflix', 'Nykaa'],
-  O: ['Ola', 'OLX'],
+  O: ['Ola'],
   P: ['Pantaloons', 'Paytm Mall', 'Poorvika Mobiles', 'Purplle', 'Pepperfry'],
   R: ['Rapido', 'Reliance Smart', 'Reliance Digital'],
   S: ['SonyLIV', 'ShopClues', 'Shoppers Stop', 'Sun NXT', "Spencer's Retail", 'Swiggy Instamart', 'Snapdeal', 'Swiggy'],
@@ -119,22 +119,22 @@ export const CITY_CATEGORIES_BY_LETTER = {
 
 // ── TRAVEL BY LETTER (Flattened for selection) ───────────────────────────────
 export const TRAVEL_CATEGORIES_BY_LETTER = {
-  A: ['Air India', 'Air India Express', 'Akasa Air', 'Alliance Air', 'APSRTC', 'AbhiBus'],
-  B: ['British Airways'],
-  C: ['Cleartrip', 'ConfirmTkt'],
+  A: ['Air India', 'Air India Express', 'Akasa Air', 'Alliance Air', 'APSRTC', 'AbhiBus', 'Auto'],
+  B: ['British Airways', 'Buses', 'Bikes'],
+  C: ['Cleartrip', 'ConfirmTkt', 'Cars'],
   E: ['Emirates', 'Etihad Airways', 'Expedia', 'EaseMyTrip'],
   G: ['Goibibo'],
   I: ['IndiGo', 'Ixigo', 'IRCTC'],
   K: ['Kayak'],
   L: ['Lufthansa'],
   M: ['MakeMyTrip', 'Mega Cabs', 'Meru', 'MSRTC'],
-  O: ['Ola', 'Ola Cabs'],
-  P: ['Paytm', 'Paytm Travel'],
+  O: ['Ola', 'Ola Cabs', 'Ola Auto', 'Ola Bikes'],
+  P: ['Paytm', 'Paytm Travel', 'Planes'],
   Q: ['Qatar Airways'],
-  R: ['RailYatri', 'Rapido', 'RedBus', 'Revv'],
+  R: ['RailYatri', 'Rapido', 'RedBus', 'Revv', 'Rapido Auto'],
   S: ['Savaari', 'Singapore Airlines', 'Skyscanner', 'SpiceJet', 'Star Air'],
-  T: ['TNSTC', 'Trainman', 'TSRTC'],
-  U: ['Uber'],
+  T: ['TNSTC', 'Trainman', 'TSRTC', 'Trains'],
+  U: ['Uber', 'Uber Moto', 'Uber Auto'],
   Y: ['Yatra'],
   Z: ['Zoomcar'],
 }
@@ -176,7 +176,7 @@ export const TOP_STORES = [
   'Amazon', 'Flipkart', 'Myntra', 'Ajio', 'Nykaa', 'Meesho',
   'Swiggy', 'Zomato', 'Zepto', 'BigBasket', 'JioMart',
   'Reliance Digital', 'Snapdeal', 'FirstCry', 'Pepperfry',
-  'Tata CLiQ', 'OLX', 'Quikr', 'Udaan', 'Voonik', 'Yepme', 'Zivame',
+  'Tata CLiQ', 'Quikr', 'Udaan', 'Voonik', 'Yepme', 'Zivame',
 ]
 
 // ── PRODUCTS & THEIR BRANDS (Existing) ──────────────────────────────────────

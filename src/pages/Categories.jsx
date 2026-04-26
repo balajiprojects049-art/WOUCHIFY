@@ -35,6 +35,7 @@ const LETTERS = ["ALL", ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")]
 export default function Categories() {
   const { deals, lootDeals, coupons } = useData()
   const [activeTab, setActiveTab] = useState('all')
+  const [activeTravelSub, setActiveTravelSub] = useState('All')
   const [activeLetter, setActiveLetter] = useState('ALL')
   const [search, setSearch] = useState('')
   const [isLoading, setIsLoading] = useState(true)
@@ -86,6 +87,7 @@ export default function Categories() {
     // Special handling for nested travel sub-sections
     if (activeTab === 'travel') {
       Object.entries(data).forEach(([tripType, letterGroups]) => {
+        if (activeTravelSub !== 'All' && tripType !== activeTravelSub) return
         Object.entries(letterGroups).forEach(([letter, list]) => {
           if (activeLetter !== 'ALL' && letter !== activeLetter) return
           const filtered = list.filter(item => item.name.toLowerCase().includes(search.toLowerCase()))
@@ -339,6 +341,25 @@ export default function Categories() {
                   </div>
                 </div>
               </div>
+
+              {/* Travel Sub-categories filter */}
+              {activeTab === 'travel' && (
+                <div className="flex flex-wrap items-center gap-2 mb-6">
+                  {['All', 'Planes', 'Buses', 'Trains', 'Cars', 'Bikes', 'Auto'].map(sub => (
+                    <button
+                      key={sub}
+                      onClick={() => setActiveTravelSub(sub)}
+                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
+                        activeTravelSub === sub
+                          ? 'bg-gold text-white border-gold shadow-md'
+                          : 'bg-surface text-muted border-line hover:border-gold/40'
+                      }`}
+                    >
+                      {sub}
+                    </button>
+                  ))}
+                </div>
+              )}
 
               {/* ── Alphabet filter: wraps on tablet ── */}
               <div className="flex flex-wrap items-center gap-1.5 mb-6 md:mb-8">
