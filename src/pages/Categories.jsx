@@ -154,14 +154,96 @@ export default function Categories() {
     { id: 'cities', label: 'Cities Deals', icon: 'MapPin' },
   ]
 
-  const popularCategories = [
-    { name: 'Flight', icon: 'Plane' },
-    { name: 'Electronics', icon: 'Laptop' },
-    { name: 'Fashion', icon: 'Shirt' },
-    { name: 'Beauty', icon: 'Sparkles' },
-    { name: 'Phones', icon: 'Smartphone' },
-    { name: 'Watches', icon: 'Watch' },
-  ]
+  const getTrendingSectionData = () => {
+    switch(activeTab) {
+      case 'stores':
+        return {
+          title: 'Trending Stores',
+          items: [
+            { name: 'Amazon', icon: 'Store' },
+            { name: 'Flipkart', icon: 'Store' },
+            { name: 'Ajio', icon: 'Store' },
+            { name: 'Myntra', icon: 'Store' },
+            { name: 'Swiggy', icon: 'Store' },
+            { name: 'Zomato', icon: 'Store' }
+          ]
+        };
+      case 'brands':
+        return {
+          title: 'Trending Brands',
+          items: [
+            { name: 'Boat', icon: 'Headphones' },
+            { name: 'Adidas', icon: 'Shirt' },
+            { name: 'Dell', icon: 'Laptop' },
+            { name: 'Nike', icon: 'Shirt' },
+            { name: 'Samsung', icon: 'Smartphone' },
+            { name: 'Apple', icon: 'Laptop' }
+          ]
+        };
+      case 'banks':
+        return {
+          title: 'Trending Banks',
+          items: [
+            { name: 'SBI', icon: 'Building' },
+            { name: 'Axis Bank', icon: 'Building' },
+            { name: 'HDFC Bank', icon: 'Building' },
+            { name: 'ICICI Bank', icon: 'Building' },
+            { name: 'Kotak', icon: 'Building' },
+            { name: 'Citi', icon: 'Building' }
+          ]
+        };
+      case 'festivals':
+        return {
+          title: 'Famous Festivals',
+          items: [
+            { name: 'Dasara (Dussehra)', icon: 'Sparkles' },
+            { name: 'Diwali', icon: 'Sparkles' },
+            { name: 'Holi', icon: 'Sparkles' },
+            { name: 'Christmas', icon: 'Sparkles' },
+            { name: 'Eid al-Adha (Bakrid)', icon: 'Sparkles' },
+            { name: 'Navratri', icon: 'Sparkles' }
+          ]
+        };
+      case 'travel':
+        return {
+          title: 'Trending Traveling Categories',
+          items: [
+            { name: 'Planes', icon: 'Plane' },
+            { name: 'Trains', icon: 'Train' },
+            { name: 'Buses', icon: 'Bus' },
+            { name: 'Cars', icon: 'Car' },
+            { name: 'Bikes', icon: 'Bike' },
+            { name: 'Auto', icon: 'Car' }
+          ]
+        };
+      case 'cities':
+        return {
+          title: 'Famous Cities',
+          items: [
+            { name: 'Hyderabad', icon: 'MapPin' },
+            { name: 'Bangalore', icon: 'MapPin' },
+            { name: 'Delhi/NCR', icon: 'MapPin' },
+            { name: 'Mumbai', icon: 'MapPin' },
+            { name: 'Pune', icon: 'MapPin' },
+            { name: 'Chennai', icon: 'MapPin' }
+          ]
+        };
+      default:
+        return {
+          title: 'Trending Categories',
+          items: [
+            { name: 'Flight', icon: 'Plane' },
+            { name: 'Electronics', icon: 'Laptop' },
+            { name: 'Fashion', icon: 'Shirt' },
+            { name: 'Beauty', icon: 'Sparkles' },
+            { name: 'Phones', icon: 'Smartphone' },
+            { name: 'Watches', icon: 'Watch' },
+          ]
+        };
+    }
+  };
+
+  const { title: trendingTitle, items: trendingItems } = getTrendingSectionData();
 
   const today = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
 
@@ -276,11 +358,11 @@ export default function Categories() {
               <div className="flex items-center justify-between mb-5">
                 <h2 className="text-xl font-bold tracking-tight text-ink flex items-center gap-2">
                   <div className="p-1.5 bg-gold/10 rounded-lg"><TrendingUp className="w-4 h-4 text-gold" /></div>
-                  Trending Categories
+                  {trendingTitle}
                 </h2>
               </div>
               <div className="grid grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4 gap-y-6 sm:gap-y-8">
-                {popularCategories.map((cat, i) => (
+                {trendingItems.map((cat, i) => (
                   <Link
                     key={i}
                     to={`/category-results?category=${encodeURIComponent(cat.name)}`}
