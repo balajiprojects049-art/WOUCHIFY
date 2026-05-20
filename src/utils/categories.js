@@ -121,7 +121,7 @@ export const CITY_CATEGORIES_BY_LETTER = {
 export const TRAVEL_CATEGORIES_BY_LETTER = {
   A: ['Air India', 'Air India Express', 'Akasa Air', 'Alliance Air', 'APSRTC', 'AbhiBus', 'Auto'],
   B: ['British Airways', 'Buses', 'Bikes'],
-  C: ['Cleartrip', 'ConfirmTkt', 'Cars'],
+  C: ['Cleartrip', 'ConfirmTkt', 'Cabs'],
   E: ['Emirates', 'Etihad Airways', 'Expedia', 'EaseMyTrip'],
   G: ['Goibibo'],
   I: ['IndiGo', 'Ixigo', 'IRCTC'],

@@ -93,11 +93,14 @@ class AppErrorBoundary extends Component {
 import AdZone from './components/AdZone'
 
 function PublicLayout({ children }) {
+  const { pathname } = useLocation()
   return (
     <div className="min-h-screen bg-cream">
       <Navbar />
       <AdZone position="global_top" className="mx-auto max-w-7xl px-6 pt-6" />
-      {children}
+      <div key={pathname} className="page-transition">
+        {children}
+      </div>
       <div className="mx-auto max-w-7xl px-6">
         <AdZone position="global_bottom" />
       </div>
@@ -106,7 +109,6 @@ function PublicLayout({ children }) {
       <div className="fixed bottom-24 right-4 z-40 w-[85vw] max-w-[320px] sm:bottom-4 drop-shadow-2xl animate-[slideInUp_0.5s_ease-out_forwards]">
         <AdZone position="floating_bottom_right" />
       </div>
-
 
       <Footer />
     </div>

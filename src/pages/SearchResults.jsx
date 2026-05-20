@@ -128,7 +128,7 @@ export default function SearchResults() {
                 <h2 className="text-lg font-black uppercase tracking-wider text-ink">Deals ({results.deals.length})</h2>
                 <Link to="/deals" className="text-xs font-bold text-gold hover:underline">View All Deals</Link>
               </div>
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {results.deals.map(d => <DealCard key={d.slug} deal={d} nowMs={nowMs} />)}
               </div>
             </section>
@@ -141,7 +141,7 @@ export default function SearchResults() {
                 <h2 className="text-lg font-black uppercase tracking-wider text-ink">Loot Deals ({results.loot.length})</h2>
                 <Link to="/loot-deals" className="text-xs font-bold text-gold hover:underline">View All Loot</Link>
               </div>
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-2 gap-3 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {results.loot.map(d => <LootDealCard key={d.slug} deal={d} nowMs={nowMs} />)}
               </div>
             </section>
@@ -154,7 +154,7 @@ export default function SearchResults() {
                 <h2 className="text-lg font-black uppercase tracking-wider text-ink">Stores ({results.stores.length})</h2>
                 <Link to="/stores" className="text-xs font-bold text-gold hover:underline">All Stores</Link>
               </div>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="grid grid-cols-2 gap-2.5 sm:gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {results.stores.map(s => <StoreCard key={s.slug} store={s} />)}
               </div>
             </section>

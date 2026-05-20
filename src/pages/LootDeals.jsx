@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import FilterBar from '../components/FilterBar'
-import LootDealCard from '../components/LootDealCard'
+import LootProductCard from '../components/LootProductCard'
 import ScrollingPageBanner from '../components/ScrollingPageBanner'
 import { useData } from '../context/DataContext'
 import { getDealRemainingSeconds } from '../utils/dealExpiry'
@@ -84,14 +84,20 @@ function LootDeals() {
         <FilterBar {...filterProps} />
 
         {/* Full-width grid */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {filteredDeals.map((deal) => (
-            <LootDealCard key={deal.id} deal={deal} />
+            <LootProductCard key={deal.id} item={deal} />
           ))}
           {filteredDeals.length === 0 && (
-            <article className="rounded-2xl border border-line bg-surface p-8 text-center text-sm font-medium text-muted sm:col-span-2 md:col-span-3 shadow-inner">
-              No loot deals found for current filters.
-            </article>
+            <div className="col-span-2 md:col-span-3 lg:col-span-4 flex flex-col items-center justify-center py-20 text-center">
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50">
+                <svg className="h-8 w-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <p className="text-base font-bold text-[#121826]">No loot deals found</p>
+              <p className="mt-1 text-sm text-[#667085]">Try adjusting your filters</p>
+            </div>
           )}
         </div>
       </section>

@@ -1,6 +1,6 @@
 export function getDealRemainingSeconds(deal, nowMs = Date.now()) {
   const totalSeconds = Number(deal?.expiresInSeconds)
-  if (!Number.isFinite(totalSeconds) || totalSeconds <= 0) return 0
+  if (!Number.isFinite(totalSeconds) || totalSeconds <= 0) return null
 
   const createdMs = deal?.createdAt ? new Date(deal.createdAt).getTime() : NaN
   const elapsedSeconds = Number.isFinite(createdMs)

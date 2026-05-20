@@ -66,10 +66,6 @@ function LootDealCard({ deal }) {
           {deal.discountPercent}% OFF
         </div>
 
-        {/* Views */}
-        <span className="absolute bottom-3 left-3 flex items-center gap-1.5 rounded-lg bg-black/60 px-2.5 py-1 text-[10px] font-bold text-white backdrop-blur-sm">
-          👁️ {deal.usageCount || 0} views
-        </span>
 
         {/* Urgency tag */}
         {deal.urgency && (

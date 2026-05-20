@@ -8,7 +8,7 @@ import { resolveStoreLogoUrl } from '../utils/storeLogo'
 
 function StoreDetail() {
   const { storeName } = useParams()
-  const { stores, coupons, trackPageView } = useData()
+  const { stores, coupons, deals, lootDeals, trackPageView } = useData()
   const store = (stores || []).find(s => s.slug === (storeName || '').toLowerCase())
 
   useEffect(() => {
@@ -29,7 +29,7 @@ function StoreDetail() {
 
     const threshold = Number.parseInt(minDiscount.replace('%+', ''), 10)
 
-    // Merge store.offers with coupons collection entries that belong to this store
+    // Merge store.offers, coupons, deals, and lootDeals entries that belong to this store
     const storeName_ = (store.name || '').toLowerCase()
     const storeSlug_ = (store.slug || '').toLowerCase()
 
@@ -49,6 +49,7 @@ function StoreDetail() {
 
         return {
           id: c.id || c.slug,
+          slug: c.slug,
           title: c.discount || c.title || c.code,
           description: c.discount || '',
           type: 'coupon',
@@ -66,12 +67,62 @@ function StoreDetail() {
         }
       })
 
+    const dealOffers = (deals || [])
+      .filter(d => {
+        const dStore = (d.store || '').toLowerCase()
+        return dStore === storeName_ || dStore === storeSlug_
+      })
+      .map(d => {
+        const discountMatch = (d.discount || '').match(/(\d+)/)
+        const discountValue = discountMatch ? Number.parseInt(discountMatch[1], 10) : 0
+        return {
+          id: d.id || d.slug,
+          slug: d.slug,
+          title: d.title,
+          description: d.description || '',
+          type: 'deal',
+          discount: d.discount || '',
+          discountValue,
+          expiryDays: 30,
+          expiry: d.expiry || '',
+          popularity: d.views || 95,
+          category: d.category || 'General',
+          active: true,
+          createdAt: d.createdAt || new Date().toISOString(),
+        }
+      })
+
+    const lootOffers = (lootDeals || [])
+      .filter(d => {
+        const dStore = (d.store || '').toLowerCase()
+        return dStore === storeName_ || dStore === storeSlug_
+      })
+      .map(d => {
+        const discountMatch = (d.discount || '').match(/(\d+)/)
+        const discountValue = discountMatch ? Number.parseInt(discountMatch[1], 10) : 0
+        return {
+          id: d.id || d.slug,
+          slug: d.slug,
+          title: d.title,
+          description: d.description || '',
+          type: 'loot',
+          discount: d.discount || '',
+          discountValue,
+          expiryDays: 15,
+          expiry: d.expiry || '',
+          popularity: d.views || 99,
+          category: d.category || 'Loot',
+          active: true,
+          createdAt: d.createdAt || new Date().toISOString(),
+        }
+      })
+
     const storeOffers = (store.offers || [])
-    const allOffers = [...storeOffers, ...couponOffers]
+    const allOffers = [...storeOffers, ...couponOffers, ...dealOffers, ...lootOffers]
 
     const filtered = allOffers.filter((offer) => {
       const isExpired = offer.expiryDays < 0
-      const normalizedType = isExpired ? 'Expired' : offer.type === 'coupon' ? 'Coupons' : 'Deals'
+      const normalizedType = isExpired ? 'Expired' : (offer.type === 'coupon' ? 'Coupons' : 'Deals')
       const matchesType = offerType === 'All' || normalizedType === offerType
       const matchesDiscount = Number.isNaN(threshold) || offer.discountValue >= threshold
       const query = searchText.trim().toLowerCase()

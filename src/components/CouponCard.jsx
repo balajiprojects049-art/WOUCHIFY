@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { resolveStoreLogoUrl } from '../utils/storeLogo'
 import { useData } from '../context/DataContext'
 
@@ -59,10 +60,6 @@ function CouponCard({ store, offer }) {
   return (
     <article className="[perspective:1200px]">
       <div className={`relative h-[420px] transition-transform duration-700 [transform-style:preserve-3d] ${isFlipped ? '[transform:rotateY(180deg)]' : ''}`}>
-        
-        <span className="absolute left-3 top-3 rounded-md bg-gray-50 border border-line px-2 py-1 text-[10px] font-black text-gray-500 shadow-sm flex items-center justify-center gap-1 z-20" title="Total Views">
-          <span className="text-[12px] leading-none mb-[1px]">👁️</span> {offer.usageCount || 0}
-        </span>
 
         <div className="absolute inset-0 rounded-2xl border border-line bg-white p-4 shadow-[0_8px_24px_rgba(0,0,0,0.08)] [backface-visibility:hidden]">
           <div className="h-full rounded-xl border border-line bg-cream/50 p-3 flex flex-col">
@@ -95,12 +92,21 @@ function CouponCard({ store, offer }) {
               </div>
             </div>
 
-            <button
-              onClick={() => { setIsFlipped(true); if (isCoupon) trackCouponCopy(offer.id) }}
-              className="mt-auto inline-flex h-10 w-full items-center justify-center rounded-xl bg-gold px-3 text-sm font-bold text-midnight transition-all duration-300 hover:brightness-95"
-            >
-              {isCoupon ? 'Get This Coupon' : 'Get This Deal'}
-            </button>
+            {isCoupon ? (
+              <button
+                onClick={() => { setIsFlipped(true); trackCouponCopy(offer.id) }}
+                className="mt-auto inline-flex h-10 w-full items-center justify-center rounded-xl bg-gold px-3 text-sm font-bold text-midnight transition-all duration-300 hover:brightness-95"
+              >
+                Get This Coupon
+              </button>
+            ) : (
+              <Link
+                to={offer.type === 'loot' ? `/loot-deal/${offer.slug || offer.id}` : `/deal/${offer.slug || offer.id}`}
+                className="mt-auto inline-flex h-10 w-full items-center justify-center rounded-xl bg-gold px-3 text-sm font-bold text-midnight transition-all duration-300 hover:brightness-95 text-center"
+              >
+                Get This Deal
+              </Link>
+            )}
           </div>
         </div>
 

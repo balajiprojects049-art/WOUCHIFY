@@ -63,10 +63,12 @@ function TrendingDealsSection() {
                 {deal.title}
               </h3>
               <div className="mt-0.5 flex items-center gap-1.5">
-                <span className="text-xs font-extrabold text-ink">{deal.price}</span>
-                <span className="rounded bg-gold/10 px-1 py-0.5 text-[9px] font-bold text-gold">
-                  {deal.discountLabel}
-                </span>
+                <span className="text-xs font-extrabold text-ink">{deal.newPrice || deal.price}</span>
+                {(deal.discountPercent || deal.discountLabel) && (
+                  <span className="rounded bg-gold/10 px-1 py-0.5 text-[9px] font-bold text-gold">
+                    {deal.discountPercent ? `${deal.discountPercent}% OFF` : deal.discountLabel}
+                  </span>
+                )}
               </div>
             </div>
 

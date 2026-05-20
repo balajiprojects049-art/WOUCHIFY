@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react'
 import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom'
 import { useData } from '../context/DataContext'
 import DealGrid from '../components/DealGrid'
+import CreditCardDetailCard from '../components/CreditCardDetailCard'
 import { ChevronRight, Filter, Search, Tag, Sparkles, LayoutGrid, CheckSquare, Square, Store, Compass } from 'lucide-react'
 import { getDealRemainingSeconds } from '../utils/dealExpiry'
 import { resolveStoreLogoUrl } from '../utils/storeLogo'
@@ -15,7 +16,7 @@ const IconRenderer = ({ name, ...props }) => {
 }
 
 export default function CategoryResults() {
-  const { deals, lootDeals, coupons, stores } = useData()
+  const { deals, lootDeals, coupons, stores, creditCards } = useData()
   const [searchParams] = useSearchParams()
   const categoryName = searchParams.get('category')
   const [nowMs, setNowMs] = useState(Date.now())
@@ -34,10 +35,106 @@ export default function CategoryResults() {
     return () => clearInterval(timer)
   }, [categoryName]) // reset scroll when category changes
 
+  // Helper to check if a deal matches this category
+  const matchesCategory = (item, catName) => {
+    if (!item || !catName) return false;
+    const target = catName.toLowerCase();
+    const itemCat = (item.category || '').toLowerCase();
+    const itemStore = (item.store || '').toLowerCase();
+    const itemTitle = (item.title || '').toLowerCase();
+    const itemDesc = (item.description || '').toLowerCase();
+
+    // 1. Direct Category or Store match
+    if (itemCat === target || itemStore === target) return true;
+
+    // 2. Loose checks for Travel Subcategories
+    const travelGroup = categoriesData.travel?.[catName] || 
+                        (target === 'cabs' ? categoriesData.travel?.['Cabs'] : null) ||
+                        categoriesData.travel?.[target.charAt(0).toUpperCase() + target.slice(1)];
+    if (travelGroup) {
+      const brands = Object.values(travelGroup).flat().map(b => b.name.toLowerCase());
+      if (brands.includes(itemStore) || brands.includes(itemCat)) return true;
+    }
+
+    // 3. Fallbacks for plural/singular traveling terms
+    if (target === 'flights' || target === 'planes') {
+      if (itemCat.includes('flight') || itemCat.includes('plane') || itemStore.includes('flight')) return true;
+    }
+    if (target === 'trains') {
+      if (itemCat.includes('train') || itemStore.includes('train') || itemStore === 'irctc') return true;
+    }
+    if (target === 'buses') {
+      if (itemCat.includes('bus') || itemStore.includes('bus') || itemStore === 'redbus') return true;
+    }
+    if (target === 'cabs' || target === 'cars') {
+      if (itemCat.includes('cab') || itemCat.includes('car') || itemStore.includes('ola') || itemStore.includes('uber') || itemStore.includes('meru')) return true;
+    }
+    if (target === 'bikes') {
+      if (itemCat.includes('bike') || itemStore.includes('rapido')) return true;
+    }
+
+    // 4. Loose checks for Stores (e.g. "Amazon India" contains "Amazon")
+    const storesGroup = categoriesData.stores;
+    let isKnownStore = false;
+    if (storesGroup) {
+      isKnownStore = Object.values(storesGroup).flat().some(s => s.name.toLowerCase() === target);
+    }
+    if (isKnownStore) {
+      if (itemStore.includes(target) || target.includes(itemStore)) return true;
+    }
+
+    // 5. Loose checks for Brands (e.g. Nike deal has "Nike" in the title)
+    const brandsGroup = categoriesData.brands;
+    let isKnownBrand = false;
+    if (brandsGroup) {
+      isKnownBrand = Object.values(brandsGroup).flat().some(b => b.name.toLowerCase() === target);
+    }
+    if (isKnownBrand) {
+      if (itemTitle.includes(target) || itemDesc.includes(target) || itemCat.includes(target)) return true;
+    }
+
+    // 6. Loose checks for Banks (e.g. SBI card deals)
+    const banksGroup = categoriesData.banks;
+    let isKnownBank = false;
+    if (banksGroup) {
+      isKnownBank = Object.values(banksGroup).flat().some(b => b.name.toLowerCase() === target);
+    }
+    if (isKnownBank) {
+      // For banks, match any deal/coupon that mentions the bank in title/desc/category
+      if (itemTitle.includes(target) || itemDesc.includes(target) || itemCat.includes(target) || itemStore.includes(target)) return true;
+      if (target.includes('sbi') && (itemTitle.includes('sbi') || itemDesc.includes('sbi'))) return true;
+      if (target.includes('hdfc') && (itemTitle.includes('hdfc') || itemDesc.includes('hdfc'))) return true;
+      if (target.includes('icici') && (itemTitle.includes('icici') || itemDesc.includes('icici'))) return true;
+      if (target.includes('axis') && (itemTitle.includes('axis') || itemDesc.includes('axis'))) return true;
+    }
+
+    return false;
+  };
+
   // Fetch all items assigned to this category
-  const categoryDeals = useMemo(() => deals.filter(d => d.category === categoryName && getDealRemainingSeconds(d, nowMs) > 0), [deals, categoryName, nowMs])
-  const categoryLoot = useMemo(() => lootDeals.filter(d => d.category === categoryName && getDealRemainingSeconds(d, nowMs) > 0), [lootDeals, categoryName, nowMs])
-  const categoryCoupons = useMemo(() => coupons.filter(c => c.category === categoryName), [coupons, categoryName])
+  const categoryDeals = useMemo(() => deals.filter(d => matchesCategory(d, categoryName) && getDealRemainingSeconds(d, nowMs) > 0), [deals, categoryName, nowMs])
+  const categoryLoot = useMemo(() => lootDeals.filter(d => matchesCategory(d, categoryName) && getDealRemainingSeconds(d, nowMs) > 0), [lootDeals, categoryName, nowMs])
+  const categoryCoupons = useMemo(() => coupons.filter(c => matchesCategory(c, categoryName)), [coupons, categoryName])
+
+  // Get matching bank cards for bank categories
+  const bankCards = useMemo(() => {
+    if (!categoryName || !creditCards) return []
+    const bankKeywords = ['bank', 'sbi', 'hdfc', 'icici', 'axis', 'kotak', 'indusind', 'citi', 'card', 'american express', 'standard chartered']
+    const isBank = bankKeywords.some(kw => categoryName.toLowerCase().includes(kw))
+    if (!isBank) return []
+
+    const allCards = [
+      ...(creditCards.shopping || []),
+      ...(creditCards.lifetime || [])
+    ]
+    const targetBank = categoryName.toLowerCase()
+    return allCards.filter(card => {
+      const cardBank = (card.bank || '').toLowerCase()
+      const cardName = (card.card || '').toLowerCase()
+      if (targetBank.includes('sbi') && cardBank.includes('sbi')) return true
+      return cardBank.includes(targetBank) || targetBank.includes(cardBank) || cardName.includes(targetBank)
+    })
+  }, [creditCards, categoryName])
 
   // Get ALL stores from the platform
   const availableStores = useMemo(() => {
@@ -83,7 +180,7 @@ export default function CategoryResults() {
     return categoryCoupons.filter(c => selectedStores.includes(c.store))
   }, [categoryCoupons, selectedStores])
 
-  const totalCount = filteredDeals.length + filteredLoot.length + filteredCoupons.length
+  const totalCount = filteredDeals.length + filteredLoot.length + filteredCoupons.length + bankCards.length
 
   return (
     <div className="min-h-screen bg-cream font-sans transition-colors duration-500">
@@ -234,7 +331,23 @@ export default function CategoryResults() {
 
          {/* ── RIGHT CONTENT (Results) ── */}
          <div className="flex-grow min-w-0">
-           {(tab === 'all' || tab === 'deals') && filteredDeals.length > 0 && (
+            {tab === 'all' && bankCards.length > 0 && (
+              <section className="mb-12">
+                 <div className="flex items-center gap-3 mb-6">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                       <LucideIcons.CreditCard className="w-4 h-4" />
+                    </div>
+                    <h2 className="text-xl font-extrabold tracking-tight text-emerald-500">Credit Cards & Bank Details</h2>
+                 </div>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {bankCards.map(card => (
+                      <CreditCardDetailCard key={card.id} item={card} dark={card.type === 'lifetime'} />
+                    ))}
+                 </div>
+              </section>
+            )}
+
+            {(tab === 'all' || tab === 'deals') && filteredDeals.length > 0 && (
              <section className="mb-12">
                 <div className="flex items-center gap-3 mb-2">
                    <div className="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center text-gold">

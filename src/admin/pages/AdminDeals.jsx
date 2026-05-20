@@ -60,10 +60,14 @@ function DealForm({ initial, onSave, onCancel, role }) {
   
   const [form, setForm] = useState(() => {
     const startMs = initial.createdAt ? new Date(initial.createdAt).getTime() : Date.now()
-    const expiresMs = startMs + (initial.expiresInSeconds || 86400) * 1000
+    const expiresMs = startMs + (initial.expiresInSeconds || 21600) * 1000
     const d = new Date(expiresMs)
     d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
-    return { ...initial, expiresAt: d.toISOString().slice(0, 16), status: isEditor ? 'Draft' : initial.status || 'Active' }
+    const initImages = Array.isArray(initial.images) && initial.images.length > 0 
+      ? initial.images 
+      : (initial.image ? [initial.image] : [])
+    
+    return { ...EMPTY_DEAL, ...initial, expiresAt: d.toISOString().slice(0, 16), images: initImages, status: isEditor ? 'Draft' : initial.status || 'Active' }
   })
   const [showAdvanced, setShowAdvanced] = useState(!!initial.publishAt)
   
@@ -88,7 +92,12 @@ function DealForm({ initial, onSave, onCancel, role }) {
       priceValue: Number(form.priceValue),
       expiresInSeconds,
       successRate: Number(form.successRate),
+      isFreeShipping: !!form.isFreeShipping,
+      rating: form.rating ? Number(form.rating) : null,
+      reviews: form.reviews ? Number(form.reviews) : null,
       expiry: expiryText,
+      images: Array.isArray(form.images) ? form.images.filter(Boolean) : [],
+      image: (Array.isArray(form.images) && form.images.filter(Boolean).length > 0) ? form.images.filter(Boolean)[0] : form.image,
       steps: typeof form.steps === 'string' ? form.steps.split('\n').filter(Boolean) : form.steps,
       highlights: typeof form.highlights === 'string' ? form.highlights.split('\n').filter(Boolean) : form.highlights,
       createdAt: form.createdAt || new Date().toISOString(),
@@ -177,6 +186,8 @@ function DealForm({ initial, onSave, onCancel, role }) {
                 { lbl: 'Discount Label', key: 'discountLabel', ph: 'Save 18%', req: true },
                 { lbl: 'Discount %', key: 'discountValue', ph: '18', type: 'number', max: 100 },
                 { lbl: 'Success Rate %', key: 'successRate', ph: '90', type: 'number', max: 100 },
+                { lbl: 'Star Rating', key: 'rating', ph: '4.8', type: 'number', step: '0.1', max: 5 },
+                { lbl: 'Reviews Count', key: 'reviews', ph: '243', type: 'number' },
               ].map(f => (
                 <div key={f.key}>
                   <label className={lbl}>{f.lbl}{f.req && <span style={{ color: G }}> *</span>}</label>
@@ -219,13 +230,32 @@ function DealForm({ initial, onSave, onCancel, role }) {
         {/* RIGHT */}
         <div className="space-y-5 sticky top-4 self-start">
           <div className="rounded-2xl p-5" style={cardStyle}>
-            <SectionHeader title="Deal Image" />
-            <ImageUpload label="" value={form.image} onChange={v => set('image', v)} height="h-48" />
+            <SectionHeader title="Deal Images (Max 5)" />
+            <div className="grid grid-cols-2 gap-3">
+              {[0, 1, 2, 3, 4].map(idx => (
+                <div key={idx} className={idx === 0 ? "col-span-2" : "col-span-1"}>
+                  <ImageUpload 
+                    label={idx === 0 ? "Main Image *" : `Image ${idx + 1}`}
+                    value={(form.images && form.images[idx]) || ''} 
+                    onChange={v => {
+                      const newImages = [...(form.images || [])];
+                      newImages[idx] = v;
+                      set('images', newImages);
+                    }} 
+                    height={idx === 0 ? "h-48" : "h-24"} 
+                  />
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="rounded-2xl p-5" style={cardStyle}>
             <SectionHeader title="Visibility & Automation" />
             <div className="space-y-4">
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input type="checkbox" checked={form.isFreeShipping} onChange={e => set('isFreeShipping', e.target.checked)} className="h-4 w-4 rounded accent-[#00D47E]" />
+                <span className="text-sm font-semibold text-white">🚚 Free Shipping</span>
+              </label>
               <label className="flex items-center gap-3 cursor-pointer">
                 <input type="checkbox" checked={form.featured} onChange={e => set('featured', e.target.checked)} className="h-4 w-4 rounded accent-[#00D47E]" />
                 <span className="text-sm font-semibold text-white">⭐ Featured Deal (Top page)</span>

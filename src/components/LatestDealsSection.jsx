@@ -1,74 +1,138 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useData } from '../context/DataContext'
 
-function LatestDealsSection() {
+const FALLBACK = 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=600&q=80'
+
+function DealCard({ deal }) {
+  const navigate = useNavigate()
+  const [imgErr, setImgErr] = useState(false)
+
+  const discountText = deal.discountPercent
+    ? `${deal.discountPercent}% OFF`
+    : (deal.discount || deal.discountLabel || null)
+
+  const price    = deal.newPrice || deal.price || null
+  const oldPrice = deal.oldPrice || null
+
+  return (
+    <article
+      onClick={() => navigate(`/deal/${deal.slug}`)}
+      className="group flex cursor-pointer flex-col overflow-hidden rounded-2xl border border-[#EEEBE5] bg-white shadow-[0_2px_12px_rgba(0,0,0,0.06)] transition-all duration-300 hover:-translate-y-1.5 hover:border-[#C89B1E]/40 hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)]"
+    >
+      {/* ── Fixed-height Image Block ── */}
+      <div className="relative h-[160px] shrink-0 overflow-hidden bg-gray-100">
+        <img
+          src={imgErr ? FALLBACK : (deal.image || FALLBACK)}
+          alt={deal.title}
+          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+          onError={() => setImgErr(true)}
+        />
+
+        {/* Gradient overlay */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+
+        {/* Discount badge — top right */}
+        {discountText && (
+          <div className="absolute right-2.5 top-2.5 rounded-lg bg-red-500 px-2 py-0.5 shadow-md">
+            <span className="text-[10px] font-black text-white">{discountText}</span>
+          </div>
+        )}
+
+        {/* Extra badge — top left */}
+        {deal.badge && (
+          <div className="absolute left-2.5 top-2.5 rounded-lg bg-[#C89B1E] px-2 py-0.5 shadow">
+            <span className="text-[9px] font-black text-[#141417]">{deal.badge}</span>
+          </div>
+        )}
+
+        {/* Store pill — bottom left, ON the image */}
+        <div className="absolute bottom-2.5 left-2.5">
+          <span className="rounded-full bg-black/60 px-2.5 py-1 text-[9px] font-black uppercase tracking-widest text-[#C89B1E] backdrop-blur-sm">
+            {deal.store}
+          </span>
+        </div>
+      </div>
+
+      {/* ── Content Block (equal height via flex-1) ── */}
+      <div className="flex flex-1 flex-col p-3.5">
+        {/* Title */}
+        <h3 className="mb-auto line-clamp-2 text-[12.5px] font-bold leading-snug text-[#121826] transition-colors group-hover:text-[#C89B1E]">
+          {deal.title}
+        </h3>
+
+        {/* Divider */}
+        <div className="my-3 h-px bg-[#E6E2DA]" />
+
+        {/* Price + Button */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex flex-col">
+            {price && (
+              <span className="text-base font-extrabold leading-none text-[#121826]">
+                {price}
+              </span>
+            )}
+            {oldPrice && (
+              <span className="mt-0.5 text-[10px] text-[#667085] line-through">
+                {oldPrice}
+              </span>
+            )}
+          </div>
+
+          <button className="shrink-0 rounded-xl bg-[#C89B1E] px-3.5 py-2 text-[10px] font-black uppercase tracking-wider text-[#141417] shadow-sm transition-all duration-300 group-hover:shadow-[0_4px_18px_rgba(200,155,30,0.5)] group-hover:scale-105 active:scale-95">
+            View →
+          </button>
+        </div>
+      </div>
+    </article>
+  )
+}
+
+export default function LatestDealsSection() {
   const navigate = useNavigate()
   const { deals } = useData()
 
-  const latest = [...deals]
-    .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
-    .slice(0, 4)
+  const latest = [...(deals || [])]
+    .sort((a, b) => {
+      const aDate = new Date(a.createdAt || a.publishAt || 0)
+      const bDate = new Date(b.createdAt || b.publishAt || 0)
+      return bDate - aDate
+    })
+    .slice(0, 5)
 
-  if (latest.length === 0) return null
+  if (!latest.length) return null
 
   return (
     <section>
-      {/* Header */}
-      <div className="mb-4 flex items-center justify-between">
-        <div>
-          <p className="mb-0.5 text-[10px] font-bold uppercase tracking-[0.2em] text-gold">Just Added</p>
-          <h2 className="text-lg font-extrabold tracking-tight text-ink sm:text-xl">Latest Deals</h2>
+      {/* ── Section Header ── */}
+      <div className="mb-6 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#C89B1E]/10">
+            <svg className="h-4 w-4 text-[#C89B1E]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#C89B1E]">Just Added</p>
+            <h2 className="text-xl font-extrabold tracking-tight text-[#121826]">Latest Deals</h2>
+          </div>
         </div>
+
         <button
           onClick={() => navigate('/deals')}
-          className="rounded-lg border border-line bg-surface px-3 py-1.5 text-[11px] font-bold text-ink transition-all duration-200 hover:border-gold hover:bg-gold hover:text-midnight"
+          className="group flex items-center gap-1.5 rounded-full border border-[#E6E2DA] bg-white px-4 py-2 text-[11px] font-bold text-[#667085] shadow-sm transition-all hover:border-[#C89B1E] hover:bg-[#C89B1E] hover:text-[#141417]"
         >
-          View All →
+          View All
+          <span className="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
         </button>
       </div>
 
-      {/* Grid */}
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {latest.map((deal) => (
-          <article
-            key={deal.slug}
-            onClick={() => navigate(`/deal/${deal.slug}`)}
-            className="group cursor-pointer rounded-xl border border-line bg-surface p-3 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-gold/40 hover:shadow-[0_4px_20px_rgba(212,168,32,0.10)]"
-          >
-            {/* Image */}
-            <div className="relative mb-2.5 overflow-hidden rounded-lg">
-              <img
-                src={deal.image}
-                alt={deal.title}
-                className="h-24 sm:h-28 w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                onError={e => e.target.style.display = 'none'}
-              />
-              {deal.badge && (
-                <span className="absolute left-1.5 top-1.5 rounded bg-gold px-1.5 py-0.5 text-[9px] font-black text-midnight">
-                  {deal.badge}
-                </span>
-              )}
-              <span className="absolute right-1.5 top-1.5 rounded bg-ink/80 px-1.5 py-0.5 text-[9px] font-bold text-gold backdrop-blur-sm">
-                {deal.discountLabel}
-              </span>
-            </div>
-
-            <p className="mb-0.5 text-[9px] font-bold uppercase tracking-wider text-gold">{deal.store}</p>
-            <h3 className="mb-2 line-clamp-2 text-xs font-bold leading-snug text-ink transition-colors group-hover:text-gold">
-              {deal.title}
-            </h3>
-
-            <div className="mt-2 flex flex-col gap-1.5">
-              <p className="text-sm font-extrabold text-ink leading-none">{deal.price}</p>
-              <span className="w-full rounded-lg bg-gold px-2 py-1.5 text-[10px] font-black uppercase tracking-wider text-midnight text-center shadow-sm transition-all group-hover:shadow-[0_4px_10px_rgba(255,179,0,0.35)]">
-                View Deal →
-              </span>
-            </div>
-          </article>
+      {/* ── 5-Card Uniform Grid ── */}
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+        {latest.map(deal => (
+          <DealCard key={deal.slug || deal.id} deal={deal} />
         ))}
       </div>
     </section>
   )
 }
-
-export default LatestDealsSection

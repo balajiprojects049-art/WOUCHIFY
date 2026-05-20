@@ -515,7 +515,7 @@ export const categoriesData = {
       T: [{ name: "Trainman", coupons: 145, offers: 320, icon: "Train" }],
       Y: [{ name: "Yatra", coupons: 210, offers: 450, icon: "Train" }]
     },
-    Cars: {
+    Cabs: {
       M: [
         { name: "Mega Cabs", coupons: 45, offers: 110, icon: "Car" },
         { name: "Meru", coupons: 120, offers: 280, icon: "Car" }

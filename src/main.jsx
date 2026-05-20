@@ -6,6 +6,9 @@ import App from './App'
 import { ThemeProvider } from './context/ThemeContext'
 import './index.css'
 
+// Temporary cache clear to force new deals data to load
+localStorage.removeItem('wouchify_deals');
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <HelmetProvider>

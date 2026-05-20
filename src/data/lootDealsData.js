@@ -15,6 +15,7 @@ export const lootDealsData = [
     urgency: "Expiring Soon",
     expiresInSeconds: 3600,
     popularity: 99,
+    createdAt: new Date(Date.now() - 50000).toISOString(),
     publishAt: new Date(Date.now() - 50000).toISOString()
   },
   {
@@ -33,6 +34,7 @@ export const lootDealsData = [
     urgency: "Hot Loot",
     expiresInSeconds: 7200,
     popularity: 95,
+    createdAt: new Date(Date.now() - 100000).toISOString(),
     publishAt: new Date(Date.now() - 100000).toISOString()
   },
   {
@@ -51,6 +53,7 @@ export const lootDealsData = [
     urgency: "Flash Sale",
     expiresInSeconds: 10800,
     popularity: 92,
+    createdAt: new Date(Date.now() - 150000).toISOString(),
     publishAt: new Date(Date.now() - 150000).toISOString()
   },
   {
@@ -69,6 +72,7 @@ export const lootDealsData = [
     urgency: "Almost Gone",
     expiresInSeconds: 1800,
     popularity: 98,
+    createdAt: new Date(Date.now() - 200000).toISOString(),
     publishAt: new Date(Date.now() - 200000).toISOString()
   }
 ]

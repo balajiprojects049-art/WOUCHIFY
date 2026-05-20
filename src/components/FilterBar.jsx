@@ -687,17 +687,40 @@ function MobileTopBar({ searchText, onSearchChange, searchPlaceholder, category,
   return (
     <div className="flex flex-col gap-3 lg:hidden">
       <SearchBar value={searchText} onChange={onSearchChange} placeholder={searchPlaceholder} />
-      <div className="flex gap-2 overflow-x-auto pb-0.5 scrollbar-none -mx-1 px-1">
-        {quickCats.map(cat => (
-          <button
-            key={cat} onClick={() => onCategoryChange(cat)}
-            className={`shrink-0 rounded-full border px-3.5 py-1.5 text-[12px] font-semibold whitespace-nowrap transition-all ${
-              (category === cat || (cat === 'All' && category === 'All'))
-                ? 'bg-ink text-surface border-ink'
-                : 'bg-surface text-muted border-line hover:border-gold/30 hover:text-gold'
-            }`}
-          >{cat}</button>
-        ))}
+      
+      {/* Filter option between search bar and categories */}
+      <div className="flex items-center gap-2">
+        <button
+          onClick={openDrawer}
+          className="flex items-center gap-1 shrink-0 rounded-full border border-gold/30 bg-gold/10 px-3.5 py-1.5 text-[12px] font-black text-gold transition-all active:scale-95"
+        >
+          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h18M7 8h10M10 12h4" />
+          </svg>
+          Filter
+          {activeFilterCount > 0 && (
+            <span className="ml-1 flex h-4.5 w-4.5 items-center justify-center rounded-full text-[9px] font-black text-white bg-gold px-1">
+              {activeFilterCount}
+            </span>
+          )}
+        </button>
+        
+        {/* Divider */}
+        <div className="h-6 w-px bg-gray-200 shrink-0" />
+        
+        {/* Categories scroll strip */}
+        <div className="flex-1 flex gap-2 overflow-x-auto pb-0.5 scrollbar-none px-1">
+          {quickCats.map(cat => (
+            <button
+              key={cat} onClick={() => onCategoryChange(cat)}
+              className={`shrink-0 rounded-full border px-3.5 py-1.5 text-[12px] font-semibold whitespace-nowrap transition-all ${
+                (category === cat || (cat === 'All' && category === 'All'))
+                  ? 'bg-ink text-surface border-ink'
+                  : 'bg-surface text-muted border-line hover:border-gold/30 hover:text-gold'
+              }`}
+            >{cat}</button>
+          ))}
+        </div>
       </div>
     </div>
   )

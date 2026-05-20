@@ -14,9 +14,7 @@ function StoreCard({ store, featured = false }) {
         featured ? 'sm:p-6' : ''
       }`}
     >
-      <span className="absolute left-3 top-3 rounded-md bg-gray-50 border border-line px-2 py-1 text-[10px] font-black text-gray-500 shadow-sm flex items-center justify-center gap-1 z-10" title="Total Store Views">
-          <span className="text-[12px] leading-none mb-[1px]">👁️</span> {store.usageCount || 0}
-      </span>
+
       
       <div className="mx-auto flex h-20 w-44 items-center justify-center overflow-hidden rounded-lg border border-line bg-cream/60">
         {!logoBroken && logoUrl ? (

@@ -211,7 +211,7 @@ export default function Categories() {
             { name: 'Planes', icon: 'Plane' },
             { name: 'Trains', icon: 'Train' },
             { name: 'Buses', icon: 'Bus' },
-            { name: 'Cars', icon: 'Car' },
+            { name: 'Cabs', icon: 'Car' },
             { name: 'Bikes', icon: 'Bike' },
             { name: 'Auto', icon: 'Car' }
           ]
@@ -427,7 +427,7 @@ export default function Categories() {
               {/* Travel Sub-categories filter */}
               {activeTab === 'travel' && (
                 <div className="flex flex-wrap items-center gap-2 mb-6">
-                  {['All', 'Planes', 'Buses', 'Trains', 'Cars', 'Bikes', 'Auto'].map(sub => (
+                  {['All', 'Planes', 'Buses', 'Trains', 'Cabs', 'Bikes', 'Auto'].map(sub => (
                     <button
                       key={sub}
                       onClick={() => setActiveTravelSub(sub)}
