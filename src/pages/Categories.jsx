@@ -57,7 +57,14 @@ export default function Categories() {
     const timer = setTimeout(() => setIsLoading(false), 400)
     window.scrollTo({ top: 0, behavior: 'smooth' })
     return () => clearTimeout(timer)
-  }, [activeTab, activeLetter])
+  }, [activeTab, activeLetter, activeTravelSub])
+
+  // Reset activeTravelSub when activeTab changes
+  useEffect(() => {
+    if (activeTab !== 'travel') {
+      setActiveTravelSub('All')
+    }
+  }, [activeTab])
 
   // Process data based on filters
   const processedData = useMemo(() => {
@@ -106,7 +113,7 @@ export default function Categories() {
     }
 
     return result
-  }, [activeTab, activeLetter, search, deals, lootDeals, coupons])
+  }, [activeTab, activeLetter, activeTravelSub, search, deals, lootDeals, coupons])
 
   // Quick stats
   const totalCategories = useMemo(() => {
@@ -211,7 +218,7 @@ export default function Categories() {
             { name: 'Planes', icon: 'Plane' },
             { name: 'Trains', icon: 'Train' },
             { name: 'Buses', icon: 'Bus' },
-            { name: 'Cars', icon: 'Car' },
+            { name: 'Cabs', icon: 'Car' },
             { name: 'Bikes', icon: 'Bike' },
             { name: 'Auto', icon: 'Car' }
           ]
@@ -427,7 +434,7 @@ export default function Categories() {
               {/* Travel Sub-categories filter */}
               {activeTab === 'travel' && (
                 <div className="flex flex-wrap items-center gap-2 mb-6">
-                  {['All', 'Planes', 'Buses', 'Trains', 'Cars', 'Bikes', 'Auto'].map(sub => (
+                  {['All', 'Planes', 'Buses', 'Trains', 'Cabs', 'Bikes', 'Auto'].map(sub => (
                     <button
                       key={sub}
                       onClick={() => setActiveTravelSub(sub)}

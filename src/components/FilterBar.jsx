@@ -681,12 +681,91 @@ function MobileFilterDrawer({
 /* ─────────────────────────────────────────────────────────────────────────────
    MOBILE: Top bar (search + category pills)
    ─────────────────────────────────────────────────────────────────────────── */
-function MobileTopBar({ searchText, onSearchChange, searchPlaceholder, category, onCategoryChange, openDrawer, activeFilterCount }) {
+function MobileTopBar({
+  searchText, onSearchChange, searchPlaceholder,
+  category, onCategoryChange,
+  openDrawer, activeFilterCount,
+  sortBy, onSortByChange, sortOptions = defaultSortOptions,
+  minDiscount, onMinDiscountChange, discountOptions = defaultDiscountOptions,
+  storeValue, onStoreChange, showStoreFilter,
+}) {
   // Show top few from each section for quick access
   const quickCats = ['All', ...Object.values(PRODUCT_CATEGORIES_BY_LETTER).flat().slice(0, 12)]
   return (
-    <div className="flex flex-col gap-3 lg:hidden">
+    <div className="flex flex-col gap-3 lg:hidden mb-6">
       <SearchBar value={searchText} onChange={onSearchChange} placeholder={searchPlaceholder} />
+
+      {/* Filter Options Row */}
+      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none -mx-1 px-1">
+        {/* Main Filters Button */}
+        <button
+          onClick={openDrawer}
+          className={`shrink-0 flex items-center gap-1.5 rounded-full border px-4 py-2 text-[13px] font-black transition-all ${
+            activeFilterCount > 0
+              ? 'bg-gold text-surface border-gold'
+              : 'bg-surface text-ink border-line'
+          }`}
+        >
+          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 4h18M7 8h10M10 12h4" />
+          </svg>
+          Filters
+          {activeFilterCount > 0 && (
+            <span className={`flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-black shrink-0 ${activeFilterCount > 0 ? 'bg-white text-gold' : 'bg-gold text-white'}`}>
+              {activeFilterCount}
+            </span>
+          )}
+        </button>
+
+        {/* Sort Pill */}
+        <button
+          onClick={openDrawer}
+          className="shrink-0 flex items-center gap-1 rounded-full border px-4 py-2 text-[13px] font-bold transition-all bg-cream/40 border-line text-muted"
+        >
+          <span>Sort: {sortBy}</span>
+        </button>
+
+        {/* Discount Pill */}
+        <button
+          onClick={openDrawer}
+          className={`shrink-0 flex items-center gap-1 rounded-full border px-4 py-2 text-[13px] font-bold transition-all ${
+            minDiscount && minDiscount !== discountOptions[0]
+              ? 'bg-gold/10 border-gold/30 text-gold'
+              : 'bg-cream/40 border-line text-muted'
+          }`}
+        >
+          <span>{minDiscount && minDiscount !== discountOptions[0] ? `Min ${minDiscount}` : 'Discount'}</span>
+        </button>
+
+        {/* Store Pill */}
+        {showStoreFilter && (
+          <button
+            onClick={openDrawer}
+            className={`shrink-0 flex items-center gap-1 rounded-full border px-4 py-2 text-[13px] font-bold transition-all ${
+              storeValue && storeValue !== 'All Stores'
+                ? 'bg-gold/10 border-gold/30 text-gold'
+                : 'bg-cream/40 border-line text-muted'
+            }`}
+          >
+            <span>{storeValue && storeValue !== 'All Stores' ? storeValue : 'Store'}</span>
+          </button>
+        )}
+
+        {/* Clear Filters Button */}
+        {activeFilterCount > 0 && (
+          <button
+            onClick={() => {
+              onCategoryChange('All')
+              if (onStoreChange) onStoreChange('All Stores')
+              onMinDiscountChange(discountOptions[0])
+            }}
+            className="shrink-0 rounded-full px-4 py-2 text-[13px] font-bold text-red-500 hover:bg-red-50 transition-all border border-red-100 whitespace-nowrap"
+          >
+            ✕ Clear
+          </button>
+        )}
+      </div>
+
       <div className="flex gap-2 overflow-x-auto pb-0.5 scrollbar-none -mx-1 px-1">
         {quickCats.map(cat => (
           <button
@@ -808,9 +887,9 @@ function FilterBar({
 
       {/* ── Mobile: top search + quick pills ── */}
       <MobileTopBar
-        searchText={searchText} onSearchChange={onSearchChange} searchPlaceholder={searchPlaceholder}
-        category={category} onCategoryChange={onCategoryChange}
-        openDrawer={() => setDrawerOpen(true)} activeFilterCount={activeCount}
+        {...sharedProps}
+        openDrawer={() => setDrawerOpen(true)}
+        activeFilterCount={activeCount}
       />
     </>
   )

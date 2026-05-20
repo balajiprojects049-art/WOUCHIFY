@@ -95,7 +95,7 @@ function Stores() {
         </div>
       </section>
 
-      <section className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <section className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-4">
         {filteredStores.map((store) => (
           <StoreCard key={store.slug} store={store} />
         ))}

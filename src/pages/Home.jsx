@@ -24,9 +24,9 @@ function Home() {
           </div>
 
           <div className="rounded-2xl border border-line bg-white p-4 shadow-sm sm:p-5">
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4 sm:gap-4">
               {featuredStore && (
-                <div className="sm:col-span-2 lg:row-span-2">
+                <div className="col-span-2 sm:col-span-2 lg:row-span-2">
                   <StoreCard store={featuredStore} featured />
                 </div>
               )}

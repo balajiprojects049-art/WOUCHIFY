@@ -5,6 +5,7 @@ import ScrollingPageBanner from '../components/ScrollingPageBanner'
 import { useData } from '../context/DataContext'
 import { getDealRemainingSeconds } from '../utils/dealExpiry'
 import SEO from '../components/SEO'
+import { categoriesData } from '../data/categoriesData'
 
 function parseDiscount(value) {
   return Number.parseInt((value || '').replace('%+', ''), 10)
@@ -31,6 +32,21 @@ function LootDeals() {
 
   const filteredDeals = useMemo(() => {
     const minDiscountValue = parseDiscount(minDiscount)
+    const catLower = category?.toLowerCase()
+
+    const matchedClassification = (() => {
+      if (!category || category === 'All' || category === 'All Categories') return { isStore: false, isBrand: false, isBank: false }
+      const isStore = Object.values(categoriesData.stores || {}).some(arr => 
+        arr.some(item => item.name.toLowerCase() === catLower)
+      )
+      const isBrand = Object.values(categoriesData.brands || {}).some(arr => 
+        arr.some(item => item.name.toLowerCase() === catLower)
+      )
+      const isBank = Object.values(categoriesData.banks || {}).some(arr => 
+        arr.some(item => item.name.toLowerCase() === catLower)
+      )
+      return { isStore, isBrand, isBank }
+    })()
 
     const filtered = lootDeals.filter((deal) => {
       // Auto-hide if mathematically expired (but treat missing expiry as evergreen)
@@ -38,7 +54,30 @@ function LootDeals() {
 
       const query = searchText.trim().toLowerCase()
       const matchesSearch = !query || (deal.title || '').toLowerCase().includes(query) || (deal.category || '').toLowerCase().includes(query)
-      const matchesCategory = category === 'All' || (deal.category || '') === category
+      
+      let matchesCategory = true
+      if (category !== 'All' && category !== 'All Categories') {
+        if (matchedClassification.isStore) {
+          matchesCategory = (deal.store || '').toLowerCase() === catLower || (deal.store || '').toLowerCase().includes(catLower) || catLower.includes((deal.store || '').toLowerCase())
+        } else if (matchedClassification.isBrand) {
+          matchesCategory = (deal.brand || '').toLowerCase() === catLower || 
+                            (deal.title || '').toLowerCase().includes(catLower) || 
+                            (deal.description || '').toLowerCase().includes(catLower) ||
+                            (deal.store || '').toLowerCase() === catLower
+        } else if (matchedClassification.isBank) {
+          const keywords = catLower.split(' ').filter(word => word.length > 2 && word !== 'bank' && word !== 'card')
+          const searchWords = keywords.length > 0 ? keywords : [catLower]
+          matchesCategory = searchWords.some(kw => 
+            (deal.title || '').toLowerCase().includes(kw) || 
+            (deal.description || '').toLowerCase().includes(kw) ||
+            (deal.store || '').toLowerCase().includes(kw) ||
+            (deal.category || '').toLowerCase().includes(kw)
+          )
+        } else {
+          matchesCategory = (deal.category || '').toLowerCase() === catLower || (deal.category || '').toLowerCase().includes(catLower)
+        }
+      }
+
       const matchesStore = storeFilter === 'All Stores' || (deal.store || '').toLowerCase().includes(storeFilter.toLowerCase())
       const matchesDiscount = Number.isNaN(minDiscountValue) || deal.discountPercent >= minDiscountValue
 
@@ -84,7 +123,7 @@ function LootDeals() {
         <FilterBar {...filterProps} />
 
         {/* Full-width grid */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 sm:gap-5">
           {filteredDeals.map((deal) => (
             <LootDealCard key={deal.id} deal={deal} />
           ))}

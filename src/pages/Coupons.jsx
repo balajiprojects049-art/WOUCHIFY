@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import ScrollingPageBanner from '../components/ScrollingPageBanner'
 import FilterBar from '../components/FilterBar'
@@ -6,6 +6,7 @@ import { useData } from '../context/DataContext'
 import { resolveStoreLogoUrl } from '../utils/storeLogo'
 import ShareButton from '../components/ShareButton'
 import SEO from '../components/SEO'
+import { categoriesData } from '../data/categoriesData'
 
 /* ── Animations ──────────────────────────────────────────────────── */
 const css = `
@@ -340,22 +341,63 @@ function Coupons() {
     showStoreFilter: true, storeValue: storeFilter, onStoreChange: setStoreFilter,
   }
 
-  const filtered = activeCoupons.filter(c => {
-    const matchCat = category === 'All' || category === 'All Categories'
-      || (c.category || '').toLowerCase().includes(category.toLowerCase())
-    const matchStore = storeFilter === 'All Stores'
-      || (c.store || '').toLowerCase().includes(storeFilter.toLowerCase())
-    const q = search.trim().toLowerCase()
-    const matchSearch = !q
-      || (c.store || '').toLowerCase().includes(q)
-      || (c.code || '').toLowerCase().includes(q)
-      || (c.discount || '').toLowerCase().includes(q)
-    return matchCat && matchStore && matchSearch
-  }).map(c => ({
-    ...c,
-    // Resolve the best destination link
-    resolvedLink: c.link || c.url || storeWebsiteMap[(c.store || '').toLowerCase()] || null,
-  }))
+  const filtered = useMemo(() => {
+    const catLower = category?.toLowerCase()
+
+    const matchedClassification = (() => {
+      if (!category || category === 'All' || category === 'All Categories') return { isStore: false, isBrand: false, isBank: false }
+      const isStore = Object.values(categoriesData.stores || {}).some(arr => 
+        arr.some(item => item.name.toLowerCase() === catLower)
+      )
+      const isBrand = Object.values(categoriesData.brands || {}).some(arr => 
+        arr.some(item => item.name.toLowerCase() === catLower)
+      )
+      const isBank = Object.values(categoriesData.banks || {}).some(arr => 
+        arr.some(item => item.name.toLowerCase() === catLower)
+      )
+      return { isStore, isBrand, isBank }
+    })()
+
+    return activeCoupons.filter(c => {
+      let matchesCategory = true
+      if (category !== 'All' && category !== 'All Categories') {
+        if (matchedClassification.isStore) {
+          matchesCategory = (c.store || '').toLowerCase() === catLower || (c.store || '').toLowerCase().includes(catLower) || catLower.includes((c.store || '').toLowerCase())
+        } else if (matchedClassification.isBrand) {
+          matchesCategory = (c.brand || '').toLowerCase() === catLower || 
+                            (c.title || '').toLowerCase().includes(catLower) || 
+                            (c.description || '').toLowerCase().includes(catLower) ||
+                            (c.store || '').toLowerCase() === catLower
+        } else if (matchedClassification.isBank) {
+          const keywords = catLower.split(' ').filter(word => word.length > 2 && word !== 'bank' && word !== 'card')
+          const searchWords = keywords.length > 0 ? keywords : [catLower]
+          matchesCategory = searchWords.some(kw => 
+            (c.title || '').toLowerCase().includes(kw) || 
+            (c.description || '').toLowerCase().includes(kw) ||
+            (c.store || '').toLowerCase().includes(kw) ||
+            (c.category || '').toLowerCase().includes(kw)
+          )
+        } else {
+          matchesCategory = (c.category || '').toLowerCase() === catLower || (c.category || '').toLowerCase().includes(catLower)
+        }
+      }
+
+      const matchStore = storeFilter === 'All Stores'
+        || (c.store || '').toLowerCase().includes(storeFilter.toLowerCase())
+
+      const q = search.trim().toLowerCase()
+      const matchSearch = !q
+        || (c.store || '').toLowerCase().includes(q)
+        || (c.code || '').toLowerCase().includes(q)
+        || (c.discount || '').toLowerCase().includes(q)
+
+      return matchesCategory && matchStore && matchSearch
+    }).map(c => ({
+      ...c,
+      // Resolve the best destination link
+      resolvedLink: c.link || c.url || storeWebsiteMap[(c.store || '').toLowerCase()] || null,
+    }))
+  }, [category, storeFilter, search, activeCoupons, stores])
 
   return (
     <>{/* SEO Component */}
