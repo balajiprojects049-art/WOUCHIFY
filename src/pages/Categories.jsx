@@ -572,11 +572,11 @@ export default function Categories() {
           <div className="flex flex-wrap justify-center items-center gap-4 lg:gap-6">
             {[
               { name: 'Amazon', logo: 'https://cdn-icons-png.flaticon.com/512/732/732177.png' },
-              { name: 'Flipkart', logo: 'https://logos-world.net/wp-content/uploads/2020/11/Flipkart-Logo.png' },
+              { name: 'Flipkart', logo: '/flipkart_logo.svg' },
               { name: 'Myntra', logo: 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Myntra_Logo.png' },
-              { name: 'Ajio', logo: 'https://assets.ajio.com/static/img/Ajio-Logo.svg' },
-              { name: 'Swiggy', logo: 'https://logos-world.net/wp-content/uploads/2020/11/Swiggy-Logo.png' },
-              { name: 'Zomato', logo: 'https://upload.wikimedia.org/wikipedia/commons/b/bd/Zomato_Logo.svg' }
+              { name: 'Ajio', logo: '/ajio_logo.png' },
+              { name: 'Swiggy', logo: '/swiggy_logo.png' },
+              { name: 'Zomato', logo: '/zomato_logo.png' }
             ].map(store => (
               <Link
                 key={store.name}
