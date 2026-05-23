@@ -70,8 +70,22 @@ function Deals() {
       const remainingSeconds = getDealRemainingSeconds(deal, nowMs)
       const query = searchText.trim().toLowerCase()
       const matchesSearch = !query || deal.title.toLowerCase().includes(query) || deal.store.toLowerCase().includes(query)
-      const matchesCategory = category === 'All' || deal.category === category
-      const matchesStore = storeFilter === 'All Stores' || (deal.store || '').toLowerCase().includes(storeFilter.toLowerCase())
+      const searchCat = category === 'All' || category === 'All Categories' ? '' : category.toLowerCase()
+      const itemCat = (deal.category || '').toLowerCase()
+      const itemStore = (deal.store || '').toLowerCase()
+      const itemTitle = (deal.title || '').toLowerCase()
+      
+      let matchesCategory = !searchCat
+      if (searchCat) {
+        if (itemCat === searchCat || itemCat.includes(searchCat)) matchesCategory = true
+        else if (itemStore === searchCat || itemStore.includes(searchCat)) matchesCategory = true
+        else {
+          const keywords = searchCat.split(' ').filter(k => k.length > 2)
+          if (keywords.some(k => itemTitle.includes(k) || itemCat.includes(k) || itemStore.includes(k))) matchesCategory = true
+        }
+      }
+
+      const matchesStore = storeFilter === 'All Stores' || itemStore.includes(storeFilter.toLowerCase())
       const matchesDiscount = Number.isNaN(minDiscountValue) || deal.discountValue >= minDiscountValue
       const matchesPriceRange = deal.priceValue <= priceRange
       // Auto-hide if mathematically expired (unless it's an evergreen deal with no expiry configured)

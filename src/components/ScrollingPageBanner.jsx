@@ -72,14 +72,6 @@ function ScrollingPageBanner({ banners }) {
                     {banner.description}
                   </p>
                 </div>
-                {banner.link && (
-                  <Link
-                    to={banner.link}
-                    className="inline-flex items-center justify-center rounded-2xl bg-gold px-6 py-3 text-sm font-black text-midnight shadow-xl shadow-gold/20 transition-all hover:scale-105 active:scale-95 sm:px-10 sm:py-5 sm:text-base whitespace-nowrap"
-                  >
-                    Explore Now →
-                  </Link>
-                )}
               </div>
             </div>
           </div>

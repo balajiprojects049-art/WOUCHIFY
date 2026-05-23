@@ -51,13 +51,14 @@ export default function Categories() {
     return dealsCount + lootCount + couponCount
   }
 
-  // Simulate loading for Skeleton Effect
+  // Simulate loading for Skeleton Effect — only on tab switch (not letter click)
   useEffect(() => {
     setIsLoading(true)
-    const timer = setTimeout(() => setIsLoading(false), 400)
+    setActiveLetter('ALL') // Reset letter filter when switching tabs so data shows immediately
+    const timer = setTimeout(() => setIsLoading(false), 150)
     window.scrollTo({ top: 0, behavior: 'smooth' })
     return () => clearTimeout(timer)
-  }, [activeTab, activeLetter])
+  }, [activeTab])
 
   // Process data based on filters
   const processedData = useMemo(() => {
@@ -424,13 +425,17 @@ export default function Categories() {
                 </div>
               </div>
 
-              {/* Travel Sub-categories filter */}
               {activeTab === 'travel' && (
                 <div className="flex flex-wrap items-center gap-2 mb-6">
                   {['All', 'Planes', 'Buses', 'Trains', 'Cabs', 'Bikes', 'Auto'].map(sub => (
                     <button
                       key={sub}
-                      onClick={() => setActiveTravelSub(sub)}
+                      onClick={() => {
+                        setActiveTravelSub(sub)
+                        setActiveLetter('ALL')
+                        setIsLoading(true)
+                        setTimeout(() => setIsLoading(false), 150)
+                      }}
                       className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
                         activeTravelSub === sub
                           ? 'bg-gold text-white border-gold shadow-md'

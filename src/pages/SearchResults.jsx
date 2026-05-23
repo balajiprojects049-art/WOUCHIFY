@@ -81,7 +81,7 @@ export default function SearchResults() {
         : []
 
       const d = safeDeals.filter(x => x?.title?.toLowerCase().includes(query) || x?.store?.toLowerCase().includes(query))
-      const l = safeLoot.filter(x => x?.title?.toLowerCase().includes(query) || x?.category?.toLowerCase().includes(query))
+      const l = safeLoot.filter(x => x?.title?.toLowerCase().includes(query) || x?.category?.toLowerCase().includes(query) || x?.store?.toLowerCase().includes(query))
       const s = safeStores.filter(x => x?.name?.toLowerCase().includes(query) || x?.category?.toLowerCase().includes(query))
       const c = safeCoupons.filter(x => x?.store?.toLowerCase().includes(query) || x?.code?.toLowerCase().includes(query) || x?.discount?.toLowerCase().includes(query))
       const cc = safeCards.filter(x => x?.name?.toLowerCase().includes(query) || x?.bank?.toLowerCase().includes(query))

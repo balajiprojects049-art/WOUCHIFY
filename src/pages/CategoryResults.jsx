@@ -181,6 +181,25 @@ export default function CategoryResults() {
   }, [categoryCoupons, selectedStores])
 
   const totalCount = filteredDeals.length + filteredLoot.length + filteredCoupons.length + bankCards.length
+  
+  const subTabs = useMemo(() => {
+    const baseTabs = [
+      { id: 'all', label: 'All', count: totalCount },
+      { id: 'deals', label: 'Deals', count: filteredDeals.length },
+      { id: 'loot', label: 'Loot', count: filteredLoot.length },
+      { id: 'coupons', label: 'Coupons', count: filteredCoupons.length },
+      { id: 'cards', label: 'Cards', count: bankCards.length }
+    ]
+    return baseTabs.filter(t => t.id === 'all' || t.count > 0)
+  }, [totalCount, filteredDeals.length, filteredLoot.length, filteredCoupons.length, bankCards.length])
+
+  // Reset tab to 'all' if the selected tab becomes empty (e.g. after filtering)
+  useEffect(() => {
+    const activeTabObj = subTabs.find(t => t.id === tab)
+    if (!activeTabObj && tab !== 'all') {
+      setTab('all')
+    }
+  }, [subTabs, tab])
 
   return (
     <div className="min-h-screen bg-cream font-sans transition-colors duration-500">
@@ -207,12 +226,7 @@ export default function CategoryResults() {
 
             {/* Sub Tabs */}
             <div className="flex items-center gap-1 p-1 bg-surface rounded-2xl border border-line shadow-sm overflow-x-auto no-scrollbar">
-               {[
-                 { id: 'all', label: 'All', count: totalCount },
-                 { id: 'deals', label: 'Deals', count: filteredDeals.length },
-                 { id: 'loot', label: 'Loot', count: filteredLoot.length },
-                 { id: 'coupons', label: 'Coupons', count: filteredCoupons.length }
-               ].map(t => (
+               {subTabs.map(t => (
                  <button
                    key={t.id}
                    onClick={() => setTab(t.id)}
@@ -246,9 +260,16 @@ export default function CategoryResults() {
                     placeholder="Search stores..."
                     value={storeSearch}
                     onChange={(e) => setStoreSearch(e.target.value)}
-                    className="w-full h-9 pl-9 pr-3 bg-cream border border-line rounded-lg text-xs font-bold focus:border-gold focus:outline-none transition-all placeholder:text-muted/60 text-ink"
+                    className="w-full h-9 pl-9 pr-8 bg-cream border border-line rounded-lg text-xs font-bold focus:border-gold focus:outline-none transition-all placeholder:text-muted/60 text-ink"
                   />
                   <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted group-focus-within:text-gold transition-colors" />
+                  {storeSearch && (
+                    <button onClick={() => setStoreSearch('')} className="absolute right-3 top-2.5 text-muted hover:text-ink focus:outline-none">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  )}
                 </div>
 
                 <div className="space-y-2.5 max-h-[300px] overflow-y-auto no-scrollbar pr-2">
@@ -300,9 +321,16 @@ export default function CategoryResults() {
                   placeholder="Search categories..."
                   value={categorySearch}
                   onChange={(e) => setCategorySearch(e.target.value)}
-                  className="w-full h-9 pl-9 pr-3 bg-cream border border-line rounded-lg text-xs font-bold focus:border-gold focus:outline-none transition-all placeholder:text-muted/60 text-ink"
+                  className="w-full h-9 pl-9 pr-8 bg-cream border border-line rounded-lg text-xs font-bold focus:border-gold focus:outline-none transition-all placeholder:text-muted/60 text-ink"
                 />
                 <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted group-focus-within:text-gold transition-colors" />
+                {categorySearch && (
+                  <button onClick={() => setCategorySearch('')} className="absolute right-3 top-2.5 text-muted hover:text-ink focus:outline-none">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
               </div>
 
               <div className="space-y-1 max-h-[400px] overflow-y-auto no-scrollbar pr-2">
@@ -331,7 +359,7 @@ export default function CategoryResults() {
 
          {/* ── RIGHT CONTENT (Results) ── */}
          <div className="flex-grow min-w-0">
-            {tab === 'all' && bankCards.length > 0 && (
+            {(tab === 'all' || tab === 'cards') && bankCards.length > 0 && (
               <section className="mb-12">
                  <div className="flex items-center gap-3 mb-6">
                     <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500">

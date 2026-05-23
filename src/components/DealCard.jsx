@@ -122,22 +122,22 @@ export default function DealCard({ deal, remainingSeconds }) {
         {/* ── Row A: Store logo + name + DEAL badge (fixed h-9) ── */}
         <div className="mb-2 flex h-9 items-center gap-2">
           {logoUrl ? (
-            <div className="h-7 w-7 shrink-0 overflow-hidden rounded-lg border border-[#E8E4DC] bg-white p-0.5 shadow-sm">
+            <div className="h-8 w-8 shrink-0 overflow-hidden rounded-lg border border-[#E8E4DC] bg-white p-0.5 shadow-sm">
               <img src={logoUrl} alt={deal.store} className="h-full w-full object-contain" onError={e => e.target.style.display = 'none'} />
             </div>
           ) : (
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[#C89B1E]/20 bg-[#C89B1E]/10 text-[9px] font-black text-[#C89B1E]">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#C89B1E]/20 bg-[#C89B1E]/10 text-[10px] font-black text-[#C89B1E]">
               {logoText}
             </div>
           )}
           <div className="min-w-0 flex-1">
-            <p className="truncate text-[11px] font-black text-[#121826]">{deal.store}</p>
-            <p className="flex items-center gap-1 text-[9px] font-bold text-emerald-600">
+            <p className="truncate text-[13px] font-black text-[#121826]">{deal.store}</p>
+            <p className="flex items-center gap-1 text-[10px] font-bold text-emerald-600">
               <span className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-emerald-500" />
               Verified Store
             </p>
           </div>
-          <span className="shrink-0 rounded-full bg-[#121826] px-2 py-0.5 text-[8px] font-black uppercase tracking-wider text-[#C89B1E]">
+          <span className="shrink-0 rounded-full bg-[#121826] px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-[#C89B1E]">
             DEAL
           </span>
         </div>
@@ -146,7 +146,7 @@ export default function DealCard({ deal, remainingSeconds }) {
         <div className="mb-2 flex h-6 items-center justify-between">
           <div className="flex items-center">
             {deal.category ? (
-              <span className="inline-block rounded-full border border-red-200 bg-red-50 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-red-500">
+              <span className="inline-block rounded-full border border-red-200 bg-red-50 px-2 py-0.5 text-[11px] font-black uppercase tracking-wider text-red-600">
                 {deal.category}
               </span>
             ) : (
@@ -155,16 +155,16 @@ export default function DealCard({ deal, remainingSeconds }) {
           </div>
           {deal.rating && (
             <div className="flex items-center gap-1 rounded-md bg-orange-50 px-1.5 py-0.5 border border-orange-100">
-              <span className="text-[10px]">⭐</span>
-              <span className="text-[10px] font-black text-orange-600">{deal.rating}</span>
-              {deal.reviews && <span className="text-[9px] font-bold text-orange-400">({deal.reviews})</span>}
+              <span className="text-[11px]">⭐</span>
+              <span className="text-[11px] font-black text-orange-600">{deal.rating}</span>
+              {deal.reviews && <span className="text-[10px] font-bold text-orange-500">({deal.reviews})</span>}
             </div>
           )}
         </div>
 
         {/* ── Row C: Title (fixed 2-line height) ── */}
         <Link to={isExpired ? '#' : `/deal/${slug}`} className={`mb-2.5 block ${isExpired ? 'cursor-not-allowed pointer-events-none' : ''}`}>
-          <h3 className="line-clamp-2 min-h-[2.8rem] text-[12.5px] font-bold leading-snug text-[#121826] transition-colors hover:text-red-500">
+          <h3 className="line-clamp-2 min-h-[2.8rem] text-[14px] font-bold leading-snug text-[#121826] transition-colors hover:text-red-500">
             {deal.title}
           </h3>
         </Link>
@@ -172,18 +172,18 @@ export default function DealCard({ deal, remainingSeconds }) {
         {/* ── Row D: Price (fixed h-8) ── */}
         <div className="mb-2 flex h-8 flex-wrap items-baseline gap-x-2 gap-y-0 overflow-hidden">
           {price && (
-            <span className="text-[17px] font-extrabold leading-none text-[#121826]">{price}</span>
+            <span className="text-[20px] font-extrabold leading-none text-[#121826]">{price}</span>
           )}
           {originalPrice && (
-            <span className="text-[11px] font-medium text-[#9CA3AF] line-through">{originalPrice}</span>
+            <span className="text-[13px] font-medium text-[#6B7280] line-through">{originalPrice}</span>
           )}
           {savings && (
-            <span className="rounded-md border border-emerald-200 bg-emerald-50 px-1.5 py-0.5 text-[9px] font-black text-emerald-600">
+            <span className="rounded-md border border-emerald-200 bg-emerald-50 px-1.5 py-0.5 text-[11px] font-black text-emerald-700">
               {savings}
             </span>
           )}
           {deal.isFreeShipping && (
-            <span className="flex items-center gap-1 rounded-md bg-blue-50 px-1.5 py-0.5 border border-blue-100 text-[9px] font-black text-blue-600">
+            <span className="flex items-center gap-1 rounded-md bg-blue-50 px-1.5 py-0.5 border border-blue-100 text-[11px] font-black text-blue-700">
               🚚 Free
             </span>
           )}
@@ -197,7 +197,7 @@ export default function DealCard({ deal, remainingSeconds }) {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
               </span>
-              <span className="text-[10px] font-bold text-emerald-700 truncate">{socialProofText}</span>
+              <span className="text-[11px] font-bold text-emerald-700 truncate">{socialProofText}</span>
             </div>
           ) : (
             <div className="w-full" />
@@ -212,30 +212,30 @@ export default function DealCard({ deal, remainingSeconds }) {
             </div>
           ) : hasTimer ? (
             <div className={`flex w-full items-center justify-between rounded-xl px-3 ${isUrgent ? 'bg-red-500' : 'bg-[#0f0f1e]'}`}>
-              <span className={`text-[9px] font-black uppercase tracking-wider ${isUrgent ? 'text-white/80' : 'text-[#C89B1E]/70'}`}>
+              <span className={`text-[11px] font-black uppercase tracking-wider ${isUrgent ? 'text-white' : 'text-[#C89B1E]'}`}>
                 ⏱ Ends in
               </span>
               <div className="flex items-center gap-1.5">
-                <div className={`flex flex-col items-center justify-center rounded-lg px-2 py-1 min-w-[30px] ${isUrgent ? 'bg-white/20' : 'bg-white/8'}`}>
-                  <span className={`text-[13px] font-black leading-none font-mono ${isUrgent ? 'text-white' : 'text-[#C89B1E]'}`}>{hh}</span>
-                  <span className={`text-[7px] font-bold uppercase mt-0.5 ${isUrgent ? 'text-white/60' : 'text-[#C89B1E]/50'}`}>H</span>
+                <div className={`flex flex-col items-center justify-center rounded-lg px-2 py-1 min-w-[30px] ${isUrgent ? 'bg-white/20' : 'bg-white/10'}`}>
+                  <span className={`text-[15px] font-black leading-none font-mono ${isUrgent ? 'text-white' : 'text-[#C89B1E]'}`}>{hh}</span>
+                  <span className={`text-[8px] font-bold uppercase mt-0.5 ${isUrgent ? 'text-white/80' : 'text-[#C89B1E]/70'}`}>H</span>
                 </div>
-                <span className={`text-[13px] font-black ${isUrgent ? 'text-white/50' : 'text-[#C89B1E]/40'}`}>:</span>
-                <div className={`flex flex-col items-center justify-center rounded-lg px-2 py-1 min-w-[30px] ${isUrgent ? 'bg-white/20' : 'bg-white/8'}`}>
-                  <span className={`text-[13px] font-black leading-none font-mono ${isUrgent ? 'text-white' : 'text-[#C89B1E]'}`}>{mm}</span>
-                  <span className={`text-[7px] font-bold uppercase mt-0.5 ${isUrgent ? 'text-white/60' : 'text-[#C89B1E]/50'}`}>M</span>
+                <span className={`text-[15px] font-black ${isUrgent ? 'text-white/70' : 'text-[#C89B1E]/60'}`}>:</span>
+                <div className={`flex flex-col items-center justify-center rounded-lg px-2 py-1 min-w-[30px] ${isUrgent ? 'bg-white/20' : 'bg-white/10'}`}>
+                  <span className={`text-[15px] font-black leading-none font-mono ${isUrgent ? 'text-white' : 'text-[#C89B1E]'}`}>{mm}</span>
+                  <span className={`text-[8px] font-bold uppercase mt-0.5 ${isUrgent ? 'text-white/80' : 'text-[#C89B1E]/70'}`}>M</span>
                 </div>
-                <span className={`text-[13px] font-black ${isUrgent ? 'text-white/50' : 'text-[#C89B1E]/40'}`}>:</span>
-                <div className={`flex flex-col items-center justify-center rounded-lg px-2 py-1 min-w-[30px] ${isUrgent ? 'bg-white/20' : 'bg-white/8'}`}>
-                  <span className={`text-[13px] font-black leading-none font-mono ${isUrgent ? 'text-white' : 'text-[#C89B1E]'}`}>{ss}</span>
-                  <span className={`text-[7px] font-bold uppercase mt-0.5 ${isUrgent ? 'text-white/60' : 'text-[#C89B1E]/50'}`}>S</span>
+                <span className={`text-[15px] font-black ${isUrgent ? 'text-white/70' : 'text-[#C89B1E]/60'}`}>:</span>
+                <div className={`flex flex-col items-center justify-center rounded-lg px-2 py-1 min-w-[30px] ${isUrgent ? 'bg-white/20' : 'bg-white/10'}`}>
+                  <span className={`text-[15px] font-black leading-none font-mono ${isUrgent ? 'text-white' : 'text-[#C89B1E]'}`}>{ss}</span>
+                  <span className={`text-[8px] font-bold uppercase mt-0.5 ${isUrgent ? 'text-white/80' : 'text-[#C89B1E]/70'}`}>S</span>
                 </div>
               </div>
             </div>
           ) : deal.code ? (
             <div className="flex w-full items-center justify-between rounded-xl border-2 border-dashed border-emerald-300 bg-emerald-50 px-3 hover:bg-emerald-100 transition-colors">
-              <span className="text-[10px] font-black uppercase text-emerald-600">Promo</span>
-              <span className="rounded-md bg-white px-2 py-1 text-[11px] font-mono font-black tracking-widest text-emerald-700 shadow-sm">{deal.code}</span>
+              <span className="text-[11px] font-black uppercase text-emerald-700">Promo</span>
+              <span className="rounded-md bg-white px-2 py-1 text-[12px] font-mono font-black tracking-widest text-emerald-700 shadow-sm">{deal.code}</span>
             </div>
           ) : (
             <div className="flex w-full items-center justify-center rounded-xl border border-emerald-100 bg-emerald-50/50">
