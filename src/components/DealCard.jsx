@@ -192,9 +192,9 @@ export default function DealCard({ deal, remainingSeconds }) {
         {/* ── Row E: Social proof (fixed h-8) ── */}
         <div className="mb-2.5 flex h-8 items-center">
           {socialProofText ? (
-            <div className="flex w-full items-center gap-1.5 rounded-xl border border-emerald-200/50 bg-emerald-50/70 dark:border-gold/30 dark:bg-gold/10 px-2.5 py-1.5">
+            <div className="flex w-full items-center gap-1.5 rounded-xl border border-emerald-200/50 bg-emerald-50/70 dark:border-[#D4A820]/30 dark:bg-[#D4A820]/15 px-2.5 py-1.5">
               <span className="relative flex h-2 w-2 shrink-0">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 dark:bg-gold/70 opacity-75" />
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 dark:bg-[#D4A820]/70 opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500 dark:bg-gold" />
               </span>
               <span className="text-[11px] font-bold text-emerald-700 dark:text-gold truncate">{socialProofText}</span>
@@ -238,10 +238,10 @@ export default function DealCard({ deal, remainingSeconds }) {
               <span className="rounded-md bg-white px-2 py-1 text-[12px] font-mono font-black tracking-widest text-emerald-700 shadow-sm">{deal.code}</span>
             </div>
           ) : (
-            <div className="flex w-full items-center justify-center rounded-xl border border-emerald-100 bg-emerald-50/50 dark:border-gold/30 dark:bg-gold/10">
+            <div className="flex w-full items-center justify-center rounded-xl border border-emerald-100 bg-emerald-50/50 dark:border-[#D4A820]/30 dark:bg-[#D4A820]/15">
               <span className="flex items-center gap-1.5 text-[10px] font-black tracking-wide text-emerald-600 dark:text-gold">
                 <span className="relative flex h-1.5 w-1.5">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 dark:bg-gold/70 opacity-75" />
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 dark:bg-[#D4A820]/70 opacity-75" />
                   <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500 dark:bg-gold" />
                 </span>
                 Active Deal
