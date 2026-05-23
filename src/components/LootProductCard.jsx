@@ -227,11 +227,11 @@ export default function LootProductCard({ item }) {
               <span className="rounded-md bg-white px-2 py-1 text-[12px] font-mono font-black tracking-widest text-emerald-700 shadow-sm">{item.code}</span>
             </div>
           ) : (
-            <div className="flex w-full items-center justify-center rounded-xl border border-emerald-100 bg-emerald-50/50">
-              <span className="flex items-center gap-1.5 text-[10px] font-black tracking-wide text-emerald-600">
+            <div className="flex w-full items-center justify-center rounded-xl border border-emerald-100 bg-emerald-50/50 dark:border-gold/30 dark:bg-gold/10">
+              <span className="flex items-center gap-1.5 text-[10px] font-black tracking-wide text-emerald-600 dark:text-gold">
                 <span className="relative flex h-1.5 w-1.5">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 dark:bg-gold/70 opacity-75" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500 dark:bg-gold" />
                 </span>
                 Active Deal
               </span>
