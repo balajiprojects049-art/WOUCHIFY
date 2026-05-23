@@ -120,7 +120,7 @@ export default function LootProductCard({ item }) {
             </div>
           )}
           <div className="min-w-0 flex-1">
-            <p className="truncate text-[13px] font-black text-[#121826]">{item.store}</p>
+            <p className="truncate text-[13px] font-black text-ink">{item.store}</p>
             <p className="flex items-center gap-1 text-[10px] font-bold text-emerald-600">
               <span className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-emerald-500" />
               Verified Store
@@ -153,15 +153,15 @@ export default function LootProductCard({ item }) {
 
         {/* ── Row C: Title (fixed 2-line height) ── */}
         <Link to={`/loot-deal/${slug}`} className="mb-2.5 block">
-          <h3 className="line-clamp-2 min-h-[2.8rem] text-[14px] font-bold leading-snug text-[#121826] transition-colors hover:text-red-500">
+          <h3 className="line-clamp-2 min-h-[2.8rem] text-[14px] font-bold leading-snug text-ink transition-colors hover:text-red-500">
             {item.title}
           </h3>
         </Link>
 
         {/* ── Row D: Price (fixed h-8) ── */}
         <div className="mb-2 flex h-8 flex-wrap items-baseline gap-x-2 gap-y-0 overflow-hidden">
-          {item.newPrice && (
-            <span className="text-[20px] font-extrabold leading-none text-[#121826]">{item.newPrice}</span>
+          {price && (
+            <span className="text-[20px] font-extrabold leading-none text-ink">{price}</span>
           )}
           {item.oldPrice && (
             <span className="text-[13px] font-medium text-[#6B7280] line-through">{item.oldPrice}</span>

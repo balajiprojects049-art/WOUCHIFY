@@ -111,6 +111,31 @@ export default function CategoryResults() {
     return false;
   };
 
+  const TRAVEL_GROUPS = useMemo(() => ({
+    'planes': [
+      { id: 'national', label: 'National', keywords: ['domestic', 'national', 'india'] },
+      { id: 'international', label: 'International', keywords: ['international', 'abroad'] }
+    ],
+    'buses': [
+      { id: 'redbus', label: 'RedBus', keywords: ['redbus'] },
+      { id: 'tickets', label: 'Tickets', keywords: ['bus', 'ticket'] }
+    ],
+    'trains': [
+      { id: 'irctc', label: 'IRCTC', keywords: ['irctc', 'train'] },
+      { id: 'tickets', label: 'Tickets', keywords: ['ticket'] }
+    ],
+    'cabs': [
+      { id: 'ola', label: 'Ola', keywords: ['ola'] },
+      { id: 'uber', label: 'Uber', keywords: ['uber'] },
+      { id: 'taxi', label: 'Taxi', keywords: ['cab', 'taxi', 'meru'] }
+    ],
+    'bikes': [
+      { id: 'rapido', label: 'Rapido', keywords: ['rapido', 'bike'] }
+    ]
+  }), [])
+
+  const currentTravelGroup = categoryName ? TRAVEL_GROUPS[categoryName.toLowerCase()] : null
+
   // Fetch all items assigned to this category
   const categoryDeals = useMemo(() => deals.filter(d => matchesCategory(d, categoryName) && getDealRemainingSeconds(d, nowMs) > 0), [deals, categoryName, nowMs])
   const categoryLoot = useMemo(() => lootDeals.filter(d => matchesCategory(d, categoryName) && getDealRemainingSeconds(d, nowMs) > 0), [lootDeals, categoryName, nowMs])
@@ -164,34 +189,86 @@ export default function CategoryResults() {
     )
   }
 
-  // Final filtered data
-  const filteredDeals = useMemo(() => {
+  const storeFilteredDeals = useMemo(() => {
     if (selectedStores.length === 0) return categoryDeals
     return categoryDeals.filter(d => selectedStores.includes(d.store))
   }, [categoryDeals, selectedStores])
 
-  const filteredLoot = useMemo(() => {
+  const storeFilteredLoot = useMemo(() => {
     if (selectedStores.length === 0) return categoryLoot
     return categoryLoot.filter(d => selectedStores.includes(d.store))
   }, [categoryLoot, selectedStores])
 
-  const filteredCoupons = useMemo(() => {
+  const storeFilteredCoupons = useMemo(() => {
     if (selectedStores.length === 0) return categoryCoupons
     return categoryCoupons.filter(c => selectedStores.includes(c.store))
   }, [categoryCoupons, selectedStores])
 
-  const totalCount = filteredDeals.length + filteredLoot.length + filteredCoupons.length + bankCards.length
+  const totalCount = storeFilteredDeals.length + storeFilteredLoot.length + storeFilteredCoupons.length + bankCards.length
   
   const subTabs = useMemo(() => {
+    if (currentTravelGroup) {
+      const matchKeywords = (item, keywords) => {
+        const title = (item.title || '').toLowerCase()
+        const cat = (item.category || '').toLowerCase()
+        const store = (item.store || '').toLowerCase()
+        return keywords.some(kw => title.includes(kw) || cat.includes(kw) || store.includes(kw))
+      }
+
+      const tabs = [{ id: 'all', label: 'All', count: totalCount }]
+      currentTravelGroup.forEach(sub => {
+        const count = 
+          storeFilteredDeals.filter(d => matchKeywords(d, sub.keywords)).length +
+          storeFilteredLoot.filter(d => matchKeywords(d, sub.keywords)).length +
+          storeFilteredCoupons.filter(d => matchKeywords(d, sub.keywords)).length
+        
+        if (count > 0) {
+          tabs.push({ id: sub.id, label: sub.label, count, keywords: sub.keywords })
+        }
+      })
+      return tabs
+    }
+
     const baseTabs = [
       { id: 'all', label: 'All', count: totalCount },
-      { id: 'deals', label: 'Deals', count: filteredDeals.length },
-      { id: 'loot', label: 'Loot', count: filteredLoot.length },
-      { id: 'coupons', label: 'Coupons', count: filteredCoupons.length },
+      { id: 'deals', label: 'Deals', count: storeFilteredDeals.length },
+      { id: 'loot', label: 'Loot', count: storeFilteredLoot.length },
+      { id: 'coupons', label: 'Coupons', count: storeFilteredCoupons.length },
       { id: 'cards', label: 'Cards', count: bankCards.length }
     ]
     return baseTabs.filter(t => t.id === 'all' || t.count > 0)
-  }, [totalCount, filteredDeals.length, filteredLoot.length, filteredCoupons.length, bankCards.length])
+  }, [totalCount, storeFilteredDeals, storeFilteredLoot, storeFilteredCoupons, bankCards.length, currentTravelGroup])
+
+  // Final rendering lists based on active tab
+  const finalDeals = useMemo(() => {
+    if (currentTravelGroup && tab !== 'all') {
+       const activeTabObj = subTabs.find(t => t.id === tab)
+       if (!activeTabObj || !activeTabObj.keywords) return storeFilteredDeals
+       const kws = activeTabObj.keywords
+       return storeFilteredDeals.filter(item => kws.some(kw => (item.title||'').toLowerCase().includes(kw) || (item.category||'').toLowerCase().includes(kw) || (item.store||'').toLowerCase().includes(kw)))
+    }
+    return storeFilteredDeals
+  }, [storeFilteredDeals, tab, currentTravelGroup, subTabs])
+
+  const finalLoot = useMemo(() => {
+    if (currentTravelGroup && tab !== 'all') {
+       const activeTabObj = subTabs.find(t => t.id === tab)
+       if (!activeTabObj || !activeTabObj.keywords) return storeFilteredLoot
+       const kws = activeTabObj.keywords
+       return storeFilteredLoot.filter(item => kws.some(kw => (item.title||'').toLowerCase().includes(kw) || (item.category||'').toLowerCase().includes(kw) || (item.store||'').toLowerCase().includes(kw)))
+    }
+    return storeFilteredLoot
+  }, [storeFilteredLoot, tab, currentTravelGroup, subTabs])
+
+  const finalCoupons = useMemo(() => {
+    if (currentTravelGroup && tab !== 'all') {
+       const activeTabObj = subTabs.find(t => t.id === tab)
+       if (!activeTabObj || !activeTabObj.keywords) return storeFilteredCoupons
+       const kws = activeTabObj.keywords
+       return storeFilteredCoupons.filter(item => kws.some(kw => (item.title||'').toLowerCase().includes(kw) || (item.category||'').toLowerCase().includes(kw) || (item.store||'').toLowerCase().includes(kw)))
+    }
+    return storeFilteredCoupons
+  }, [storeFilteredCoupons, tab, currentTravelGroup, subTabs])
 
   // Reset tab to 'all' if the selected tab becomes empty (e.g. after filtering)
   useEffect(() => {
@@ -375,7 +452,7 @@ export default function CategoryResults() {
               </section>
             )}
 
-            {(tab === 'all' || tab === 'deals') && filteredDeals.length > 0 && (
+            {(tab === 'all' || tab === 'deals' || currentTravelGroup) && finalDeals.length > 0 && (
              <section className="mb-12">
                 <div className="flex items-center gap-3 mb-2">
                    <div className="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center text-gold">
@@ -383,11 +460,11 @@ export default function CategoryResults() {
                    </div>
                    <h2 className="text-xl font-extrabold text-ink tracking-tight">Active Deals</h2>
                 </div>
-                <DealGrid deals={filteredDeals} nowMs={nowMs} />
+                <DealGrid deals={finalDeals} nowMs={nowMs} />
              </section>
            )}
 
-           {(tab === 'all' || tab === 'loot') && filteredLoot.length > 0 && (
+           {(tab === 'all' || tab === 'loot' || currentTravelGroup) && finalLoot.length > 0 && (
              <section className="mb-12">
                 <div className="flex items-center gap-3 mb-2">
                    <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center text-red-500">
@@ -395,11 +472,11 @@ export default function CategoryResults() {
                    </div>
                    <h2 className="text-xl font-extrabold tracking-tight text-red-500">Loot Offers</h2>
                 </div>
-                <DealGrid deals={filteredLoot} nowMs={nowMs} />
+                <DealGrid deals={finalLoot} nowMs={nowMs} />
              </section>
            )}
 
-           {(tab === 'all' || tab === 'coupons') && filteredCoupons.length > 0 && (
+           {(tab === 'all' || tab === 'coupons' || currentTravelGroup) && finalCoupons.length > 0 && (
              <section className="mb-12">
                 <div className="flex items-center gap-3 mb-6">
                    <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500">
@@ -408,7 +485,7 @@ export default function CategoryResults() {
                    <h2 className="text-xl font-extrabold tracking-tight text-blue-500">Promo Coupons</h2>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                   {filteredCoupons.map(coupon => (
+                   {finalCoupons.map(coupon => (
                      <Link 
                       key={coupon.id} 
                       to={`/deal/${coupon.slug || coupon.id}`}
