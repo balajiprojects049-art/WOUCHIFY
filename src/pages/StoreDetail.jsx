@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useNavigate } from 'react-router-dom'
 import CouponCard from '../components/CouponCard'
 import DealCard from '../components/DealCard'
 import LootProductCard from '../components/LootProductCard'
@@ -11,6 +11,7 @@ import { getDealRemainingSeconds } from '../utils/dealExpiry'
 
 function StoreDetail() {
   const { storeName } = useParams()
+  const navigate = useNavigate()
   const { stores, coupons, deals, lootDeals, trackPageView } = useData()
   const store = (stores || []).find(s => s.slug === (storeName || '').toLowerCase())
 
@@ -161,9 +162,9 @@ function StoreDetail() {
         <div className="rounded-2xl border border-line bg-white p-8 text-center shadow-sm">
           <h1 className="text-2xl font-bold text-ink">Store not found</h1>
           <p className="mt-2 text-sm text-muted">This store page does not exist yet.</p>
-          <Link to="/stores" className="mt-4 inline-flex rounded-xl bg-navy px-4 py-2 text-sm font-semibold text-cream">
-            Browse Stores
-          </Link>
+          <button onClick={() => navigate('/#stores')} className="mt-4 inline-flex rounded-xl bg-navy px-4 py-2 text-sm font-semibold text-cream">
+            Go Back
+          </button>
         </div>
       </main>
     )
@@ -171,6 +172,16 @@ function StoreDetail() {
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-16">
+      <button 
+        onClick={() => navigate('/#stores')} 
+        className="mb-4 flex items-center gap-2 text-sm font-bold text-muted hover:text-ink transition-colors"
+      >
+        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+        Back
+      </button>
+
       <section className="rounded-2xl bg-white p-6 shadow-md">
         <div className="flex flex-wrap items-center justify-between gap-5">
           <div className="flex items-start gap-4">

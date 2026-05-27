@@ -53,7 +53,7 @@ function HomePage() {
       </section>
 
       {/* 3. TOP STORES */}
-      <section className={sectionCls}>
+      <section id="stores" className={sectionCls}>
         <div className={containerCls}>
           <div className="flex items-center gap-3 mb-8">
             <span className="h-8 w-1.5 rounded-full bg-gold" />
