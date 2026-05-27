@@ -1,9 +1,12 @@
 import { useMemo, useState, useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import CouponCard from '../components/CouponCard'
+import DealCard from '../components/DealCard'
+import LootProductCard from '../components/LootProductCard'
 import StoreFilterBar from '../components/StoreFilterBar'
 import { useData } from '../context/DataContext'
 import { resolveStoreLogoUrl } from '../utils/storeLogo'
+import { getDealRemainingSeconds } from '../utils/dealExpiry'
 
 
 function StoreDetail() {
@@ -21,6 +24,14 @@ function StoreDetail() {
   const [minDiscount, setMinDiscount] = useState('10%+')
   const [sortBy, setSortBy] = useState('Latest')
   const [logoBroken, setLogoBroken] = useState(false)
+  const [nowMs, setNowMs] = useState(Date.now())
+
+  useEffect(() => {
+    const timerId = setInterval(() => {
+      setNowMs(Date.now())
+    }, 1000)
+    return () => clearInterval(timerId)
+  }, [])
 
   const storeLogoUrl = useMemo(() => resolveStoreLogoUrl(store), [store])
 
@@ -70,18 +81,20 @@ function StoreDetail() {
     const dealOffers = (deals || [])
       .filter(d => {
         const dStore = (d.store || '').toLowerCase()
-        return dStore === storeName_ || dStore === storeSlug_
+        return dStore === storeName_ || dStore === storeSlug_ || dStore.includes(storeName_) || dStore.includes(storeSlug_) || storeName_.includes(dStore)
       })
       .map(d => {
-        const discountMatch = (d.discount || '').match(/(\d+)/)
-        const discountValue = discountMatch ? Number.parseInt(discountMatch[1], 10) : 0
+        const stringDiscount = d.discount ? String(d.discount) : ''
+        const discountMatch = stringDiscount.match(/(\d+)/)
+        const discountValue = discountMatch ? Number.parseInt(discountMatch[1], 10) : (d.discountPercent || d.discountValue || 0)
         return {
+          ...d,
           id: d.id || d.slug,
           slug: d.slug,
           title: d.title,
           description: d.description || '',
           type: 'deal',
-          discount: d.discount || '',
+          discount: stringDiscount || `${discountValue}% OFF`,
           discountValue,
           expiryDays: 30,
           expiry: d.expiry || '',
@@ -95,18 +108,20 @@ function StoreDetail() {
     const lootOffers = (lootDeals || [])
       .filter(d => {
         const dStore = (d.store || '').toLowerCase()
-        return dStore === storeName_ || dStore === storeSlug_
+        return dStore === storeName_ || dStore === storeSlug_ || dStore.includes(storeName_) || dStore.includes(storeSlug_) || storeName_.includes(dStore)
       })
       .map(d => {
-        const discountMatch = (d.discount || '').match(/(\d+)/)
-        const discountValue = discountMatch ? Number.parseInt(discountMatch[1], 10) : 0
+        const stringDiscount = d.discount ? String(d.discount) : ''
+        const discountMatch = stringDiscount.match(/(\d+)/)
+        const discountValue = discountMatch ? Number.parseInt(discountMatch[1], 10) : (d.discountPercent || d.discountValue || 0)
         return {
+          ...d,
           id: d.id || d.slug,
           slug: d.slug,
           title: d.title,
           description: d.description || '',
           type: 'loot',
-          discount: d.discount || '',
+          discount: stringDiscount || `${discountValue}% OFF`,
           discountValue,
           expiryDays: 15,
           expiry: d.expiry || '',
@@ -195,19 +210,46 @@ function StoreDetail() {
         onSortByChange={setSortBy}
       />
 
-      <section className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {filteredOffers.map((offer) => (
-          <CouponCard key={offer.id} store={store} offer={offer} />
-        ))}
+      {filteredOffers.filter(o => o.type === 'coupon').length > 0 && (
+        <div className="mt-12">
+          <h2 className="mb-6 text-2xl font-bold text-ink">Coupons</h2>
+          <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {filteredOffers.filter(o => o.type === 'coupon').map((offer) => (
+              <CouponCard key={offer.id} store={store} offer={offer} />
+            ))}
+          </section>
+        </div>
+      )}
 
-        {filteredOffers.length === 0 && (
-          <article className="rounded-2xl border border-line bg-white p-8 text-center text-sm font-medium text-muted sm:col-span-2 lg:col-span-4">
-            {(store.offers || []).length === 0
-              ? 'No offers have been added to this store yet.'
-              : 'No offers found. Try changing the filters.'}
-          </article>
-        )}
-      </section>
+      {filteredOffers.filter(o => o.type === 'deal').length > 0 && (
+        <div className="mt-12">
+          <h2 className="mb-6 text-2xl font-bold text-ink">Deals</h2>
+          <section className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+            {filteredOffers.filter(o => o.type === 'deal').map((offer) => (
+              <DealCard key={offer.id} deal={offer} remainingSeconds={getDealRemainingSeconds(offer, nowMs)} />
+            ))}
+          </section>
+        </div>
+      )}
+
+      {filteredOffers.filter(o => o.type === 'loot').length > 0 && (
+        <div className="mt-12">
+          <h2 className="mb-6 text-2xl font-bold text-ink">Loot Deals</h2>
+          <section className="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {filteredOffers.filter(o => o.type === 'loot').map((offer) => (
+              <LootProductCard key={offer.id} item={offer} />
+            ))}
+          </section>
+        </div>
+      )}
+
+      {filteredOffers.length === 0 && (
+        <article className="mt-8 rounded-2xl border border-line bg-white p-8 text-center text-sm font-medium text-muted">
+          {(store.offers || []).length === 0
+            ? 'No offers have been added to this store yet.'
+            : 'No offers found. Try changing the filters.'}
+        </article>
+      )}
     </main>
   )
 }
