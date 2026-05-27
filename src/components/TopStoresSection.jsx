@@ -38,20 +38,27 @@ function TopStoresSection() {
 
   if (!visibleStores.length) return null
 
-  // Real count: sum of matching deals + lootDeals + coupons for this store
+  // Real count: sum of matching store.offers + deals + lootDeals + coupons for this store
   const getOfferCount = (store) => {
-    const name = (store.name || '').toLowerCase()
-    const slug = (store.slug || '').toLowerCase()
-    const dealsCount = (deals || []).filter(d =>
-      (d.store || '').toLowerCase().includes(name) || (d.store || '').toLowerCase().includes(slug)
-    ).length
-    const lootCount = (lootDeals || []).filter(d =>
-      (d.store || '').toLowerCase().includes(name) || (d.store || '').toLowerCase().includes(slug)
-    ).length
-    const couponCount = (coupons || []).filter(c =>
-      (c.store || '').toLowerCase().includes(name) || (c.store || '').toLowerCase().includes(slug)
-    ).length
-    return dealsCount + lootCount + couponCount
+    const storeName_ = (store.name || '').toLowerCase()
+    const storeSlug_ = (store.slug || '').toLowerCase()
+
+    const isMatchingStore = (itemStore) => {
+      if (!itemStore) return false
+      return itemStore === storeName_ || 
+             itemStore === storeSlug_ || 
+             itemStore.includes(storeName_) || 
+             itemStore.includes(storeSlug_) || 
+             (itemStore.length > 2 && storeName_.includes(itemStore)) || 
+             (itemStore.length > 2 && storeSlug_.includes(itemStore))
+    }
+
+    const dealsCount = (deals || []).filter(d => isMatchingStore((d.store || '').toLowerCase())).length
+    const lootCount = (lootDeals || []).filter(d => isMatchingStore((d.store || '').toLowerCase())).length
+    const couponCount = (coupons || []).filter(c => isMatchingStore((c.store || c.storeId || '').toLowerCase())).length
+    const storeOffersCount = (store.offers || []).length
+
+    return dealsCount + lootCount + couponCount + storeOffersCount
   }
 
   return (
