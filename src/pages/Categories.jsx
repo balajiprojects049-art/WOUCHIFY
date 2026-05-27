@@ -229,6 +229,18 @@ export default function Categories() {
             { name: 'Chennai', icon: 'MapPin' }
           ]
         };
+      case 'all':
+        return {
+          title: 'Trending Across All',
+          items: [
+            { name: 'Fashion', icon: 'Shirt' },       // From Categories
+            { name: 'Amazon', icon: 'Store' },        // From Stores
+            { name: 'SBI', icon: 'Building' },        // From Banks
+            { name: 'Trains', icon: 'Train' },        // From Travel
+            { name: 'Boat', icon: 'Headphones' },     // From Brands
+            { name: 'Diwali', icon: 'Sparkles' }      // From Festivals
+          ]
+        };
       default:
         return {
           title: 'Trending Categories',
