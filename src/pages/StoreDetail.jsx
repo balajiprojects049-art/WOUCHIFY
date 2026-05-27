@@ -44,11 +44,18 @@ function StoreDetail() {
     const storeName_ = (store.name || '').toLowerCase()
     const storeSlug_ = (store.slug || '').toLowerCase()
 
+    const isMatchingStore = (itemStore) => {
+      if (!itemStore) return false
+      return itemStore === storeName_ || 
+             itemStore === storeSlug_ || 
+             itemStore.includes(storeName_) || 
+             itemStore.includes(storeSlug_) || 
+             (itemStore.length > 2 && storeName_.includes(itemStore)) || 
+             (itemStore.length > 2 && storeSlug_.includes(itemStore))
+    }
+
     const couponOffers = (coupons || [])
-      .filter(c => {
-        const cStore = (c.store || c.storeId || '').toLowerCase()
-        return cStore === storeName_ || cStore === storeSlug_
-      })
+      .filter(c => isMatchingStore((c.store || c.storeId || '').toLowerCase()))
       .map(c => {
         // Parse "Expires in 10 days" → 10
         const expiryMatch = (c.expiry || '').match(/(\d+)\s*day/i)
@@ -59,10 +66,11 @@ function StoreDetail() {
         const discountValue = discountMatch ? Number.parseInt(discountMatch[1], 10) : 0
 
         return {
+          ...c,
           id: c.id || c.slug,
           slug: c.slug,
-          title: c.discount || c.title || c.code,
-          description: c.discount || '',
+          title: c.title || c.discount || c.code,
+          description: c.description || c.discount || '',
           type: 'coupon',
           code: c.code,
           discount: c.discount,
@@ -79,10 +87,7 @@ function StoreDetail() {
       })
 
     const dealOffers = (deals || [])
-      .filter(d => {
-        const dStore = (d.store || '').toLowerCase()
-        return dStore === storeName_ || dStore === storeSlug_ || dStore.includes(storeName_) || dStore.includes(storeSlug_) || storeName_.includes(dStore)
-      })
+      .filter(d => isMatchingStore((d.store || '').toLowerCase()))
       .map(d => {
         const stringDiscount = d.discount ? String(d.discount) : ''
         const discountMatch = stringDiscount.match(/(\d+)/)
@@ -106,29 +111,26 @@ function StoreDetail() {
       })
 
     const lootOffers = (lootDeals || [])
-      .filter(d => {
-        const dStore = (d.store || '').toLowerCase()
-        return dStore === storeName_ || dStore === storeSlug_ || dStore.includes(storeName_) || dStore.includes(storeSlug_) || storeName_.includes(dStore)
-      })
-      .map(d => {
-        const stringDiscount = d.discount ? String(d.discount) : ''
+      .filter(l => isMatchingStore((l.store || '').toLowerCase()))
+      .map(l => {
+        const stringDiscount = l.discount ? String(l.discount) : ''
         const discountMatch = stringDiscount.match(/(\d+)/)
-        const discountValue = discountMatch ? Number.parseInt(discountMatch[1], 10) : (d.discountPercent || d.discountValue || 0)
+        const discountValue = discountMatch ? Number.parseInt(discountMatch[1], 10) : (l.discountPercent || l.discountValue || 0)
         return {
-          ...d,
-          id: d.id || d.slug,
-          slug: d.slug,
-          title: d.title,
-          description: d.description || '',
+          ...l,
+          id: l.id || l.slug,
+          slug: l.slug,
+          title: l.title,
+          description: l.description || '',
           type: 'loot',
           discount: stringDiscount || `${discountValue}% OFF`,
           discountValue,
           expiryDays: 15,
-          expiry: d.expiry || '',
-          popularity: d.views || 99,
-          category: d.category || 'Loot',
+          expiry: l.expiry || '',
+          popularity: l.views || 99,
+          category: l.category || 'Loot',
           active: true,
-          createdAt: d.createdAt || new Date().toISOString(),
+          createdAt: l.createdAt || new Date().toISOString(),
         }
       })
 
@@ -151,7 +153,7 @@ function StoreDetail() {
       if (sortBy === 'Expiring Soon') return a.expiryDays - b.expiryDays
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     })
-  }, [store, coupons, searchText, offerType, minDiscount, sortBy])
+  }, [store, coupons, deals, lootDeals, searchText, offerType, minDiscount, sortBy])
 
   if (!store) {
     return (
