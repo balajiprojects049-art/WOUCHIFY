@@ -1,11 +1,13 @@
+export const GLOBAL_APP_MOUNT_TIME = Date.now();
+
 export function getDealRemainingSeconds(deal, nowMs = Date.now()) {
   const totalSeconds = Number(deal?.expiresInSeconds)
   if (!Number.isFinite(totalSeconds) || totalSeconds <= 0) return null
 
-  const createdMs = deal?.createdAt ? new Date(deal.createdAt).getTime() : NaN
+  const createdMs = deal?.createdAt ? new Date(deal.createdAt).getTime() : GLOBAL_APP_MOUNT_TIME
   const elapsedSeconds = Number.isFinite(createdMs)
     ? Math.floor((nowMs - createdMs) / 1000)
-    : 0
+    : Math.floor((nowMs - GLOBAL_APP_MOUNT_TIME) / 1000)
 
   return Math.max(totalSeconds - Math.max(elapsedSeconds, 0), 0)
 }

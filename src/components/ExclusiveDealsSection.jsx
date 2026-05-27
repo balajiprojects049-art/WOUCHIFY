@@ -3,7 +3,7 @@ import { useData } from '../context/DataContext'
 
 function ExclusiveDealsSection() {
   const navigate = useNavigate()
-  const { lootDeals } = useData()
+  const { userLootDeals: lootDeals } = useData()
 
   // Show top 3 loot deals sorted by discountPercent
   const exclusiveDeals = [...lootDeals]

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useData } from '../context/DataContext'
 
 function CouponsSection() {
-  const { coupons } = useData()
+  const { userCoupons: coupons } = useData()
   const [copiedCode, setCopiedCode] = useState('')
 
   // Show top 4 active coupons

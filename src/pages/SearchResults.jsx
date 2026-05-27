@@ -5,6 +5,7 @@ import DealCard from '../components/DealCard'
 import LootDealCard from '../components/LootDealCard'
 import StoreCard from '../components/StoreCard'
 import CreditCardDetailCard from '../components/CreditCardDetailCard'
+import PromoCouponCard from '../components/PromoCouponCard'
 import SEO from '../components/SEO'
 
 // ── Error Boundary — prevents any crash in Search from killing the whole page ──
@@ -42,20 +43,7 @@ class SearchErrorBoundary extends Component {
   }
 }
 
-// Horizontal Coupon Card for search results (simplified version of the one in Coupons.jsx)
-function SearchCouponCard({ item }) {
-  return (
-    <div className="flex items-center gap-4 rounded-2xl border border-line bg-surface p-4 shadow-sm transition-all hover:shadow-md">
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gold/10 text-xl">🎟️</div>
-      <div className="min-w-0 flex-1">
-        <p className="text-[10px] font-black uppercase tracking-widest text-gold text-opacity-80">{item.store}</p>
-        <h3 className="truncate text-sm font-bold text-ink">{item.discount}</h3>
-        <p className="truncate text-xs text-muted">Code: <span className="font-mono font-bold text-ink">{item.code}</span></p>
-      </div>
-      <Link to="/coupons" className="shrink-0 rounded-lg bg-cream px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-ink transition-colors hover:bg-gold/20">View All</Link>
-    </div>
-  )
-}
+
 
 export default function SearchResults() {
   const [searchParams] = useSearchParams()
@@ -167,8 +155,14 @@ export default function SearchResults() {
                 <h2 className="text-lg font-black uppercase tracking-wider text-ink">Coupons ({results.coupons.length})</h2>
                 <Link to="/coupons" className="text-xs font-bold text-gold hover:underline">All Coupons</Link>
               </div>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {results.coupons.map(c => <SearchCouponCard key={c.id || c.code} item={c} />)}
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
+                {results.coupons.map(c => (
+                  <PromoCouponCard 
+                    key={c.id || c.code} 
+                    offer={c} 
+                    store={{name: c.store}} 
+                  />
+                ))}
               </div>
             </section>
           )}

@@ -1,6 +1,6 @@
 import SearchBar from './SearchBar'
 
-const offerTypes = ['All', 'Deals', 'Coupons', 'Expired']
+const offerTypes = ['All', 'Deals', 'Loot', 'Coupons', 'Expired']
 const discountFilters = ['10%+', '25%+', '50%+']
 const sortOptions = ['Latest', 'Popular', 'Expiring Soon']
 

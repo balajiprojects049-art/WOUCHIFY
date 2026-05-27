@@ -4,7 +4,7 @@ import LootProductCard from './LootProductCard'
 
 export default function LatestLootDealsSection() {
   const navigate = useNavigate()
-  const { lootDeals } = useData()
+  const { userLootDeals: lootDeals } = useData()
 
   const latest = [...(lootDeals || [])]
     .sort((a, b) => {

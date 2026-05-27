@@ -8,7 +8,7 @@ function DealsCatalogSection({
 }) {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const { deals } = useData()
+  const { userDeals: deals } = useData()
 
   const selectedCategory = searchParams.get('category')
   const selectedStore = searchParams.get('store')

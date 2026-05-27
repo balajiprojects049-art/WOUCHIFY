@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
-import CouponCard from '../components/CouponCard'
+import PromoCouponCard from '../components/PromoCouponCard'
 import DealCard from '../components/DealCard'
 import LootProductCard from '../components/LootProductCard'
 import StoreFilterBar from '../components/StoreFilterBar'
@@ -12,7 +12,7 @@ import { getDealRemainingSeconds } from '../utils/dealExpiry'
 function StoreDetail() {
   const { storeName } = useParams()
   const navigate = useNavigate()
-  const { stores, coupons, deals, lootDeals, trackPageView } = useData()
+  const { stores, userCoupons: coupons, userDeals: deals, userLootDeals: lootDeals, trackPageView } = useData()
   const store = (stores || []).find(s => s.slug === (storeName || '').toLowerCase())
 
   useEffect(() => {
@@ -135,12 +135,15 @@ function StoreDetail() {
         }
       })
 
-    const storeOffers = (store.offers || [])
-    const allOffers = [...storeOffers, ...couponOffers, ...dealOffers, ...lootOffers]
+    const allOffers = [...couponOffers, ...dealOffers, ...lootOffers]
 
     const filtered = allOffers.filter((offer) => {
       const isExpired = offer.expiryDays < 0
-      const normalizedType = isExpired ? 'Expired' : (offer.type === 'coupon' ? 'Coupons' : 'Deals')
+      const normalizedType = isExpired ? 'Expired' : (
+        offer.type === 'coupon' ? 'Coupons' : (
+          offer.type === 'loot' ? 'Loot' : 'Deals'
+        )
+      )
       const matchesType = offerType === 'All' || normalizedType === offerType
       const matchesDiscount = Number.isNaN(threshold) || offer.discountValue >= threshold
       const query = searchText.trim().toLowerCase()
@@ -226,9 +229,9 @@ function StoreDetail() {
       {filteredOffers.filter(o => o.type === 'coupon').length > 0 && (
         <div className="mt-12">
           <h2 className="mb-6 text-2xl font-bold text-ink">Coupons</h2>
-          <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2">
             {filteredOffers.filter(o => o.type === 'coupon').map((offer) => (
-              <CouponCard key={offer.id} store={store} offer={offer} />
+              <PromoCouponCard key={offer.id} store={store} offer={offer} />
             ))}
           </section>
         </div>

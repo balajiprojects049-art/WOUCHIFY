@@ -90,7 +90,7 @@ function DealCard({ deal }) {
 
 export default function LatestDealsSection() {
   const navigate = useNavigate()
-  const { deals } = useData()
+  const { userDeals: deals } = useData()
 
   const latest = [...(deals || [])]
     .sort((a, b) => {

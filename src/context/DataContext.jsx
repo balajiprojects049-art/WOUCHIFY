@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, useMemo } from 'react'
 import { dealsData } from '../data/dealsData'
 import { lootDealsData } from '../data/lootDealsData'
 import { storesData } from '../data/storesData'
@@ -350,6 +350,52 @@ export function DataProvider({ children }) {
   const publishedDeals = deals.filter(isPublished)
   const publishedLootDeals = lootDeals.filter(isPublished)
 
+  // ── Unified User Panel Data ────────────────────────────────────────────────
+  // Automatically merges exclusive store offers into the global arrays
+  const storeMergedData = useMemo(() => {
+    const sDeals = []
+    const sLoot = []
+    const sCoupons = []
+    
+    ;(stores || []).forEach(store => {
+      ;(store.offers || []).forEach(offer => {
+        if (offer.type === 'deal') {
+          sDeals.push({
+            id: offer.id, slug: offer.id, store: store.name, logo: store.logo,
+            title: offer.title, description: offer.description, discountPercent: offer.discountValue || 0,
+            discountValue: offer.discountValue || 0, category: store.category, 
+            expiresInSeconds: offer.expiryDays ? offer.expiryDays * 24 * 60 * 60 : undefined,
+            popularity: offer.popularity || 0, createdAt: offer.createdAt || new Date().toISOString(), publishAt: offer.createdAt || new Date().toISOString(),
+            image: store.logo, isExclusive: true
+          })
+        } else if (offer.type === 'loot') {
+          sLoot.push({
+            id: offer.id, slug: offer.id, store: store.name, logo: store.logo,
+            title: offer.title, description: offer.description, discountPercent: offer.discountValue || 0,
+            discountValue: offer.discountValue || 0, category: store.category, 
+            expiresInSeconds: offer.expiryDays ? offer.expiryDays * 24 * 60 * 60 : undefined,
+            popularity: offer.popularity || 0, createdAt: offer.createdAt || new Date().toISOString(), publishAt: offer.createdAt || new Date().toISOString(),
+            image: store.logo, isExclusive: true
+          })
+        } else if (offer.type === 'coupon') {
+          sCoupons.push({
+            id: offer.id, store: store.name, logo: store.logo, code: offer.code,
+            discount: offer.badge || offer.title, category: store.category,
+            expiry: offer.expiryDays ? `Expires in ${offer.expiryDays} days` : '',
+            expiresInSeconds: offer.expiryDays ? offer.expiryDays * 24 * 60 * 60 : undefined,
+            success: offer.successRate ? `${offer.successRate}%` : '', badge: offer.badge || 'HOT',
+            active: offer.active !== false, isExclusive: true, createdAt: offer.createdAt || new Date().toISOString()
+          })
+        }
+      })
+    })
+    return { sDeals, sLoot, sCoupons }
+  }, [stores])
+
+  const userDeals = useMemo(() => [...publishedDeals, ...storeMergedData.sDeals], [publishedDeals, storeMergedData])
+  const userLootDeals = useMemo(() => [...publishedLootDeals, ...storeMergedData.sLoot], [publishedLootDeals, storeMergedData])
+  const userCoupons = useMemo(() => [...coupons, ...storeMergedData.sCoupons], [coupons, storeMergedData])
+
   // ── ADVERTISEMENTS CRUD ───────────────────────────────────────────────────
   const addAdvertisement = (ad) => {
     const newAd = { ...ad, id: generateId(), createdAt: new Date().toISOString() }
@@ -608,6 +654,7 @@ export function DataProvider({ children }) {
     <DataContext.Provider value={{
       // Data
       deals, lootDeals, publishedDeals, publishedLootDeals, stores, coupons, giveaways, creditCards, banners, adminSettings, adminMembers, dbConnected, syncDataToDb,
+      userDeals, userLootDeals, userCoupons,
       advertisements, addAdvertisement, updateAdvertisement, deleteAdvertisement,
       // Auth
       currentUser, loginAdmin, logoutAdmin,

@@ -6,6 +6,7 @@ import { useData } from '../context/DataContext'
 import { resolveStoreLogoUrl } from '../utils/storeLogo'
 import ShareButton from '../components/ShareButton'
 import SEO from '../components/SEO'
+import PromoCouponCard from '../components/PromoCouponCard'
 
 /* ── Animations ──────────────────────────────────────────────────── */
 const css = `
@@ -126,171 +127,12 @@ function getDynamicExpiry(expiryString, createdAtStr) {
   return expiryString.replace(match[0], `${remainingDays} days`)
 }
 
-/* ── Professional CouponCard ─────────────────────────────────────── */
-function CouponCard({ item, index, dealLink }) {
-  const [revealed, setRevealed] = useState(false)
-  const [copied, setCopied] = useState(false)
-  const [burst, setBurst] = useState(0)
 
-  const dynamicExpiryText = getDynamicExpiry(item.expiry, item.createdAt)
-  const isExpired = dynamicExpiryText === 'Expired'
-  const isUrgent = dynamicExpiryText && (dynamicExpiryText.includes('1 day') || dynamicExpiryText.includes('today'))
-
-  const handleReveal = () => { setRevealed(true); setBurst(b => b + 1) }
-  const handleCopy = () => {
-    navigator.clipboard.writeText(item.code)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2500)
-  }
-
-  return (
-    <article className={`group relative flex w-full overflow-hidden rounded-2xl bg-surface border transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_30px_rgba(0,0,0,0.15)] ${
-      isExpired ? 'opacity-60 grayscale border-line' : 'border-gold/20 shadow-[0_2px_12px_rgba(0,0,0,0.1)]'
-    }`}>
-
-      {/* Gold top accent line */}
-      <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-transparent via-[#C89B1E] to-transparent" />
-
-      {/* ── LEFT: info ───────────────────────────────── */}
-      <div className="flex min-w-0 flex-1 items-center gap-4 px-5 py-5">
-        <StoreLogo store={item.store} directLogo={item.logo} />
-
-        <div className="min-w-0 flex-1">
-          {/* Category + badge */}
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 truncate">
-              {item.category || 'Coupon'}
-            </span>
-            {item.badge && (
-              <span className={`shrink-0 rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${badgeStyle(item.badge)}`}>
-                {item.badge}
-              </span>
-            )}
-          </div>
-
-          {/* Store name */}
-          <h3 className="truncate text-base font-black text-ink sm:text-lg group-hover:text-gold transition-colors">
-            {item.store}
-          </h3>
-
-          {/* Discount description */}
-          <p className="mt-0.5 line-clamp-1 text-sm font-semibold text-muted">{item.discount}</p>
-
-          {/* Meta row */}
-          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
-            {item.minOrder && (
-              <span className="flex items-center gap-1 text-[11px] font-medium text-muted">
-                <span>🛒</span> Min: {item.minOrder}
-              </span>
-            )}
-            {dynamicExpiryText && (
-              <span className={`flex items-center gap-1 text-[11px] font-bold ${
-                isExpired ? 'text-red-500' : isUrgent ? 'text-orange-500' : 'text-muted'
-              }`}>
-                <span>⏰</span> {dynamicExpiryText}
-              </span>
-            )}
-            {item.success && (
-              <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-500">
-                <span>✓</span> {item.success} success
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* ── Dashed divider ───────────────────────────── */}
-      <div className="relative flex shrink-0 flex-col items-center justify-center py-4 px-0.5">
-        <div className="absolute -top-3 h-6 w-6 rounded-full bg-cream" />
-        <div className="h-full border-l-2 border-dashed border-gold/25" />
-        <span className="absolute rotate-90 text-[11px] text-gold/30">✂</span>
-        <div className="absolute -bottom-3 h-6 w-6 rounded-full bg-cream" />
-      </div>
-
-      {/* ── RIGHT: code reveal ───────────────────────── */}
-      <div className="relative flex w-40 shrink-0 flex-col items-center justify-center gap-2.5 px-4 py-5 sm:w-44">
-        <ConfettiBurst trigger={burst} />
-
-        {!revealed ? (
-          <>
-            {/* Blurred code preview */}
-            <div className="relative w-full overflow-hidden rounded-xl border border-gold/20 bg-cream px-3 py-2.5">
-              <p className="select-none text-center text-xs font-black tracking-[0.35em] text-gold/30 blur-[5px]">
-                {item.code || 'XXXXXX'}
-              </p>
-              <div className="absolute inset-0 rounded-xl" style={{
-                background: 'linear-gradient(90deg,transparent,rgba(200,155,30,0.08),transparent)',
-                backgroundSize: '200% 100%',
-                animation: 'shimmer 2s linear infinite',
-              }} />
-            </div>
-
-            {/* Reveal button */}
-            <button
-              onClick={handleReveal}
-              className="relative w-full overflow-hidden rounded-xl border border-gold bg-gold py-2.5 text-[11px] font-black text-surface shadow-sm shadow-gold/20 transition-all duration-200 hover:bg-gold/90 hover:scale-105 active:scale-95"
-            >
-              <span className="relative flex items-center justify-center gap-1.5">
-                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
-                Reveal Code
-              </span>
-            </button>
-          </>
-        ) : (
-          <>
-            {/* Revealed code box */}
-            <div className="reveal-anim w-full rounded-xl border border-gold/40 bg-cream px-3 py-2.5">
-              <p className="slide-up text-center text-[11px] font-black tracking-[0.2em] text-gold">
-                {item.code}
-              </p>
-            </div>
-
-            {/* Action buttons */}
-            <div className="slide-up flex w-full flex-col gap-1.5">
-              <button
-                onClick={handleCopy}
-                className={`w-full rounded-xl py-2 text-[11px] font-black shadow-sm transition-all duration-200 hover:scale-105 active:scale-95 ${
-                  copied
-                    ? 'bg-emerald-500 text-white shadow-emerald-200'
-                    : 'bg-gold text-surface shadow-gold/20 hover:bg-gold/90'
-                }`}
-              >
-                {copied ? '✓ Copied!' : 'Copy Code'}
-              </button>
-              <a
-                href={dealLink || '#'}
-                target={dealLink ? '_blank' : undefined}
-                rel="noopener noreferrer"
-                onClick={!dealLink ? e => e.preventDefault() : undefined}
-                className={`flex w-full items-center justify-center gap-1 rounded-xl border py-2 text-[11px] font-black transition-all duration-200 hover:scale-105 active:scale-95 ${
-                  dealLink
-                    ? 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
-                    : 'border-slate-100 bg-slate-50 text-slate-300 cursor-not-allowed'
-                }`}
-              >
-                {dealLink ? 'Get Deal ↗' : 'No Link'}
-              </a>
-              <ShareButton
-                variant="pill"
-                title={`${item.store} Coupon — ${item.discount}`}
-                text={`Use code ${item.code} for ${item.discount} at ${item.store}`}
-                url={dealLink || window.location.href}
-                className="w-full justify-center border-line bg-cream text-muted hover:border-gold/30 hover:text-ink"
-              />
-            </div>
-          </>
-        )}
-      </div>
-    </article>
-  )
-}
 
 /* ── Coupons Page ────────────────────────────────────────────────── */
 function Coupons() {
-  const { coupons: allCoupons, banners, stores } = useData()
+  const { userCoupons: allCoupons, banners, stores } = useData()
+
   const activeCoupons = allCoupons.filter(c => {
     if (c.active === false) return false
     
@@ -386,7 +228,11 @@ function Coupons() {
             {/* Vertical list */}
             <div className="flex flex-col gap-4">
               {filtered.map((coupon, i) => (
-                <CouponCard key={coupon.id || coupon.code} item={coupon} index={i} dealLink={coupon.resolvedLink} />
+                <PromoCouponCard 
+                  key={coupon.id || coupon.code} 
+                  offer={{...coupon, link: coupon.resolvedLink}} 
+                  store={{name: coupon.store, category: coupon.category}} 
+                />
               ))}
               {filtered.length === 0 && (
                 <div className="rounded-3xl border border-line bg-surface p-16 text-center shadow-inner">

@@ -11,7 +11,7 @@ function parseDiscount(value) {
 }
 
 function LootDeals() {
-  const { publishedLootDeals: lootDeals, banners } = useData()
+  const { userLootDeals: lootDeals, banners } = useData()
   const [nowMs, setNowMs] = useState(Date.now())
   const [searchText, setSearchText] = useState('')
   const [category, setCategory] = useState('All')

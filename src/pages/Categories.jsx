@@ -33,7 +33,7 @@ const IconRenderer = ({ name, className = "w-5 h-5" }) => {
 const LETTERS = ["ALL", ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")]
 
 export default function Categories() {
-  const { deals, lootDeals, coupons } = useData()
+  const { deals, lootDeals, coupons, stores } = useData()
   const [activeTab, setActiveTab] = useState('all')
   const [activeTravelSub, setActiveTravelSub] = useState('All')
   const [activeLetter, setActiveLetter] = useState('ALL')
@@ -43,12 +43,51 @@ export default function Categories() {
 
   const { pathname } = useLocation()
 
-  // Helper to get real count for a specific category string
+  // Helper to get real count for a specific category/store/bank/brand string
   const getCatCount = (catName) => {
-    const dealsCount = deals?.filter(d => d.category === catName)?.length || 0
-    const lootCount = lootDeals?.filter(d => d.category === catName)?.length || 0
-    const couponCount = coupons?.filter(c => c.category === catName)?.length || 0
-    return dealsCount + lootCount + couponCount
+    const name = (catName || '').toLowerCase()
+    
+    // Check if this category name actually matches a store
+    const store = (stores || []).find(s => (s.name || '').toLowerCase() === name || (s.slug || '').toLowerCase() === name)
+    const storeOffersCount = store ? (store.offers || []).length : 0
+
+    const isMatchingStore = (itemStore) => {
+      if (!itemStore) return false
+      if (store) {
+         const storeName_ = (store.name || '').toLowerCase()
+         const storeSlug_ = (store.slug || '').toLowerCase()
+         return itemStore === storeName_ || 
+                itemStore === storeSlug_ || 
+                itemStore.includes(storeName_) || 
+                itemStore.includes(storeSlug_) || 
+                (itemStore.length > 2 && storeName_.includes(itemStore)) || 
+                (itemStore.length > 2 && storeSlug_.includes(itemStore))
+      }
+      return itemStore === name || itemStore.includes(name)
+    }
+
+    const match = (item) => {
+      if (!item) return false
+      if ((item.category || '').toLowerCase() === name) return true
+      if ((item.brand || '').toLowerCase() === name) return true
+      if ((item.bank || '').toLowerCase() === name) return true
+      
+      const itemStore = (item.store || item.storeId || '').toLowerCase()
+      if (isMatchingStore(itemStore)) return true
+
+      // Fallback: search title and description to capture brands, banks, and festivals
+      if (name.length > 2) {
+        const textToSearch = `${item.title || ''} ${item.description || ''} ${item.category || ''}`.toLowerCase()
+        if (textToSearch.includes(name)) return true
+      }
+
+      return false
+    }
+
+    const dealsCount = deals?.filter(match)?.length || 0
+    const lootCount = lootDeals?.filter(match)?.length || 0
+    const couponCount = coupons?.filter(match)?.length || 0
+    return dealsCount + lootCount + couponCount + storeOffersCount
   }
 
   // Simulate loading for Skeleton Effect — only on tab switch (not letter click)

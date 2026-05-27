@@ -3,7 +3,7 @@ import { useData } from '../context/DataContext'
 
 function TrendingDealsSection() {
   const navigate = useNavigate()
-  const { deals } = useData()
+  const { userDeals: deals } = useData()
 
   const trending = [...deals]
     .sort((a, b) => {

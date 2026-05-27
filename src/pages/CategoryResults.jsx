@@ -3,6 +3,8 @@ import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom'
 import { useData } from '../context/DataContext'
 import DealGrid from '../components/DealGrid'
 import CreditCardDetailCard from '../components/CreditCardDetailCard'
+import PromoCouponCard from '../components/PromoCouponCard'
+import LootProductCard from '../components/LootProductCard'
 import { ChevronRight, Filter, Search, Tag, Sparkles, LayoutGrid, CheckSquare, Square, Store, Compass } from 'lucide-react'
 import { getDealRemainingSeconds } from '../utils/dealExpiry'
 import { resolveStoreLogoUrl } from '../utils/storeLogo'
@@ -15,8 +17,35 @@ const IconRenderer = ({ name, ...props }) => {
   return <IconComponent {...props} />
 }
 
+// Gorgeous fallback store logo component to fix double-checkbox visual bug
+const StoreLogo = ({ storeName, stores }) => {
+  const [failed, setFailed] = React.useState(false)
+  const storeObj = stores.find(s => s.name.toLowerCase() === storeName.toLowerCase()) || { name: storeName }
+  const logoUrl = resolveStoreLogoUrl(storeObj)
+
+  if (failed || !logoUrl) {
+    return (
+      <div className="w-5 h-5 bg-gold/15 rounded flex items-center justify-center shrink-0 shadow-sm">
+        <span className="text-[9px] font-black text-gold uppercase">{storeName.slice(0, 2).toUpperCase()}</span>
+      </div>
+    )
+  }
+
+  return (
+    <div className="w-5 h-5 bg-surface rounded border border-line flex items-center justify-center overflow-hidden shrink-0 shadow-sm p-0.5">
+      <img 
+        src={logoUrl} 
+        alt={storeName} 
+        className="w-full h-full object-contain" 
+        onError={() => setFailed(true)} 
+      />
+    </div>
+  )
+}
+
 export default function CategoryResults() {
-  const { deals, lootDeals, coupons, stores, creditCards } = useData()
+  const { userDeals: deals, userLootDeals: lootDeals, userCoupons: coupons, stores, creditCards } = useData()
+
   const [searchParams] = useSearchParams()
   const categoryName = searchParams.get('category')
   const [nowMs, setNowMs] = useState(Date.now())
@@ -32,8 +61,14 @@ export default function CategoryResults() {
   useEffect(() => {
     const timer = setInterval(() => setNowMs(Date.now()), 1000)
     window.scrollTo(0, 0)
+    
+    // Reset store filters and searches when navigating to a new category
+    setSelectedStores([])
+    setStoreSearch('')
+    setCategorySearch('')
+    
     return () => clearInterval(timer)
-  }, [categoryName]) // reset scroll when category changes
+  }, [categoryName]) // reset scroll and filter states when category changes
 
   // Helper to check if a deal matches this category
   const matchesCategory = (item, catName) => {
@@ -73,14 +108,20 @@ export default function CategoryResults() {
       if (itemCat.includes('bike') || itemStore.includes('rapido')) return true;
     }
 
-    // 4. Loose checks for Stores (e.g. "Amazon India" contains "Amazon")
+    // 2. Partial match on category (e.g. 'Men's Footwear' includes 'Footwear')
+    if (itemCat && (itemCat.includes(target) || (itemCat.length > 2 && target.includes(itemCat)))) return true;
+
+    // 3. Partial match on store (e.g. 'Amazon India' includes 'Amazon', 'Amazon' matches 'Amazon India')
+    if (itemStore && (itemStore.includes(target) || (itemStore.length > 2 && target.includes(itemStore)))) return true;
+
+    // 4. Loose checks for known Stores in categoriesData
     const storesGroup = categoriesData.stores;
     let isKnownStore = false;
     if (storesGroup) {
       isKnownStore = Object.values(storesGroup).flat().some(s => s.name.toLowerCase() === target);
     }
     if (isKnownStore) {
-      if (itemStore.includes(target) || target.includes(itemStore)) return true;
+      if (itemStore && (itemStore.includes(target) || (itemStore.length > 2 && target.includes(itemStore)))) return true;
     }
 
     // 5. Loose checks for Brands (e.g. Nike deal has "Nike" in the title)
@@ -137,8 +178,8 @@ export default function CategoryResults() {
   const currentTravelGroup = categoryName ? TRAVEL_GROUPS[categoryName.toLowerCase()] : null
 
   // Fetch all items assigned to this category
-  const categoryDeals = useMemo(() => deals.filter(d => matchesCategory(d, categoryName) && getDealRemainingSeconds(d, nowMs) > 0), [deals, categoryName, nowMs])
-  const categoryLoot = useMemo(() => lootDeals.filter(d => matchesCategory(d, categoryName) && getDealRemainingSeconds(d, nowMs) > 0), [lootDeals, categoryName, nowMs])
+  const categoryDeals = useMemo(() => deals.filter(d => matchesCategory(d, categoryName) && (d.expiresInSeconds === undefined || getDealRemainingSeconds(d, nowMs) > 0)), [deals, categoryName, nowMs])
+  const categoryLoot = useMemo(() => lootDeals.filter(d => matchesCategory(d, categoryName) && (d.expiresInSeconds === undefined || getDealRemainingSeconds(d, nowMs) > 0)), [lootDeals, categoryName, nowMs])
   const categoryCoupons = useMemo(() => coupons.filter(c => matchesCategory(c, categoryName)), [coupons, categoryName])
 
   // Get matching bank cards for bank categories
@@ -161,10 +202,16 @@ export default function CategoryResults() {
     })
   }, [creditCards, categoryName])
 
-  // Get ALL stores from the platform
+  // Get unique store names ONLY from active offers in the current category
   const availableStores = useMemo(() => {
-    return stores.map(store => store.name).sort()
-  }, [stores])
+    const dealStoreNames = [
+      ...(categoryDeals || []).map(d => d.store),
+      ...(categoryLoot || []).map(d => d.store),
+      ...(categoryCoupons || []).map(c => c.store),
+    ].filter(Boolean)
+    const allNames = [...new Set(dealStoreNames)]
+    return allNames.sort()
+  }, [categoryDeals, categoryLoot, categoryCoupons])
 
   // Get ALL product categories
   const allCategories = useMemo(() => {
@@ -189,19 +236,26 @@ export default function CategoryResults() {
     )
   }
 
+  // Exact case-insensitive store match for precise multi-select checkbox filtering
+  const fuzzyStoreMatch = (itemStore, selectedList) => {
+    if (!itemStore) return false
+    const item = itemStore.toLowerCase().trim()
+    return selectedList.some(sel => sel.toLowerCase().trim() === item)
+  }
+
   const storeFilteredDeals = useMemo(() => {
     if (selectedStores.length === 0) return categoryDeals
-    return categoryDeals.filter(d => selectedStores.includes(d.store))
+    return categoryDeals.filter(d => fuzzyStoreMatch(d.store, selectedStores))
   }, [categoryDeals, selectedStores])
 
   const storeFilteredLoot = useMemo(() => {
     if (selectedStores.length === 0) return categoryLoot
-    return categoryLoot.filter(d => selectedStores.includes(d.store))
+    return categoryLoot.filter(d => fuzzyStoreMatch(d.store, selectedStores))
   }, [categoryLoot, selectedStores])
 
   const storeFilteredCoupons = useMemo(() => {
     if (selectedStores.length === 0) return categoryCoupons
-    return categoryCoupons.filter(c => selectedStores.includes(c.store))
+    return categoryCoupons.filter(c => fuzzyStoreMatch(c.store, selectedStores))
   }, [categoryCoupons, selectedStores])
 
   const totalCount = storeFilteredDeals.length + storeFilteredLoot.length + storeFilteredCoupons.length + bankCards.length
@@ -283,13 +337,25 @@ export default function CategoryResults() {
       {/* Header */}
       <div className="bg-surface border-b border-line pt-6 pb-8">
         <div className="max-w-[1400px] mx-auto px-4 sm:px-6">
-          <nav className="flex items-center gap-2 text-[10px] font-bold text-muted uppercase tracking-widest mb-4">
-            <Link to="/" className="hover:text-gold transition-colors">Home</Link>
-            <ChevronRight className="w-3 h-3" />
-            <Link to="/categories" className="hover:text-gold transition-colors">Categories</Link>
-            <ChevronRight className="w-3 h-3" />
-            <span className="text-ink">{categoryName}</span>
-          </nav>
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+            <button 
+              onClick={() => navigate(-1)} 
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-muted hover:text-ink transition-colors focus:outline-none"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+              Back
+            </button>
+
+            <nav className="flex items-center gap-2 text-[10px] font-bold text-muted uppercase tracking-widest">
+              <Link to="/" className="hover:text-gold transition-colors">Home</Link>
+              <ChevronRight className="w-3 h-3" />
+              <Link to="/categories" className="hover:text-gold transition-colors">Categories</Link>
+              <ChevronRight className="w-3 h-3" />
+              <span className="text-ink">{categoryName}</span>
+            </nav>
+          </div>
 
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
@@ -320,6 +386,31 @@ export default function CategoryResults() {
       {/* Main Layout */}
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 py-10 flex flex-col lg:flex-row gap-8">
          
+         {/* Related Categories Horizontal Scroll (Mobile Only) */}
+         {allCategories.length > 0 && (
+           <div className="lg:hidden w-full shrink-0">
+             <div className="flex items-center gap-2 mb-3">
+               <Compass className="w-4 h-4 text-gold" />
+               <h3 className="text-xs font-black text-ink uppercase tracking-wider">Related Categories</h3>
+             </div>
+             <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+               {allCategories.map(cat => {
+                 const isActive = categoryName === cat.name;
+                 return (
+                   <button
+                     key={cat.name}
+                     onClick={() => navigate(`/category-results?category=${encodeURIComponent(cat.name)}`)}
+                     className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold shrink-0 transition-all border ${isActive ? 'bg-gold/10 border-gold/30 text-gold shadow-sm' : 'bg-surface border-line text-muted hover:text-ink'}`}
+                   >
+                     <IconRenderer name={cat.icon} className="w-3.5 h-3.5" />
+                     <span>{cat.name}</span>
+                   </button>
+                 )
+               })}
+             </div>
+           </div>
+         )}
+
          {/* ── LEFT SIDEBAR FILTERS ── */}
          <aside className="w-full lg:w-64 shrink-0 space-y-6">
             {/* Store Filter */}
@@ -360,9 +451,7 @@ export default function CategoryResults() {
                           className={`w-full flex items-center justify-between p-2 rounded-lg transition-colors duration-200 border border-transparent ${isSelected ? 'bg-gold/10 border-gold/30 text-gold' : 'hover:bg-cream text-ink'}`}
                         >
                           <div className="flex items-center gap-2.5">
-                            <div className="w-5 h-5 bg-surface rounded border border-line flex items-center justify-center overflow-hidden shrink-0 shadow-sm p-0.5">
-                              <img src={resolveStoreLogoUrl(store)} alt={store} className="w-full h-full object-contain" onError={(e) => { e.target.style.display = 'none' }} />
-                            </div>
+                            <StoreLogo storeName={store} stores={stores} />
                             <span className={`text-xs font-semibold ${isSelected ? 'text-gold' : 'text-ink'}`}>{store}</span>
                           </div>
                           {isSelected ? <CheckSquare className="w-4 h-4 text-gold shrink-0" /> : <Square className="w-4 h-4 text-muted shrink-0" />}
@@ -385,7 +474,7 @@ export default function CategoryResults() {
             )}
 
             {/* Related Categories Links */}
-            <div className="bg-surface rounded-2xl border border-line p-5 shadow-sm">
+            <div className="hidden lg:block bg-surface rounded-2xl border border-line p-5 shadow-sm">
               <div className="flex items-center gap-2 mb-4">
                 <Compass className="w-4 h-4 text-gold" />
                 <h3 className="text-sm font-bold text-ink uppercase tracking-wider">Related Categories</h3>
@@ -472,7 +561,11 @@ export default function CategoryResults() {
                    </div>
                    <h2 className="text-xl font-extrabold tracking-tight text-red-500">Loot Offers</h2>
                 </div>
-                <DealGrid deals={finalLoot} nowMs={nowMs} />
+                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 mt-8">
+                   {finalLoot.map(deal => (
+                     <LootProductCard key={deal.id || deal.slug} item={deal} />
+                   ))}
+                 </div>
              </section>
            )}
 
@@ -484,23 +577,13 @@ export default function CategoryResults() {
                    </div>
                    <h2 className="text-xl font-extrabold tracking-tight text-blue-500">Promo Coupons</h2>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-5">
                    {finalCoupons.map(coupon => (
-                     <Link 
-                      key={coupon.id} 
-                      to={`/deal/${coupon.slug || coupon.id}`}
-                      className="group bg-surface rounded-2xl border border-line p-5 hover:border-gold/50 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300 relative overflow-hidden flex flex-col"
-                     >
-                       <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:opacity-10 group-hover:scale-110 transition-all duration-500">
-                          <Tag className="w-16 h-16 text-blue-500" />
-                       </div>
-                       <p className="text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-1">{coupon.store}</p>
-                       <h3 className="text-base font-bold text-ink mb-1 leading-snug line-clamp-2 group-hover:text-gold transition-colors">{coupon.title}</h3>
-                       <div className="mt-auto pt-6 flex items-center justify-between">
-                          <span className="text-[10px] font-black px-3 py-1.5 bg-cream rounded-md text-ink border border-line group-hover:bg-gold/10 group-hover:border-gold/30 group-hover:text-gold transition-colors">COPY CODE</span>
-                          <ChevronRight className="w-4 h-4 text-muted group-hover:translate-x-1 group-hover:text-gold transition-all" />
-                       </div>
-                     </Link>
+                     <PromoCouponCard 
+                       key={coupon.id} 
+                       offer={coupon} 
+                       store={{ name: coupon.store, category: coupon.category }} 
+                     />
                    ))}
                 </div>
              </section>

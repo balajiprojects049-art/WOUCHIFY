@@ -58,13 +58,15 @@ export default function DealCard({ deal, remainingSeconds }) {
     if (b === 'FLASH')     return 'bg-amber-400 text-black'
     if (b === 'EXCLUSIVE') return 'bg-purple-600 text-white'
     if (b === 'LOOT')      return 'bg-emerald-500 text-white'
-    return 'bg-black/80 text-[#C89B1E]'
+    return 'bg-[#121826] text-[#C89B1E]' // default
   }
+
+  if (isExpired) return null;
 
   return (
     <article className={`group flex flex-col overflow-hidden rounded-2xl border bg-white transition-all duration-300 ${
       isExpired
-        ? 'opacity-55 grayscale border-gray-200'
+        ? 'opacity-60 grayscale border-gray-200'
         : 'border-[#E8E4DC] shadow-[0_2px_16px_rgba(0,0,0,0.07)] hover:-translate-y-1.5 hover:border-red-300/50 hover:shadow-[0_20px_50px_rgba(239,68,68,0.10)]'
     }`}>
 

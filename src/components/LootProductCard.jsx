@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
 import { storesData } from '../data/storesData'
 import { resolveStoreLogoUrl } from '../utils/storeLogo'
+import { GLOBAL_APP_MOUNT_TIME } from '../utils/dealExpiry'
 import ShareButton from './ShareButton'
 
 const FALLBACK = 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=600&q=80'
@@ -12,7 +13,6 @@ function pad(n) {
 
 export default function LootProductCard({ item }) {
   const [nowMs, setNowMs]   = useState(Date.now())
-  const [mountTime]         = useState(Date.now())
   const [imgErr, setImgErr] = useState(false)
 
   useEffect(() => {
@@ -24,10 +24,10 @@ export default function LootProductCard({ item }) {
   const remainingSeconds = useMemo(() => {
     const total = Number(item.expiresInSeconds) || 0
     if (total <= 0) return null                       // null = no timer
-    const birth   = item.createdAt ? new Date(item.createdAt).getTime() : mountTime
+    const birth   = item.createdAt ? new Date(item.createdAt).getTime() : GLOBAL_APP_MOUNT_TIME
     const elapsed = Math.floor((nowMs - birth) / 1000)
     return Math.max(total - Math.max(elapsed, 0), 0)
-  }, [item.expiresInSeconds, item.createdAt, nowMs, mountTime])
+  }, [item.expiresInSeconds, item.createdAt, nowMs])
 
   const isExpired = remainingSeconds !== null && remainingSeconds <= 0
   const hasTimer  = remainingSeconds !== null && !isExpired
@@ -56,6 +56,8 @@ export default function LootProductCard({ item }) {
   const logoText = (item.store || 'ST').slice(0, 2).toUpperCase()
   const price    = item.newPrice || item.price || null
   const slug     = item.slug || item.id
+
+  if (isExpired) return null;
 
   return (
     <article className={`group flex flex-col overflow-hidden rounded-2xl border bg-white transition-all duration-300 ${
