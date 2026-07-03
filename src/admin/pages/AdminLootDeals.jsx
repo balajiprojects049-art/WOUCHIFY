@@ -62,7 +62,35 @@ function LootForm({ initial, onSave, onCancel, stores }) {
   })
   const [showAdvanced, setShowAdvanced] = useState(!!initial.publishAt)
   
-  const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
+  const set = (k, v) => setForm(p => {
+    let next = { ...p, [k]: v }
+    
+    const calcFields = ['newPrice', 'oldPrice', 'discountPercent']
+    if (calcFields.includes(k)) {
+      const parseNum = (str) => {
+        if (!str) return 0
+        const num = Number(String(str).replace(/[^0-9.]/g, ''))
+        return isNaN(num) ? 0 : num
+      }
+
+      const mrp = parseNum(k === 'oldPrice' ? v : p.oldPrice)
+      
+      if (k === 'newPrice' || k === 'oldPrice') {
+        const curr = parseNum(k === 'newPrice' ? v : p.newPrice)
+        if (mrp > 0 && curr > 0 && mrp > curr) {
+          const percent = Math.round(((mrp - curr) / mrp) * 100)
+          next.discountPercent = percent
+        }
+      } else if (k === 'discountPercent') {
+        const percent = parseNum(v)
+        if (mrp > 0 && percent >= 0 && percent <= 100) {
+          const curr = Math.round(mrp - (mrp * (percent / 100)))
+          next.newPrice = curr > 0 ? `₹${curr.toLocaleString('en-IN')}` : ''
+        }
+      }
+    }
+    return next
+  })
   const inputProps = { className: inp, style: inpStyle, onFocus: addFocus, onBlur: remFocus }
   const flatCategories = useMemo(() => Array.from(new Set(CATEGORY_SECTIONS.flatMap(s => Object.values(s.data).flat()))).sort(), [])
   const storeOptions = useMemo(() => Array.from(new Set(stores?.map(s => s.name) || [])).sort(), [stores])
