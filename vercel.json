@@ -11,14 +11,13 @@
       "config": { "distDir": "dist" }
     }
   ],
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "/api/events", "dest": "/api/events.js" },
-    { "src": "/api/poll",   "dest": "/api/poll.js" },
-    { "src": "/api/data",   "dest": "/api/data.js" },
-    { "src": "/api/sync",   "dest": "/api/sync.js" },
-    { "src": "/api/(.*)",   "dest": "/api/collection/$1" },
-    { "src": "/(.*)",       "dest": "/index.html" }
+  "rewrites": [
+    { "source": "/api/events", "destination": "/api/events" },
+    { "source": "/api/poll", "destination": "/api/poll" },
+    { "source": "/api/data", "destination": "/api/data" },
+    { "source": "/api/sync", "destination": "/api/sync" },
+    { "source": "/api/:path*", "destination": "/api/collection/:path*" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
 
