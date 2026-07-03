@@ -171,8 +171,8 @@ function DealForm({ initial, onSave, onCancel, role, stores }) {
                 <input {...inputProps} value={form.code} onChange={e => set('code', e.target.value.toUpperCase())} placeholder="e.g. IPHONE18" />
               </div>
               <div>
-                <label className={lbl}>URL Slug <span className="normal-case font-normal text-[10px] text-white/20">(auto if blank)</span></label>
-                <input {...inputProps} value={form.slug} onChange={e => set('slug', e.target.value)} placeholder="iphone-15-pro-max" />
+                <label className={lbl}>URL Slug <span className="normal-case font-normal text-[10px] text-white/20">{initial.slug ? '(cannot be changed)' : '(auto if blank)'}</span></label>
+                <input {...inputProps} value={form.slug} onChange={e => set('slug', e.target.value)} placeholder="iphone-15-pro-max" disabled={!!initial.slug} style={{ ...inputProps.style, opacity: initial.slug ? 0.5 : 1, cursor: initial.slug ? 'not-allowed' : 'text' }} />
               </div>
               <div className="col-span-2 sm:col-span-1">
                 <label className={lbl}>Deal URL / Redirect Link</label>
@@ -403,7 +403,12 @@ export default function AdminDeals() {
   }
 
   const handleSave = (data) => {
-    if (mode === 'add') addDeal(data)
+    if (mode === 'add') {
+      if (deals.find(d => d.slug === data.slug)) {
+        return alert('A deal with this URL slug already exists. Please choose a different title or slug.')
+      }
+      addDeal(data)
+    }
     else updateDeal(editing.slug, data)
     setMode(null); setEditing(null)
   }

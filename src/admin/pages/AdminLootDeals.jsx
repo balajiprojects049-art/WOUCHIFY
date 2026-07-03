@@ -127,8 +127,8 @@ function LootForm({ initial, onSave, onCancel, stores }) {
                 <input type="number" min="0" max="100" {...inputProps} value={form.popularity} onChange={e => set('popularity', e.target.value)} placeholder="90" />
               </div>
               <div className="col-span-2 sm:col-span-1">
-                <label className={lbl}>URL Slug <span className="normal-case font-normal text-[10px] text-white/20">(auto if blank)</span></label>
-                <input {...inputProps} value={form.slug} onChange={e => set('slug', e.target.value)} placeholder="iphone-15-mega-drop" />
+                <label className={lbl}>URL Slug <span className="normal-case font-normal text-[10px] text-white/20">{initial.slug ? '(cannot be changed)' : '(auto if blank)'}</span></label>
+                <input {...inputProps} value={form.slug} onChange={e => set('slug', e.target.value)} placeholder="iphone-15-mega-drop" disabled={!!initial.slug} style={{ ...inputProps.style, opacity: initial.slug ? 0.5 : 1, cursor: initial.slug ? 'not-allowed' : 'text' }} />
               </div>
               <div>
                 <label className={lbl}>Coupon Code</label>
@@ -311,7 +311,12 @@ export default function AdminLootDeals() {
 
   const filtered = lootDeals.filter(d => (d.title?.toLowerCase() || '').includes(search.toLowerCase()))
   const handleSave = (data) => {
-    if (mode === 'add') addLootDeal(data)
+    if (mode === 'add') {
+      if (lootDeals.find(d => d.slug === data.slug)) {
+        return alert('A loot deal with this URL slug already exists. Please choose a different title or slug.')
+      }
+      addLootDeal(data)
+    }
     else updateLootDeal(editing.slug, data)
     setMode(null); setEditing(null)
   }
