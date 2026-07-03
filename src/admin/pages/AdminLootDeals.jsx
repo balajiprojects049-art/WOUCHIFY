@@ -216,7 +216,7 @@ function LootForm({ initial, onSave, onCancel, stores }) {
 
         <div className="space-y-5 sticky top-4 self-start">
           <div className="rounded-2xl p-5" style={cardStyle}>
-            <SectionHeader title="Deal Images (Max 5)" />
+            <SectionHeader title="Deal Images (Max 5 • 800x800px)" />
             <div className="grid grid-cols-2 gap-3">
               {[0, 1, 2, 3, 4].map(idx => (
                 <div key={idx} className={idx === 0 ? "col-span-2" : "col-span-1"}>
