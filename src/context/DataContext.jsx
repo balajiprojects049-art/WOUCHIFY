@@ -189,7 +189,16 @@ export function DataProvider({ children }) {
   const [creditCards, setCreditCards] = useState(() => loadFromStorage('wouchify_credit_cards', defaultCreditCards))
   const [banners, setBanners] = useState(() => normalizeBanners(loadFromStorage('wouchify_banners', defaultBanners)))
   const [adminSettings, setAdminSettings] = useState(() => loadFromStorage('wouchify_admin_settings', defaultAdminSettings))
-  const [adminMembers, setAdminMembers] = useState(() => normalizeAdminMembers(loadFromStorage('wouchify_admin_members', defaultAdminMembers)))
+  const [adminMembers, setAdminMembers] = useState(() => {
+    const stored = normalizeAdminMembers(loadFromStorage('wouchify_admin_members', defaultAdminMembers))
+    const merged = [...stored]
+    defaultAdminMembers.forEach(defMember => {
+      if (!merged.find(m => m.email === defMember.email)) {
+        merged.push(defMember)
+      }
+    })
+    return merged
+  })
   const [auditLog, setAuditLog] = useState(() => loadFromStorage('wouchify_audit_log', []))
   const [analytics, setAnalytics] = useState(() => loadFromStorage('wouchify_analytics', defaultAnalytics))
   const [advertisements, setAdvertisements] = useState(() => loadFromStorage('wouchify_advertisements', []))
