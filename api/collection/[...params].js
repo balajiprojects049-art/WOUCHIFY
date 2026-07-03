@@ -7,21 +7,18 @@ export default async function handler(req, res) {
 
   if (req.method === 'OPTIONS') return res.status(200).end()
 
-  // Parse the URL path directly to extract parameters safely
-  // req.url is like "/api/collection/deals" or "/api/collection/deals/some-slug"
+  // req.url on Vercel contains the original requested path (e.g. "/api/deals" or "/api/deals/some-slug")
   const urlPath = req.url.split('?')[0]
-  const urlParts = urlPath.split('/').filter(Boolean) // ['api', 'collection', 'deals', ...]
+  const urlParts = urlPath.split('/').filter(Boolean) // ['api', 'deals', ...]
   
-  // Find where 'collection' is in the path
-  const collectionIdx = urlParts.indexOf('collection')
-  const collection = collectionIdx !== -1 ? urlParts[collectionIdx + 1] : null
-  const itemId = collectionIdx !== -1 ? (urlParts[collectionIdx + 2] || null) : null
+  const collection = urlParts[1] || null
+  const itemId = urlParts[2] || null
 
   const pool = getPool()
   if (!pool) return res.json({ skip: true })
 
   const cfg = COLLECTIONS[collection]
-  if (!cfg) return res.status(400).json({ error: `Unknown collection: ${collection}. url: ${req.url}, parts: ${JSON.stringify(urlParts)}` })
+  if (!cfg) return res.status(400).json({ error: `Unknown collection: ${collection}` })
 
   try {
     await ensureTables(pool)
