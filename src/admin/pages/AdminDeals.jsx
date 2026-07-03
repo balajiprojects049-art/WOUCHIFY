@@ -228,11 +228,11 @@ function DealForm({ initial, onSave, onCancel, role, stores }) {
             <SectionHeader title="Pricing & Discount" />
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
               {[
-                { lbl: 'Current Price', key: 'price', ph: '₹1,049', req: true },
                 { lbl: 'Original Price (MRP)', key: 'originalPrice', ph: '₹1,299' },
+                { lbl: 'Discount %', key: 'discountValue', ph: '18', type: 'number', max: 100 },
+                { lbl: 'Current Price', key: 'price', ph: '₹1,049', req: true },
                 { lbl: 'Price Value', key: 'priceValue', ph: '1049', type: 'number' },
                 { lbl: 'Discount Label', key: 'discountLabel', ph: 'Save 18%', req: true },
-                { lbl: 'Discount %', key: 'discountValue', ph: '18', type: 'number', max: 100 },
                 { lbl: 'Success Rate %', key: 'successRate', ph: '90', type: 'number', max: 100 },
                 { lbl: 'Star Rating', key: 'rating', ph: '4.8', type: 'number', step: '0.1', max: 5 },
                 { lbl: 'Reviews Count', key: 'reviews', ph: '243', type: 'number' },

@@ -177,12 +177,12 @@ function LootForm({ initial, onSave, onCancel, stores }) {
                 <input {...inputProps} required value={form.oldPrice} onChange={e => set('oldPrice', e.target.value)} placeholder="₹1,999" />
               </div>
               <div>
-                <label className={lbl}>Loot Price <span style={{ color: G }}>*</span></label>
-                <input {...inputProps} required value={form.newPrice} onChange={e => set('newPrice', e.target.value)} placeholder="₹599" />
-              </div>
-              <div>
                 <label className={lbl}>Discount %</label>
                 <input type="number" min="1" max="99" {...inputProps} value={form.discountPercent} onChange={e => set('discountPercent', e.target.value)} placeholder="70" />
+              </div>
+              <div>
+                <label className={lbl}>Loot Price <span style={{ color: G }}>*</span></label>
+                <input {...inputProps} required value={form.newPrice} onChange={e => set('newPrice', e.target.value)} placeholder="₹599" />
               </div>
               <div>
                 <label className={lbl}>Star Rating</label>
