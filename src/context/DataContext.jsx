@@ -90,7 +90,9 @@ const defaultAdminMembers = [
   { id: 'am3', name: 'Ops Leader', email: 'ops@wouchify.com', phone: '+91 98765 00002', department: 'Operations', role: 'Operational Manager', active: true, password: 'admin' },
   { id: 'am4', name: 'Content Editor', email: 'editor@wouchify.com', phone: '+91 98765 00003', department: 'Content & Marketing', role: 'Editors', active: true, password: 'admin' },
   { id: 'am5', name: 'Support Agent', email: 'support@wouchify.com', phone: '+91 98765 00004', department: 'Customer Support', role: 'Support', active: true, password: 'admin' },
-  { id: 'am6', name: 'Balaji (Executive)', email: 'balaji@wouchify.com', phone: '+91 98765 00005', department: 'Content Entry', role: 'Operational Executive', active: true, password: 'admin' }
+  { id: 'am6', name: 'Balaji (Executive)', email: 'balaji@wouchify.com', phone: '+91 98765 00005', department: 'Content Entry', role: 'Operational Executive', active: true, password: 'admin' },
+  { id: 'am7', name: 'User 1 (Executive)', email: 'user1@gmail.com', phone: '', department: 'Content Entry', role: 'Operational Executive', active: true, password: 'User1@123' },
+  { id: 'am8', name: 'User 2 (Executive)', email: 'user2@gmail.com', phone: '', department: 'Content Entry', role: 'Operational Executive', active: true, password: 'User2@123' }
 ]
 
 // ── Default Analytics ───────────────────────────────────────────────────────

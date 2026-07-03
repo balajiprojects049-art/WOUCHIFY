@@ -427,6 +427,8 @@ const adminSettings = {
 const adminMembers = [
   { id: 'am1', name: 'Admin User', email: 'admin@wouchify.com', role: 'Owner', active: true },
   { id: 'am2', name: 'Content Manager', email: 'content@wouchify.com', role: 'Editor', active: true },
+  { id: 'am7', name: 'User 1 (Executive)', email: 'user1@gmail.com', role: 'Operational Executive', active: true, password: 'User1@123' },
+  { id: 'am8', name: 'User 2 (Executive)', email: 'user2@gmail.com', role: 'Operational Executive', active: true, password: 'User2@123' }
 ]
 
 // ── 11. AUDIT LOG ────────────────────────────────────────────────────────────
