@@ -7,14 +7,15 @@ export default async function handler(req, res) {
 
   if (req.method === 'OPTIONS') return res.status(200).end()
 
-  // Route: /api/collection/[...params]
-  // Vercel passes query.params as an array: ['deals'] or ['deals', 'some-slug']
-  let params = req.query.params || []
-  if (typeof params === 'string') {
-    params = [params]
-  }
-  const collection = params[0]
-  const itemId = params[1] || null
+  // Parse the URL path directly to extract parameters safely
+  // req.url is like "/api/collection/deals" or "/api/collection/deals/some-slug"
+  const urlPath = req.url.split('?')[0]
+  const urlParts = urlPath.split('/').filter(Boolean) // ['api', 'collection', 'deals', ...]
+  
+  // Find where 'collection' is in the path
+  const collectionIdx = urlParts.indexOf('collection')
+  const collection = collectionIdx !== -1 ? urlParts[collectionIdx + 1] : null
+  const itemId = collectionIdx !== -1 ? (urlParts[collectionIdx + 2] || null) : null
 
   const pool = getPool()
   if (!pool) return res.json({ skip: true })
