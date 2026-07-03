@@ -178,8 +178,8 @@ export default function CategoryResults() {
   const currentTravelGroup = categoryName ? TRAVEL_GROUPS[categoryName.toLowerCase()] : null
 
   // Fetch all items assigned to this category
-  const categoryDeals = useMemo(() => deals.filter(d => matchesCategory(d, categoryName) && (d.expiresInSeconds === undefined || getDealRemainingSeconds(d, nowMs) > 0)), [deals, categoryName, nowMs])
-  const categoryLoot = useMemo(() => lootDeals.filter(d => matchesCategory(d, categoryName) && (d.expiresInSeconds === undefined || getDealRemainingSeconds(d, nowMs) > 0)), [lootDeals, categoryName, nowMs])
+  const categoryDeals = useMemo(() => deals.filter(d => matchesCategory(d, categoryName) && (d.expiresInSeconds == null || getDealRemainingSeconds(d, nowMs) > 0)), [deals, categoryName, nowMs])
+  const categoryLoot = useMemo(() => lootDeals.filter(d => matchesCategory(d, categoryName) && (d.expiresInSeconds == null || getDealRemainingSeconds(d, nowMs) > 0)), [lootDeals, categoryName, nowMs])
   const categoryCoupons = useMemo(() => coupons.filter(c => matchesCategory(c, categoryName)), [coupons, categoryName])
 
   // Get matching bank cards for bank categories

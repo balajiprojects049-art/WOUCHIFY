@@ -522,7 +522,7 @@ export default function AdminDeals() {
               {filtered.length === 0 && <tr><td colSpan={5} className="px-5 py-12 text-center text-sm text-white/30">No deals matched your criteria.</td></tr>}
               {filtered.map((deal) => {
                 const isSelected = selected.includes(deal.slug)
-                const remaining = deal.expiresInSeconds === undefined ? 1 : getDealRemainingSeconds(deal)
+                const remaining = deal.expiresInSeconds == null ? 1 : getDealRemainingSeconds(deal)
                 const isDead = remaining <= 0 || deal.status === 'Expired'
                 
                 return (

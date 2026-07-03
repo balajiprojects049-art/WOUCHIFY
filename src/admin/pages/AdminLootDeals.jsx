@@ -384,7 +384,7 @@ export default function AdminLootDeals() {
             <tbody>
               {filtered.length === 0 && <tr><td colSpan={7} className="px-5 py-12 text-center text-sm text-white/30">No loot deals yet.</td></tr>}
               {filtered.map((d) => {
-                const remaining = d.expiresInSeconds === undefined ? 1 : getDealRemainingSeconds(d)
+                const remaining = d.expiresInSeconds == null ? 1 : getDealRemainingSeconds(d)
                 const isDead = remaining <= 0 || d.status === 'Expired'
                 return (
                 <tr key={d.slug} style={trBorderStyle}

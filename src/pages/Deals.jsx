@@ -89,10 +89,10 @@ function Deals() {
       const matchesDiscount = Number.isNaN(minDiscountValue) || deal.discountValue >= minDiscountValue
       const matchesPriceRange = deal.priceValue <= priceRange
       // Auto-hide if mathematically expired (unless it's an evergreen deal with no expiry configured)
-      if (deal.expiresInSeconds !== undefined && remainingSeconds <= 0) return false
+      if (deal.expiresInSeconds != null && remainingSeconds !== null && remainingSeconds <= 0) return false
 
       const matchesActive = dealStatus === 'All Deals' ||
-        (dealStatus === 'Active Deals' && (remainingSeconds > 0 || deal.expiresInSeconds === undefined))
+        (dealStatus === 'Active Deals' && (remainingSeconds > 0 || deal.expiresInSeconds == null))
 
       return matchesSearch && matchesCategory && matchesStore && matchesDiscount && matchesPriceRange && matchesActive
     })

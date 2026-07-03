@@ -34,7 +34,8 @@ function LootDeals() {
 
     const filtered = lootDeals.filter((deal) => {
       // Auto-hide if mathematically expired (but treat missing expiry as evergreen)
-      if (deal.expiresInSeconds !== undefined && getDealRemainingSeconds(deal, nowMs) <= 0) return false
+      const remainingSeconds = getDealRemainingSeconds(deal, nowMs)
+      if (deal.expiresInSeconds != null && remainingSeconds !== null && remainingSeconds <= 0) return false
 
       const query = searchText.trim().toLowerCase()
       const matchesSearch = !query || (deal.title || '').toLowerCase().includes(query) || (deal.category || '').toLowerCase().includes(query)
