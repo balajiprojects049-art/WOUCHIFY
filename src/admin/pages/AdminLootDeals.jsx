@@ -207,6 +207,10 @@ function LootForm({ initial, onSave, onCancel, stores }) {
                 <textarea {...inputProps} rows={4} value={Array.isArray(form.steps) ? form.steps.join('\n') : form.steps} onChange={e => set('steps', e.target.value)} placeholder={"Click 'Grab Deal'\nSign in or create account\nAdd to cart\nDiscount applies automatically"} />
               </div>
               <div>
+                <label className={lbl}>Product Specifications <span className="normal-case font-normal text-[10px] text-white/20">(one per line, e.g. RAM: 8GB)</span></label>
+                <textarea {...inputProps} rows={4} value={Array.isArray(form.specifications) ? form.specifications.join('\n') : form.specifications} onChange={e => set('specifications', e.target.value)} placeholder={"RAM: 8GB\nStorage: 256GB\nColor: Space Black"} />
+              </div>
+              <div>
                 <label className={lbl}>Terms & Conditions</label>
                 <textarea {...inputProps} rows={2} value={form.terms} onChange={e => set('terms', e.target.value)} placeholder="Valid while stock lasts. One per customer." />
               </div>

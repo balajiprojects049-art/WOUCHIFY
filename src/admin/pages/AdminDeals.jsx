@@ -16,7 +16,7 @@ const EMPTY_DEAL = {
   slug: '', title: '', store: '', category: 'Electronics', discountLabel: '', discountValue: 0,
   type: 'offer', price: '', originalPrice: '', priceValue: 0, usageCount: '', expiresInSeconds: 7200,
   successRate: 90, expiry: '', badge: 'HOT', code: '', image: '', description: '',
-  terms: '', steps: '', highlights: '', link: '', createdAt: new Date().toISOString(),
+  terms: '', steps: '', highlights: '', specifications: '', link: '', createdAt: new Date().toISOString(),
   priority: 'Medium', status: 'Active', featured: false, trending: false, telegramSync: true,
   publishAt: '', // Scheduled publish date — empty = publish immediately
 }
@@ -223,6 +223,10 @@ function DealForm({ initial, onSave, onCancel, role, stores }) {
                 <div>
                   <label className={lbl}>Highlights <span className="normal-case font-normal text-[10px] text-white/20">(one per line)</span></label>
                   <textarea {...inputProps} rows={5} value={Array.isArray(form.highlights) ? form.highlights.join('\n') : form.highlights} onChange={e => set('highlights', e.target.value)} placeholder={"M3 chip performance\n8-hour battery\nFree Prime delivery"} />
+                </div>
+                <div className="col-span-1 sm:col-span-2">
+                  <label className={lbl}>Product Specifications <span className="normal-case font-normal text-[10px] text-white/20">(one per line, e.g. RAM: 8GB)</span></label>
+                  <textarea {...inputProps} rows={4} value={Array.isArray(form.specifications) ? form.specifications.join('\n') : form.specifications} onChange={e => set('specifications', e.target.value)} placeholder={"RAM: 8GB\nStorage: 256GB\nColor: Space Black"} />
                 </div>
               </div>
               <div>

@@ -359,6 +359,32 @@ function DealDetail() {
                 </ol>
               </div>
             )}
+
+            {Array.isArray(deal.specifications) && deal.specifications.length > 0 && (
+              <div className="mb-6">
+                <h4 className="text-sm font-bold text-ink mb-3">Product Specifications</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+                  {deal.specifications.map(spec => {
+                    const [key, ...rest] = spec.split(':');
+                    const val = rest.join(':').trim();
+                    if (!val) {
+                      return (
+                        <div key={spec} className="flex items-start gap-2 text-sm text-ink/80">
+                          <span className="w-1.5 h-1.5 rounded-full bg-ink/40 mt-1.5 shrink-0"></span>
+                          <span className="leading-relaxed">{spec}</span>
+                        </div>
+                      )
+                    }
+                    return (
+                      <div key={spec} className="flex border-b border-line/10 pb-1.5">
+                        <span className="w-1/3 text-xs font-bold text-ink/70">{key.trim()}</span>
+                        <span className="w-2/3 text-sm text-ink/90">{val}</span>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
           </div>
           
           {/* Terms & Conditions Accordion (Simple) */}
