@@ -55,7 +55,7 @@ function ConfirmDialog({ onConfirm, onCancel, message = 'This will immediately r
   )
 }
 
-function DealForm({ initial, onSave, onCancel, role }) {
+function DealForm({ initial, onSave, onCancel, role, stores }) {
   const isEditor = role === 'Operational Executive'
   
   const [form, setForm] = useState(() => {
@@ -73,6 +73,7 @@ function DealForm({ initial, onSave, onCancel, role }) {
   
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
   const flatCategories = useMemo(() => Array.from(new Set(CATEGORY_SECTIONS.flatMap(s => Object.values(s.data).flat()))).sort(), [])
+  const storeOptions = useMemo(() => Array.from(new Set(stores?.map(s => s.name) || [])).sort(), [stores])
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -125,7 +126,12 @@ function DealForm({ initial, onSave, onCancel, role }) {
               </div>
               <div>
                 <label className={lbl}>Store Name <span style={{ color: G }}>*</span></label>
-                <input {...inputProps} required value={form.store} onChange={e => set('store', e.target.value)} placeholder="e.g. Amazon, Flipkart" />
+                <SearchableSelect 
+                  value={form.store} 
+                  onChange={v => set('store', v)} 
+                  options={storeOptions} 
+                  placeholder="Select a store..."
+                />
               </div>
               <div>
                 <label className={lbl}>Category</label>
@@ -346,7 +352,7 @@ function DealForm({ initial, onSave, onCancel, role }) {
 }
 
 export default function AdminDeals() {
-  const { deals, addDeal, updateDeal, deleteDeal, currentUser, analytics } = useData()
+  const { deals, stores, addDeal, updateDeal, deleteDeal, currentUser, analytics } = useData()
   const [mode, setMode] = useState(null)
   const [editing, setEditing] = useState(null)
   const [search, setSearch] = useState('')
@@ -407,7 +413,7 @@ export default function AdminDeals() {
       <div className="mb-5">
         <button onClick={() => { setMode(null); setEditing(null) }} className={backLinkCls}>← Back to Deals</button>
       </div>
-      <DealForm initial={editing || EMPTY_DEAL} onSave={handleSave} onCancel={() => { setMode(null); setEditing(null) }} role={role} />
+      <DealForm initial={editing || EMPTY_DEAL} onSave={handleSave} onCancel={() => { setMode(null); setEditing(null) }} role={role} stores={stores} />
     </AdminLayout>
   )
 

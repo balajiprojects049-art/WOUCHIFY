@@ -49,7 +49,7 @@ function ConfirmDialog({ onConfirm, onCancel }) {
   )
 }
 
-function LootForm({ initial, onSave, onCancel }) {
+function LootForm({ initial, onSave, onCancel, stores }) {
   const [form, setForm] = useState(() => {
     const startMs = initial.createdAt ? new Date(initial.createdAt).getTime() : Date.now()
     const expiresMs = startMs + (initial.expiresInSeconds || 21600) * 1000
@@ -65,6 +65,7 @@ function LootForm({ initial, onSave, onCancel }) {
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
   const inputProps = { className: inp, style: inpStyle, onFocus: addFocus, onBlur: remFocus }
   const flatCategories = useMemo(() => Array.from(new Set(CATEGORY_SECTIONS.flatMap(s => Object.values(s.data).flat()))).sort(), [])
+  const storeOptions = useMemo(() => Array.from(new Set(stores?.map(s => s.name) || [])).sort(), [stores])
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -105,7 +106,12 @@ function LootForm({ initial, onSave, onCancel }) {
               </div>
               <div>
                 <label className={lbl}>Store Name <span style={{ color: G }}>*</span></label>
-                <input {...inputProps} required value={form.store} onChange={e => set('store', e.target.value)} placeholder="e.g. Amazon, Flipkart, Myntra" />
+                <SearchableSelect 
+                  value={form.store} 
+                  onChange={v => set('store', v)} 
+                  options={storeOptions} 
+                  placeholder="Select a store..."
+                />
               </div>
               <div>
                 <label className={lbl}>Category</label>
@@ -297,7 +303,7 @@ function LootForm({ initial, onSave, onCancel }) {
 }
 
 export default function AdminLootDeals() {
-  const { lootDeals, addLootDeal, updateLootDeal, deleteLootDeal, analytics } = useData()
+  const { lootDeals, stores, addLootDeal, updateLootDeal, deleteLootDeal, analytics } = useData()
   const [mode, setMode] = useState(null)
   const [editing, setEditing] = useState(null)
   const [search, setSearch] = useState('')
@@ -313,7 +319,7 @@ export default function AdminLootDeals() {
   if (mode) return (
     <AdminLayout title={mode === 'add' ? 'Add Loot Deal' : 'Edit Loot Deal'}>
       <div className="mb-5"><button onClick={() => { setMode(null); setEditing(null) }} className={backLinkCls}>← Back to Loot Deals</button></div>
-      <LootForm initial={editing || EMPTY} onSave={handleSave} onCancel={() => { setMode(null); setEditing(null) }} />
+      <LootForm initial={editing || EMPTY} onSave={handleSave} onCancel={() => { setMode(null); setEditing(null) }} stores={stores} />
     </AdminLayout>
   )
 
