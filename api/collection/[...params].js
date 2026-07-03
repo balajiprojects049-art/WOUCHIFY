@@ -21,7 +21,7 @@ export default async function handler(req, res) {
   if (!pool) return res.json({ skip: true })
 
   const cfg = COLLECTIONS[collection]
-  if (!cfg) return res.status(400).json({ error: `Unknown collection: ${collection}` })
+  if (!cfg) return res.status(400).json({ error: `Unknown collection: ${collection}. url: ${req.url}, parts: ${JSON.stringify(urlParts)}` })
 
   try {
     await ensureTables(pool)
