@@ -1,10 +1,6 @@
 {
   "rewrites": [
-    { "source": "/api/events", "destination": "/api/events" },
-    { "source": "/api/poll", "destination": "/api/poll" },
-    { "source": "/api/data", "destination": "/api/data" },
-    { "source": "/api/sync", "destination": "/api/sync" },
-    { "source": "/api/:path*", "destination": "/api/collection/:path*" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/api/:path((?!data|sync|events|poll).*)", "destination": "/api/collection/:path" },
+    { "source": "/((?!api/|api$).*)", "destination": "/index.html" }
   ]
 }

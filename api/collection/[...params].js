@@ -9,7 +9,10 @@ export default async function handler(req, res) {
 
   // Route: /api/collection/[...params]
   // Vercel passes query.params as an array: ['deals'] or ['deals', 'some-slug']
-  const params = req.query.params || []
+  let params = req.query.params || []
+  if (typeof params === 'string') {
+    params = [params]
+  }
   const collection = params[0]
   const itemId = params[1] || null
 
