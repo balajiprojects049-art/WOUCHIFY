@@ -337,15 +337,14 @@ export function DataProvider({ children }) {
     })
   }
   const removeDb = (collection, id) => {
-    const endpoint = id ? `/api/${collection}/${id}` : `/api/${collection}`
-    fetch(endpoint, { method: 'DELETE' }).then((res) => {
-      if (!res.ok) {
-        console.error(`DB delete failed for ${id ? `${collection}/${id}` : collection}: HTTP ${res.status}`)
-      }
-    }).catch((err) => {
-      console.error(`DB delete failed for ${id ? `${collection}/${id}` : collection}:`, err?.message || err)
-      // Deletion will remain local if backend is unavailable.
-    })
+    const endpoint = id ? `/api/${collection}/${encodeURIComponent(id)}` : `/api/${collection}`
+    fetch(endpoint, { 
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: id ? JSON.stringify({ id }) : undefined
+    }).then((res) => {
+      if (!res.ok) console.error('Failed to remove from DB:', collection, id)
+    }).catch(err => console.error('Error removing from DB:', err))
   }
 
 
