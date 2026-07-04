@@ -786,5 +786,17 @@ export function DataProvider({ children }) {
 export function useData() {
   const ctx = useContext(DataContext)
   if (!ctx) throw new Error('useData must be used within DataProvider')
-  return ctx
+  
+  const isAdmin = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')
+  
+  const publicDeals = useMemo(() => ctx.deals.filter(d => d.status === 'Approved'), [ctx.deals])
+  const publicLootDeals = useMemo(() => ctx.lootDeals.filter(d => d.status === 'Approved'), [ctx.lootDeals])
+  const publicCoupons = useMemo(() => ctx.coupons.filter(d => d.status === 'Approved'), [ctx.coupons])
+
+  return useMemo(() => ({
+    ...ctx,
+    deals: isAdmin ? ctx.deals : publicDeals,
+    lootDeals: isAdmin ? ctx.lootDeals : publicLootDeals,
+    coupons: isAdmin ? ctx.coupons : publicCoupons,
+  }), [ctx, isAdmin, publicDeals, publicLootDeals, publicCoupons])
 }
