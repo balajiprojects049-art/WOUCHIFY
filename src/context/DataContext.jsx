@@ -227,7 +227,7 @@ export function DataProvider({ children }) {
   // ── 1) Connect to Neon Backend on Mount ──
   useEffect(() => {
     const syncFromDb = () => {
-      fetch('/api/data', { cache: 'no-store' }).then(r => r.json()).then(res => {
+      fetch(`/api/data?t=${Date.now()}`, { cache: 'no-store' }).then(r => r.json()).then(res => {
         if (res.isConnected) {
           setDbConnected(true)
           if (res.hasData) {
@@ -295,7 +295,8 @@ export function DataProvider({ children }) {
     let lastVersion = null
     const checkUpdates = async () => {
       try {
-        const res = await fetch('/api/poll').then(r => r.json())
+        const r = await fetch(`/api/poll?t=${Date.now()}`, { cache: 'no-store' })
+        const res = await r.json()
         if (res.version && res.version !== lastVersion) {
           lastVersion = res.version
           syncFromDb()
