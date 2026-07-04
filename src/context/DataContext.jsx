@@ -478,7 +478,7 @@ export function DataProvider({ children }) {
   const updateDeal = (slug, updates) => {
     setDeals((prev) => {
       const draft = prev.map((d) => d.slug === slug ? { ...d, ...updates } : d)
-      persist('deals', draft.find(x => x.slug === slug))
+      persist('deals', draft.find(x => x.slug === (updates.slug || slug)))
       return draft
     })
     addAuditLog('UPDATE', 'Deal', `Updated deal "${updates.title || slug}"`)
@@ -508,7 +508,7 @@ export function DataProvider({ children }) {
   const updateLootDeal = (slug, updates) => {
     setLootDeals((prev) => {
       const draft = prev.map((d) => d.slug === slug ? { ...d, ...updates } : d)
-      persist('lootDeals', draft.find(x => x.slug === slug))
+      persist('lootDeals', draft.find(x => x.slug === (updates.slug || slug)))
       return draft
     })
     addAuditLog('UPDATE', 'Loot Deal', `Updated loot deal "${updates.title || slug}"`)
@@ -532,7 +532,7 @@ export function DataProvider({ children }) {
   const updateStore = (slug, updates) => {
     setStores((prev) => {
       const draft = prev.map((s) => s.slug === slug ? { ...s, ...updates } : s)
-      persist('stores', draft.find(x => x.slug === slug))
+      persist('stores', draft.find(x => x.slug === (updates.slug || slug)))
       return draft
     })
     addAuditLog('UPDATE', 'Store', `Updated store "${updates.name || slug}"`)

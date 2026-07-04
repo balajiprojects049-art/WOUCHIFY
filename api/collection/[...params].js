@@ -7,12 +7,13 @@ export default async function handler(req, res) {
 
   if (req.method === 'OPTIONS') return res.status(200).end()
 
-  // req.url on Vercel contains the original requested path (e.g. "/api/deals" or "/api/deals/some-slug")
+  // req.url on Vercel contains the destination path (e.g. "/api/collection/deals") or original path (e.g. "/api/deals")
   const urlPath = req.url.split('?')[0]
-  const urlParts = urlPath.split('/').filter(Boolean) // ['api', 'deals', ...]
+  const urlParts = urlPath.split('/').filter(Boolean) // ['api', 'collection', 'deals', ...] or ['api', 'deals', ...]
   
-  const collection = urlParts[1] || null
-  const itemId = urlParts[2] || null
+  const isServerlessRewritten = urlParts[1] === 'collection'
+  const collection = isServerlessRewritten ? (urlParts[2] || null) : (urlParts[1] || null)
+  const itemId = isServerlessRewritten ? (urlParts[3] || null) : (urlParts[2] || null)
 
   const pool = getPool()
   if (!pool) return res.json({ skip: true })
@@ -49,7 +50,7 @@ export default async function handler(req, res) {
 
     return res.status(405).json({ error: 'Method not allowed' })
   } catch (err) {
-    console.error(`Error on ${req.method} /api/collection/${params.join('/')}:`, err)
+    console.error(`Error on ${req.method} /api/collection/${urlParts.join('/')}:`, err)
     return res.status(500).json({ error: err.message })
   }
 }

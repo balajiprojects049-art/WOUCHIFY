@@ -6,7 +6,9 @@ export const G = '#00D47E'
 export const inp =
   'w-full rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/20 focus:outline-none transition-all duration-200'
 export const inpStyle = {
-  border: '1px solid rgba(255,255,255,0.09)',
+  borderWidth: '1px',
+  borderStyle: 'solid',
+  borderColor: 'rgba(255,255,255,0.09)',
   background: 'rgba(255,255,255,0.04)',
 }
 export const inpFocus = {

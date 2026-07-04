@@ -22,6 +22,7 @@ const COLLECTIONS = {
   creditCards: { table: 'wouchify_credit_cards', mode: 'single' },
   banners: { table: 'wouchify_banners', mode: 'single' },
   analytics: { table: 'wouchify_analytics', mode: 'single' },
+  advertisements: { table: 'wouchify_advertisements', mode: 'list' },
 }
 
 const LEGACY_SINGLETON_KEYS = new Set(['adminSettings', 'creditCards', 'banners', 'analytics'])
