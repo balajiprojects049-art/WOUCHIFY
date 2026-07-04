@@ -237,7 +237,7 @@ export function DataProvider({ children }) {
             // When DB responds, fully replace local state so ALL devices/team members
             // see exactly the same data. LocalStorage is only used as offline fallback.
             const dbReplaceList = (dbItems, localFallback) => {
-              if (!Array.isArray(dbItems) || dbItems.length === 0) return localFallback
+              if (!Array.isArray(dbItems)) return localFallback
               return dbItems.filter(item => {
                 const itemId = String(item.slug || item.id || '')
                 return !itemId || !deletedIds.has(itemId)
