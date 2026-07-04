@@ -292,11 +292,11 @@ export function DataProvider({ children }) {
     // Vercel serverless doesn't support long-running SSE well. 
     // Instead, we ping /api/poll every 3 seconds. It returns a lightweight timestamp.
     // If the database has newer data, we trigger a full sync instantly.
-    let lastVersion = 0
+    let lastVersion = null
     const checkUpdates = async () => {
       try {
         const res = await fetch('/api/poll').then(r => r.json())
-        if (res.version && res.version > lastVersion) {
+        if (res.version && res.version !== lastVersion) {
           lastVersion = res.version
           syncFromDb()
         }
