@@ -336,7 +336,6 @@ function LootForm({ initial, onSave, onCancel, stores, role }) {
                 </div>
               )}
             </div>
-            </div>
             {/* Executive: Save as Draft + Submit for Review */}
             {isEditor ? (
               <>
