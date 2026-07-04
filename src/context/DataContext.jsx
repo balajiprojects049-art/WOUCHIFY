@@ -300,7 +300,7 @@ export function DataProvider({ children }) {
           lastVersion = res.version
           syncFromDb()
         }
-      } catch (err) {}
+      } catch (err) { }
     }
 
     const pollInterval = setInterval(checkUpdates, 3000)
@@ -338,7 +338,7 @@ export function DataProvider({ children }) {
   }
   const removeDb = (collection, id) => {
     const endpoint = `/api/${collection}`
-    fetch(endpoint, { 
+    fetch(endpoint, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: id ? JSON.stringify({ id }) : undefined
@@ -786,9 +786,9 @@ export function DataProvider({ children }) {
 export function useData() {
   const ctx = useContext(DataContext)
   if (!ctx) throw new Error('useData must be used within DataProvider')
-  
+
   const isAdmin = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')
-  
+
   const publicDeals = useMemo(() => ctx.deals.filter(d => d.status === 'Approved'), [ctx.deals])
   const publicLootDeals = useMemo(() => ctx.lootDeals.filter(d => d.status === 'Approved'), [ctx.lootDeals])
   const publicCoupons = useMemo(() => ctx.coupons.filter(d => d.status === 'Approved'), [ctx.coupons])
