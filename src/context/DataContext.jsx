@@ -143,7 +143,7 @@ function addToDeletedIds(...ids) {
     const existing = new Set(JSON.parse(localStorage.getItem('wouchify_deleted_ids') || '[]'))
     ids.forEach(id => id && existing.add(String(id)))
     localStorage.setItem('wouchify_deleted_ids', JSON.stringify([...existing]))
-  } catch {}
+  } catch { }
 }
 function getDeletedIds() {
   try { return new Set(JSON.parse(localStorage.getItem('wouchify_deleted_ids') || '[]')) }
@@ -264,13 +264,13 @@ export function DataProvider({ children }) {
               return merged
             }
 
-            if (res.data.deals != null)      setDeals(prev      => dbReplaceList(res.data.deals, prev))
-            if (res.data.lootDeals != null)  setLootDeals(prev  => dbReplaceList(res.data.lootDeals, prev))
-            if (res.data.stores)             setStores(prev     => mergeList(res.data.stores, prev))
-            if (res.data.coupons)            setCoupons(prev    => mergeList(res.data.coupons, prev))
-            if (res.data.giveaways)          setGiveaways(prev  => mergeList(res.data.giveaways, prev))
-            if (res.data.advertisements)     setAdvertisements(prev => mergeList(res.data.advertisements, prev))
-            if (res.data.adminMembers)       setAdminMembers(prev   => normalizeAdminMembers(mergeList(res.data.adminMembers, prev)))
+            if (res.data.deals != null) setDeals(prev => dbReplaceList(res.data.deals, prev))
+            if (res.data.lootDeals != null) setLootDeals(prev => dbReplaceList(res.data.lootDeals, prev))
+            if (res.data.stores) setStores(prev => mergeList(res.data.stores, prev))
+            if (res.data.coupons) setCoupons(prev => mergeList(res.data.coupons, prev))
+            if (res.data.giveaways) setGiveaways(prev => mergeList(res.data.giveaways, prev))
+            if (res.data.advertisements) setAdvertisements(prev => mergeList(res.data.advertisements, prev))
+            if (res.data.adminMembers) setAdminMembers(prev => normalizeAdminMembers(mergeList(res.data.adminMembers, prev)))
             if (res.data.creditCards && !localStorage.getItem('wouchify_credit_cards')) {
               setCreditCards(res.data.creditCards)
             }
@@ -382,9 +382,16 @@ export function DataProvider({ children }) {
   useEffect(() => { saveToStorage('wouchify_analytics', analytics) }, [analytics])
   useEffect(() => { saveToStorage('wouchify_advertisements', advertisements) }, [advertisements])
 
-  // ── Scheduled publishing filter ───────────────────────────────────────────
-  // A deal is "live" if publishAt is empty/missing OR if publishAt is in the past
+  // ── Public-facing deal filter ─────────────────────────────────────────────
+  // Only show deals that are:
+  //   1. status === 'Approved' (or legacy items with no status)
+  //   2. publishAt is in the past (or not set)
+  // Draft, Pending Approval, Rejected, Expired → always hidden from users
   const isPublished = (item) => {
+    // Check approval status — legacy items without a status are treated as Approved
+    const status = item.status
+    if (status && status !== 'Approved') return false
+    // Check scheduled publish time
     if (!item.publishAt) return true
     return new Date(item.publishAt).getTime() <= Date.now()
   }
@@ -397,39 +404,39 @@ export function DataProvider({ children }) {
     const sDeals = []
     const sLoot = []
     const sCoupons = []
-    
-    ;(stores || []).forEach(store => {
-      ;(store.offers || []).forEach(offer => {
-        if (offer.type === 'deal') {
-          sDeals.push({
-            id: offer.id, slug: offer.id, store: store.name, logo: store.logo,
-            title: offer.title, description: offer.description, discountPercent: offer.discountValue || 0,
-            discountValue: offer.discountValue || 0, category: store.category, 
-            expiresInSeconds: offer.expiryDays ? offer.expiryDays * 24 * 60 * 60 : undefined,
-            popularity: offer.popularity || 0, createdAt: offer.createdAt || new Date().toISOString(), publishAt: offer.createdAt || new Date().toISOString(),
-            image: store.logo, isExclusive: true
-          })
-        } else if (offer.type === 'loot') {
-          sLoot.push({
-            id: offer.id, slug: offer.id, store: store.name, logo: store.logo,
-            title: offer.title, description: offer.description, discountPercent: offer.discountValue || 0,
-            discountValue: offer.discountValue || 0, category: store.category, 
-            expiresInSeconds: offer.expiryDays ? offer.expiryDays * 24 * 60 * 60 : undefined,
-            popularity: offer.popularity || 0, createdAt: offer.createdAt || new Date().toISOString(), publishAt: offer.createdAt || new Date().toISOString(),
-            image: store.logo, isExclusive: true
-          })
-        } else if (offer.type === 'coupon') {
-          sCoupons.push({
-            id: offer.id, store: store.name, logo: store.logo, code: offer.code,
-            discount: offer.badge || offer.title, category: store.category,
-            expiry: offer.expiryDays ? `Expires in ${offer.expiryDays} days` : '',
-            expiresInSeconds: offer.expiryDays ? offer.expiryDays * 24 * 60 * 60 : undefined,
-            success: offer.successRate ? `${offer.successRate}%` : '', badge: offer.badge || 'HOT',
-            active: offer.active !== false, isExclusive: true, createdAt: offer.createdAt || new Date().toISOString()
-          })
-        }
+
+      ; (stores || []).forEach(store => {
+        ; (store.offers || []).forEach(offer => {
+          if (offer.type === 'deal') {
+            sDeals.push({
+              id: offer.id, slug: offer.id, store: store.name, logo: store.logo,
+              title: offer.title, description: offer.description, discountPercent: offer.discountValue || 0,
+              discountValue: offer.discountValue || 0, category: store.category,
+              expiresInSeconds: offer.expiryDays ? offer.expiryDays * 24 * 60 * 60 : undefined,
+              popularity: offer.popularity || 0, createdAt: offer.createdAt || new Date().toISOString(), publishAt: offer.createdAt || new Date().toISOString(),
+              image: store.logo, isExclusive: true
+            })
+          } else if (offer.type === 'loot') {
+            sLoot.push({
+              id: offer.id, slug: offer.id, store: store.name, logo: store.logo,
+              title: offer.title, description: offer.description, discountPercent: offer.discountValue || 0,
+              discountValue: offer.discountValue || 0, category: store.category,
+              expiresInSeconds: offer.expiryDays ? offer.expiryDays * 24 * 60 * 60 : undefined,
+              popularity: offer.popularity || 0, createdAt: offer.createdAt || new Date().toISOString(), publishAt: offer.createdAt || new Date().toISOString(),
+              image: store.logo, isExclusive: true
+            })
+          } else if (offer.type === 'coupon') {
+            sCoupons.push({
+              id: offer.id, store: store.name, logo: store.logo, code: offer.code,
+              discount: offer.badge || offer.title, category: store.category,
+              expiry: offer.expiryDays ? `Expires in ${offer.expiryDays} days` : '',
+              expiresInSeconds: offer.expiryDays ? offer.expiryDays * 24 * 60 * 60 : undefined,
+              success: offer.successRate ? `${offer.successRate}%` : '', badge: offer.badge || 'HOT',
+              active: offer.active !== false, isExclusive: true, createdAt: offer.createdAt || new Date().toISOString()
+            })
+          }
+        })
       })
-    })
     return { sDeals, sLoot, sCoupons }
   }, [stores])
 
@@ -516,9 +523,28 @@ export function DataProvider({ children }) {
   const deleteDeal = (slug) => {
     const d = deals.find(x => x.slug === slug)
     addToDeletedIds(slug)
-    setDeals((prev) => prev.filter((d) => d.slug !== slug))
+    setDeals((prev) => {
+      const next = prev.filter((d) => d.slug !== slug)
+      // Immediately write cleared list to localStorage so this device is clean instantly
+      saveToStorage('wouchify_deals', next)
+      return next
+    })
     removeDb('deals', slug)
     addAuditLog('DELETE', 'Deal', `Deleted deal "${d?.title || slug}"`)
+  }
+  const approveDeal = (slug) => {
+    const d = deals.find(x => x.slug === slug)
+    if (!d) return
+    const updated = { ...d, status: 'Approved', approvedBy: currentUser?.name, approvedAt: new Date().toISOString() }
+    updateDeal(slug, updated)
+    addAuditLog('APPROVE', 'Deal', `Approved deal "${d.title}"`)
+  }
+  const rejectDeal = (slug, reason = '') => {
+    const d = deals.find(x => x.slug === slug)
+    if (!d) return
+    const updated = { ...d, status: 'Rejected', rejectionReason: reason, rejectedBy: currentUser?.name, rejectedAt: new Date().toISOString() }
+    updateDeal(slug, updated)
+    addAuditLog('REJECT', 'Deal', `Rejected deal "${d.title}"${reason ? ` — Reason: ${reason}` : ''}`)
   }
   const getDealBySlug = (slug) => deals.find((d) => d.slug === slug)
 
@@ -546,9 +572,28 @@ export function DataProvider({ children }) {
   const deleteLootDeal = (slug) => {
     const d = lootDeals.find(x => x.slug === slug)
     addToDeletedIds(slug)
-    setLootDeals((prev) => prev.filter((d) => d.slug !== slug))
+    setLootDeals((prev) => {
+      const next = prev.filter((d) => d.slug !== slug)
+      // Immediately write cleared list to localStorage so this device is clean instantly
+      saveToStorage('wouchify_loot_deals', next)
+      return next
+    })
     removeDb('lootDeals', slug)
     addAuditLog('DELETE', 'Loot Deal', `Deleted loot deal "${d?.title || slug}"`)
+  }
+  const approveLootDeal = (slug) => {
+    const d = lootDeals.find(x => x.slug === slug)
+    if (!d) return
+    const updated = { ...d, status: 'Approved', approvedBy: currentUser?.name, approvedAt: new Date().toISOString() }
+    updateLootDeal(slug, updated)
+    addAuditLog('APPROVE', 'Loot Deal', `Approved loot deal "${d.title}"`)
+  }
+  const rejectLootDeal = (slug, reason = '') => {
+    const d = lootDeals.find(x => x.slug === slug)
+    if (!d) return
+    const updated = { ...d, status: 'Rejected', rejectionReason: reason, rejectedBy: currentUser?.name, rejectedAt: new Date().toISOString() }
+    updateLootDeal(slug, updated)
+    addAuditLog('REJECT', 'Loot Deal', `Rejected loot deal "${d.title}"${reason ? ` — Reason: ${reason}` : ''}`)
   }
   const getLootDealBySlug = (slug) => lootDeals.find((d) => d.slug === slug)
 
@@ -700,9 +745,9 @@ export function DataProvider({ children }) {
       // Auth
       currentUser, loginAdmin, logoutAdmin,
       // Deals
-      addDeal, updateDeal, deleteDeal, getDealBySlug,
+      addDeal, updateDeal, deleteDeal, getDealBySlug, approveDeal, rejectDeal,
       // Loot Deals
-      addLootDeal, updateLootDeal, deleteLootDeal, getLootDealBySlug,
+      addLootDeal, updateLootDeal, deleteLootDeal, getLootDealBySlug, approveLootDeal, rejectLootDeal,
       // Stores
       addStore, updateStore, deleteStore, getStoreBySlug,
       // Coupons

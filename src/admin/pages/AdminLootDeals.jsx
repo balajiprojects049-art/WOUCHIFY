@@ -12,12 +12,14 @@ import {
   confirmDialogStyle, inpStyle, inpFocus
 } from '../components/adminStyles'
 
+const STATUSES = ['Approved', 'Pending Approval', 'Draft', 'Rejected', 'Expired']
+
 const EMPTY = {
   slug: '', title: '', store: '', category: 'Electronics', discountPercent: 70,
   oldPrice: '', newPrice: '', grabbed: '', stockLabel: 'Only a few left!',
   urgency: 'Ending soon — grab it now!', expiresInSeconds: 21600, popularity: 90, image: '',
   description: '', steps: '', terms: '', link: '',
-  publishAt: '', // empty = publish immediately
+  status: 'Active', publishAt: '', // empty = publish immediately
 }
 
 function addFocus(e) { Object.assign(e.target.style, inpFocus) }
@@ -49,7 +51,9 @@ function ConfirmDialog({ onConfirm, onCancel }) {
   )
 }
 
-function LootForm({ initial, onSave, onCancel, stores }) {
+function LootForm({ initial, onSave, onCancel, stores, role }) {
+  const isEditor = role === 'Operational Executive'
+
   const [form, setForm] = useState(() => {
     const startMs = initial.createdAt ? new Date(initial.createdAt).getTime() : Date.now()
     const expiresMs = startMs + (initial.expiresInSeconds || 21600) * 1000
@@ -58,7 +62,7 @@ function LootForm({ initial, onSave, onCancel, stores }) {
     const initImages = Array.isArray(initial.images) && initial.images.length > 0 
       ? initial.images 
       : (initial.image ? [initial.image] : [])
-    return { ...EMPTY, ...initial, expiresAt: d.toISOString().slice(0, 16), images: initImages }
+    return { ...EMPTY, ...initial, expiresAt: d.toISOString().slice(0, 16), images: initImages, status: isEditor ? 'Draft' : initial.status || 'Approved' }
   })
   const [showAdvanced, setShowAdvanced] = useState(!!initial.publishAt)
   
@@ -101,13 +105,16 @@ function LootForm({ initial, onSave, onCancel, stores }) {
     const nowIso = new Date().toISOString()
     const createdAt = form.createdAt || nowIso
     const createdAtMs = new Date(createdAt).getTime()
-    const expiresAtMs = new Date(form.expiresAt).getTime()
-    const expiresInSeconds = Math.max(0, Math.round((expiresAtMs - createdAtMs) / 1000))
+    const expiresAtIso = form.expiresAt ? new Date(form.expiresAt).toISOString() : ''
+    const expiresInSeconds = expiresAtIso
+      ? Math.max(0, Math.round((new Date(expiresAtIso).getTime() - createdAtMs) / 1000))
+      : 0
     
     const slug = form.slug || form.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
     onSave({
       ...form, slug,
       createdAt,        // ← always persisted so timer survives page reload
+      expiresAt: expiresAtIso,
       expiresInSeconds, // ← calculated from real createdAt → real expiresAt
       discountPercent: Number(form.discountPercent),
       popularity: Number(form.popularity),
@@ -149,6 +156,12 @@ function LootForm({ initial, onSave, onCancel, stores }) {
                   options={flatCategories} 
                   placeholder="Search categories..."
                 />
+              </div>
+              <div>
+                <label className={lbl}>Status {isEditor && <span className="text-amber-400 font-normal lowercase">(Executive: use Submit for Review below)</span>}</label>
+                <select {...inputProps} value={form.status} onChange={e => set('status', e.target.value)} disabled={isEditor} className={`${inp} cursor-pointer`}>
+                  {STATUSES.map(s => <option key={s} value={s} className="bg-[#0C1018]">{s}</option>)}
+                </select>
               </div>
               <div>
                 <label className={lbl}>Popularity (0–100)</label>
@@ -323,9 +336,27 @@ function LootForm({ initial, onSave, onCancel, stores }) {
                 </div>
               )}
             </div>
-            <button type="submit" className={btnPrimaryCls} style={btnPrimary}>
-              {showAdvanced && form.publishAt ? '🗓️ Schedule Loot Deal' : '✓ Save Loot Deal'}
-            </button>
+            </div>
+            {/* Executive: Save as Draft + Submit for Review */}
+            {isEditor ? (
+              <>
+                <button type="submit" className={btnPrimaryCls} style={btnPrimary}>
+                  💾 Save as Draft
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { set('status', 'Pending Approval'); setTimeout(() => document.querySelector('form').requestSubmit(), 50) }}
+                  className="w-full rounded-xl py-3 text-sm font-black text-white transition-all hover:opacity-90 mt-2.5"
+                  style={{ background: 'linear-gradient(135deg,#f59e0b,#d97706)', boxShadow: '0 4px 20px rgba(245,158,11,0.3)' }}
+                >
+                  📤 Submit for Manager Review
+                </button>
+              </>
+            ) : (
+              <button type="submit" className={btnPrimaryCls} style={btnPrimary}>
+                {showAdvanced && form.publishAt ? '🗓️ Schedule Loot Deal' : '✓ Save Loot Deal'}
+              </button>
+            )}
             <button type="button" onClick={onCancel} className={btnCancelCls} style={btnCancelStyle}>Cancel</button>
           </div>
         </div>
@@ -335,13 +366,31 @@ function LootForm({ initial, onSave, onCancel, stores }) {
 }
 
 export default function AdminLootDeals() {
-  const { lootDeals, stores, addLootDeal, updateLootDeal, deleteLootDeal, analytics } = useData()
+  const { lootDeals, stores, addLootDeal, updateLootDeal, deleteLootDeal, approveLootDeal, rejectLootDeal, currentUser, analytics } = useData()
   const [mode, setMode] = useState(null)
   const [editing, setEditing] = useState(null)
   const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState('All')
   const [confirm, setConfirm] = useState(null)
+  const [rejectModal, setRejectModal] = useState(null) // { slug, reason }
 
-  const filtered = lootDeals.filter(d => (d.title?.toLowerCase() || '').includes(search.toLowerCase()))
+  const role = currentUser?.role || 'Support'
+  const canApprove = ['Owner', 'Manager', 'Operational Manager'].includes(role)
+  const canPublish = ['Owner', 'Manager', 'Operational Manager'].includes(role)
+  const canDelete = ['Owner', 'Manager', 'Operational Manager'].includes(role)
+  const canEdit = ['Owner', 'Manager', 'Operational Manager', 'Operational Executive'].includes(role)
+
+  const filtered = lootDeals.filter(d => {
+    const term = search.toLowerCase()
+    const matchesSearch = (d.title?.toLowerCase() || '').includes(term) || (d.store?.toLowerCase() || '').includes(term)
+    if (!matchesSearch) return false
+    if (statusFilter === 'Active' || statusFilter === 'Approved') return d.status === 'Approved'
+    if (statusFilter === 'Pending Approval') return d.status === 'Pending Approval'
+    if (statusFilter === 'Rejected') return d.status === 'Rejected'
+    if (statusFilter === 'Expired') return d.status === 'Expired'
+    if (statusFilter === 'Draft') return d.status === 'Draft'
+    return true
+  })
   const handleSave = (data) => {
     if (mode === 'add') {
       if (lootDeals.find(d => d.slug === data.slug)) {
@@ -356,19 +405,66 @@ export default function AdminLootDeals() {
   if (mode) return (
     <AdminLayout title={mode === 'add' ? 'Add Loot Deal' : 'Edit Loot Deal'}>
       <div className="mb-5"><button onClick={() => { setMode(null); setEditing(null) }} className={backLinkCls}>← Back to Loot Deals</button></div>
-      <LootForm initial={editing || EMPTY} onSave={handleSave} onCancel={() => { setMode(null); setEditing(null) }} stores={stores} />
+      <LootForm initial={editing || EMPTY} onSave={handleSave} onCancel={() => { setMode(null); setEditing(null) }} stores={stores} role={role} />
     </AdminLayout>
   )
 
   return (
     <AdminLayout title="Manage Loot Deals">
       {confirm && <ConfirmDialog onConfirm={() => { deleteLootDeal(confirm); setConfirm(null) }} onCancel={() => setConfirm(null)} />}
-      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative sm:max-w-xs w-full">
-          <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search loot deals..." className={searchInpCls} style={searchInpStyle} />
+
+      {/* ── Rejection Reason Modal ── */}
+      {rejectModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)' }}>
+          <div className="w-full max-w-sm p-8 shadow-2xl rounded-2xl" style={{ background: '#12151C', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <h3 className="text-lg font-black text-white mb-1">Reject Loot Deal</h3>
+            <p className="text-xs text-white/40 mb-4">Provide a reason so the Executive can improve and resubmit.</p>
+            <textarea
+              rows={3}
+              placeholder="e.g. Invalid link, image too low quality..."
+              value={rejectModal.reason}
+              onChange={e => setRejectModal(p => ({ ...p, reason: e.target.value }))}
+              className="w-full rounded-xl px-3 py-2 text-sm text-white resize-none"
+              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
+            />
+            <div className="mt-5 flex gap-3">
+              <button
+                onClick={() => { rejectLootDeal(rejectModal.slug, rejectModal.reason); setRejectModal(null) }}
+                className="flex-1 rounded-xl bg-red-500 py-3 text-sm font-black text-white hover:bg-red-600"
+              >Reject Deal</button>
+              <button onClick={() => setRejectModal(null)} className="flex-1 rounded-xl py-3 text-sm font-bold text-white/60 hover:text-white" style={{ border: '1px solid rgba(255,255,255,0.12)' }}>Cancel</button>
+            </div>
+          </div>
         </div>
-        <button onClick={() => { setMode('add'); setEditing(null) }} className="shrink-0 rounded-xl px-6 py-2.5 text-sm font-black transition-all hover:opacity-90" style={btnPrimary}>+ Add Loot Deal</button>
+      )}
+
+      <div className="mb-5 flex flex-col gap-4">
+        {/* Pending Approval Banner */}
+        {canApprove && lootDeals.filter(d => d.status === 'Pending Approval').length > 0 && (
+          <div className="flex items-center gap-3 rounded-xl px-4 py-3" style={{ background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.3)' }}>
+            <span className="text-lg">⏳</span>
+            <div>
+              <p className="text-sm font-black text-amber-400">{lootDeals.filter(d => d.status === 'Pending Approval').length} loot deal(s) awaiting your approval</p>
+              <p className="text-xs text-white/40">Click the filter below and select "Pending Approval" to review them</p>
+            </div>
+            <button onClick={() => setStatusFilter('Pending Approval')} className="ml-auto shrink-0 rounded-lg px-3 py-1.5 text-xs font-black text-amber-400" style={{ background: 'rgba(245,158,11,0.15)', border: '1px solid rgba(245,158,11,0.3)' }}>Review Now →</button>
+          </div>
+        )}
+
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-1 items-center gap-3">
+            <div className="relative sm:max-w-xs w-full">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search loot deals..." className={searchInpCls} style={searchInpStyle} />
+            </div>
+            <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className={searchInpCls} style={{...searchInpStyle, width: '160px', paddingLeft: '1rem'}}>
+              {['All', 'Approved', 'Pending Approval', 'Draft', 'Rejected', 'Expired'].map(s => <option key={s} value={s} className="bg-[#0C1018]">{s}</option>)}
+            </select>
+          </div>
+          {canEdit && (
+            <button onClick={() => { setMode('add'); setEditing(null) }} className="shrink-0 rounded-xl px-6 py-2.5 text-sm font-black transition-all hover:opacity-90" style={btnPrimary}>+ Add Loot Deal</button>
+          )}
+        </div>
       </div>
 
       <div style={tableWrapStyle}>
@@ -408,12 +504,21 @@ export default function AdminLootDeals() {
                     </div>
                   </td>
                   <td className="px-5 py-4 text-white/50 hidden sm:table-cell">{d.category}</td>
-                  <td className="px-5 py-4 text-sm">
-                    {isDead ? (
-                      <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-red-500/20 text-red-500">Expired</span>
-                    ) : (
-                      <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-[#00D47E]/20 text-[#00D47E]">Active</span>
-                    )}
+                  <td className="px-5 py-4">
+                    <div className="flex flex-col gap-1 items-start">
+                      {d.status === 'Pending Approval' ? (
+                        <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-amber-500/20 text-amber-400">⏳ Pending Approval</span>
+                      ) : d.status === 'Rejected' ? (
+                        <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-red-500/20 text-red-400">✗ Rejected</span>
+                      ) : d.status === 'Approved' ? (
+                        <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-[#00D47E]/20 text-[#00D47E]">✓ Approved</span>
+                      ) : isDead ? (
+                        <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-red-500/20 text-red-500">Expired</span>
+                      ) : (
+                        <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-white/10 text-white/60">{d.status || 'Draft'}</span>
+                      )}
+                      {d.rejectionReason && <span className="text-[9px] text-red-400/70 max-w-[120px] truncate" title={d.rejectionReason}>Reason: {d.rejectionReason}</span>}
+                    </div>
                   </td>
                   <td className="px-5 py-4 hidden sm:table-cell">
                     <span className="rounded-full px-2.5 py-1 text-[10px] font-black text-red-400" style={{ background: 'rgba(239,68,68,0.12)' }}>{d.discountPercent}% OFF</span>
@@ -426,9 +531,28 @@ export default function AdminLootDeals() {
                     </div>
                   </td>
                   <td className="px-5 py-4">
-                    <div className="flex items-center justify-end gap-2">
-                      <button onClick={() => { setEditing(d); setMode('edit') }} className={editBtnCls} style={editBtnStyle}>Edit</button>
-                      <button onClick={() => setConfirm(d.slug)} className={delBtnCls} style={{ background: 'rgba(239,68,68,0.08)' }}>Delete</button>
+                    <div className="flex items-center justify-end gap-2 flex-wrap">
+                      {/* Accept / Reject — only for Pending Approval deals, only Managers/Owners */}
+                      {canApprove && d.status === 'Pending Approval' && (
+                        <>
+                          <button
+                            onClick={() => approveLootDeal(d.slug)}
+                            className="rounded-lg px-3 py-1.5 text-xs font-black text-white transition-all hover:opacity-90"
+                            style={{ background: '#00D47E' }}
+                          >✓ Accept</button>
+                          <button
+                            onClick={() => setRejectModal({ slug: d.slug, reason: '' })}
+                            className="rounded-lg px-3 py-1.5 text-xs font-black text-white transition-all hover:bg-red-600"
+                            style={{ background: '#EF4444' }}
+                          >✗ Reject</button>
+                        </>
+                      )}
+                      {canEdit && (
+                        <button onClick={() => { setEditing(d); setMode('edit') }} className={editBtnCls} style={editBtnStyle}>Edit</button>
+                      )}
+                      {canDelete && (
+                        <button onClick={() => setConfirm(d.slug)} className={delBtnCls} style={{ background: 'rgba(239,68,68,0.08)' }}>Delete</button>
+                      )}
                     </div>
                   </td>
                 </tr>

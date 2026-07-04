@@ -1,8 +1,19 @@
 export const GLOBAL_APP_MOUNT_TIME = Date.now();
 
 export function getDealRemainingSeconds(deal, nowMs = Date.now()) {
+  // Template/default items never expire
   if (deal?.id && (String(deal.id).startsWith('ld') || String(deal.id).startsWith('d'))) return null;
 
+  // ── Priority 1: absolute expiry datetime (most accurate) ──────────────────
+  // Executive sets a fixed end date like "05 July 2026 11:59 PM"
+  if (deal?.expiresAt) {
+    const expiryMs = new Date(deal.expiresAt).getTime()
+    if (Number.isFinite(expiryMs)) {
+      return Math.max(0, Math.floor((expiryMs - nowMs) / 1000))
+    }
+  }
+
+  // ── Priority 2: relative seconds from createdAt (legacy fallback) ──────────
   const totalSeconds = Number(deal?.expiresInSeconds)
   if (!Number.isFinite(totalSeconds) || totalSeconds <= 0) return null
 

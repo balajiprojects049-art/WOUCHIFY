@@ -24,7 +24,7 @@ const EMPTY_DEAL = {
 const BADGES = ['HOT', 'TRENDING', 'EXCLUSIVE', 'LIMITED', 'COUPON', 'TRAVEL', 'NEW', 'FLASH']
 const TYPES = ['offer', 'coupon', 'reward']
 const PRIORITIES = ['High', 'Medium', 'Low']
-const STATUSES = ['Active', 'Draft', 'Expired']
+const STATUSES = ['Approved', 'Pending Approval', 'Draft', 'Rejected', 'Expired']
 
 function addFocusBlur(e) { Object.assign(e.target.style, inpFocus) }
 function remFocusBlur(e) { Object.assign(e.target.style, { borderColor: 'rgba(255,255,255,0.09)', boxShadow: 'none' }) }
@@ -119,12 +119,16 @@ function DealForm({ initial, onSave, onCancel, role, stores }) {
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    // Store expiresAt as an absolute ISO datetime (the most reliable method)
+    const expiresAtIso = form.expiresAt ? new Date(form.expiresAt).toISOString() : ''
+    // Also keep expiresInSeconds for legacy components that still read it
     const createdAtMs = form.createdAt ? new Date(form.createdAt).getTime() : Date.now()
-    const expiresAtMs = new Date(form.expiresAt).getTime()
-    const expiresInSeconds = Math.max(0, Math.round((expiresAtMs - createdAtMs) / 1000))
-    
+    const expiresInSeconds = expiresAtIso
+      ? Math.max(0, Math.round((new Date(expiresAtIso).getTime() - createdAtMs) / 1000))
+      : 0
+
     const slug = form.slug || form.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
-    
+
     // Auto-generate clear expiry text
     const expDate = new Date(form.expiresAt)
     const expiryText = `Expires ${expDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}`
@@ -133,6 +137,7 @@ function DealForm({ initial, onSave, onCancel, role, stores }) {
       ...form, slug,
       discountValue: Number(form.discountValue),
       priceValue: Number(form.priceValue),
+      expiresAt: expiresAtIso,
       expiresInSeconds,
       successRate: Number(form.successRate),
       isFreeShipping: !!form.isFreeShipping,
@@ -191,7 +196,7 @@ function DealForm({ initial, onSave, onCancel, role, stores }) {
                 </select>
               </div>
               <div>
-                <label className={lbl}>Status (Auto update tracking) {isEditor && <span className="text-red-400 font-normal lowercase">(Locked to Draft for Executive)</span>}</label>
+                <label className={lbl}>Status {isEditor && <span className="text-amber-400 font-normal lowercase">(Executive: use Submit for Review below)</span>}</label>
                 <select {...selectProps} value={form.status} onChange={e => set('status', e.target.value)} disabled={isEditor}>
                   {STATUSES.map(s => <option key={s} value={s} className="bg-[#0C1018]">{s}</option>)}
                 </select>
@@ -386,9 +391,26 @@ function DealForm({ initial, onSave, onCancel, role, stores }) {
           </div>
 
           <div className="space-y-2.5">
-            <button type="submit" className={btnPrimaryCls} style={btnPrimary}>
-              {showAdvanced && form.publishAt ? '🗓️ Schedule Deal' : '✓ Save Deal'}
-            </button>
+            {/* Executive: Save as Draft + Submit for Review */}
+            {isEditor ? (
+              <>
+                <button type="submit" className={btnPrimaryCls} style={btnPrimary}>
+                  💾 Save as Draft
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { set('status', 'Pending Approval'); setTimeout(() => document.querySelector('form').requestSubmit(), 50) }}
+                  className="w-full rounded-xl py-3 text-sm font-black text-white transition-all hover:opacity-90"
+                  style={{ background: 'linear-gradient(135deg,#f59e0b,#d97706)', boxShadow: '0 4px 20px rgba(245,158,11,0.3)' }}
+                >
+                  📤 Submit for Manager Review
+                </button>
+              </>
+            ) : (
+              <button type="submit" className={btnPrimaryCls} style={btnPrimary}>
+                {showAdvanced && form.publishAt ? '🗓️ Schedule Deal' : '✓ Save Deal'}
+              </button>
+            )}
             <button type="button" onClick={onCancel} className={btnCancelCls} style={btnCancelStyle}>Cancel</button>
           </div>
         </div>
@@ -398,15 +420,17 @@ function DealForm({ initial, onSave, onCancel, role, stores }) {
 }
 
 export default function AdminDeals() {
-  const { deals, stores, addDeal, updateDeal, deleteDeal, currentUser, analytics } = useData()
+  const { deals, stores, addDeal, updateDeal, deleteDeal, approveDeal, rejectDeal, currentUser, analytics } = useData()
   const [mode, setMode] = useState(null)
   const [editing, setEditing] = useState(null)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('All')
   const [confirm, setConfirm] = useState(null)
   const [selected, setSelected] = useState([])
+  const [rejectModal, setRejectModal] = useState(null) // { slug, reason }
 
   const role = currentUser?.role || 'Support'
+  const canApprove = ['Owner', 'Manager', 'Operational Manager'].includes(role)
   const canPublish = ['Owner', 'Manager', 'Operational Manager'].includes(role)
   const canDelete = ['Owner', 'Manager', 'Operational Manager'].includes(role)
   const canEdit = ['Owner', 'Manager', 'Operational Manager', 'Operational Executive'].includes(role)
@@ -415,12 +439,10 @@ export default function AdminDeals() {
     const term = search.toLowerCase()
     const matchesSearch = (d.title?.toLowerCase() || '').includes(term) || (d.store?.toLowerCase() || '').includes(term)
     if (!matchesSearch) return false
-    
-    // Auto detect expired for filtering
-    const remainingHours = d.expiresInSeconds / 3600
-    const isExpiredState = remainingHours <= 0 || d.status === 'Expired'
-    if (statusFilter === 'Active') return !isExpiredState && d.status !== 'Draft'
-    if (statusFilter === 'Expired') return isExpiredState
+    if (statusFilter === 'Active' || statusFilter === 'Approved') return d.status === 'Approved'
+    if (statusFilter === 'Pending Approval') return d.status === 'Pending Approval'
+    if (statusFilter === 'Rejected') return d.status === 'Rejected'
+    if (statusFilter === 'Expired') return d.status === 'Expired'
     if (statusFilter === 'Draft') return d.status === 'Draft'
     return true
   })
@@ -472,7 +494,43 @@ export default function AdminDeals() {
     <AdminLayout title="Manage Deals">
       {confirm && <ConfirmDialog onConfirm={() => { deleteDeal(confirm); setConfirm(null) }} onCancel={() => setConfirm(null)} />}
 
+      {/* ── Rejection Reason Modal ── */}
+      {rejectModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)' }}>
+          <div className="w-full max-w-sm p-8 shadow-2xl rounded-2xl" style={{ background: '#12151C', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <h3 className="text-lg font-black text-white mb-1">Reject Deal</h3>
+            <p className="text-xs text-white/40 mb-4">Provide a reason so the Executive can improve and resubmit.</p>
+            <textarea
+              rows={3}
+              placeholder="e.g. Price is incorrect, missing image..."
+              value={rejectModal.reason}
+              onChange={e => setRejectModal(p => ({ ...p, reason: e.target.value }))}
+              className="w-full rounded-xl px-3 py-2 text-sm text-white resize-none"
+              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
+            />
+            <div className="mt-5 flex gap-3">
+              <button
+                onClick={() => { rejectDeal(rejectModal.slug, rejectModal.reason); setRejectModal(null) }}
+                className="flex-1 rounded-xl bg-red-500 py-3 text-sm font-black text-white hover:bg-red-600"
+              >Reject Deal</button>
+              <button onClick={() => setRejectModal(null)} className="flex-1 rounded-xl py-3 text-sm font-bold text-white/60 hover:text-white" style={{ border: '1px solid rgba(255,255,255,0.12)' }}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="mb-5 flex flex-col gap-4">
+        {/* Pending Approval Banner */}
+        {canApprove && deals.filter(d => d.status === 'Pending Approval').length > 0 && (
+          <div className="flex items-center gap-3 rounded-xl px-4 py-3" style={{ background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.3)' }}>
+            <span className="text-lg">⏳</span>
+            <div>
+              <p className="text-sm font-black text-amber-400">{deals.filter(d => d.status === 'Pending Approval').length} deal(s) awaiting your approval</p>
+              <p className="text-xs text-white/40">Click the filter below and select "Pending Approval" to review them</p>
+            </div>
+            <button onClick={() => setStatusFilter('Pending Approval')} className="ml-auto shrink-0 rounded-lg px-3 py-1.5 text-xs font-black text-amber-400" style={{ background: 'rgba(245,158,11,0.15)', border: '1px solid rgba(245,158,11,0.3)' }}>Review Now →</button>
+          </div>
+        )}
         {/* Top Actions Row */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-1 items-center gap-3">
@@ -480,8 +538,8 @@ export default function AdminDeals() {
               <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search deals by title or store..." className={searchInpCls} style={searchInpStyle} />
             </div>
-            <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className={searchInpCls} style={{...searchInpStyle, width: '130px', paddingLeft: '1rem'}}>
-              {['All', 'Active', 'Expired', 'Draft'].map(s => <option key={s} value={s} className="bg-[#0C1018]">{s}</option>)}
+            <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className={searchInpCls} style={{...searchInpStyle, width: '160px', paddingLeft: '1rem'}}>
+              {['All', 'Approved', 'Pending Approval', 'Draft', 'Rejected', 'Expired'].map(s => <option key={s} value={s} className="bg-[#0C1018]">{s}</option>)}
             </select>
           </div>
           {canEdit && (
@@ -552,14 +610,21 @@ export default function AdminDeals() {
                       </div>
                     </div>
                   </td>
-                  <td className="px-5 py-4 text-sm">
+                  <td className="px-5 py-4">
                     <div className="flex flex-col gap-1 items-start">
-                      {isDead ? (
+                      {deal.status === 'Pending Approval' ? (
+                        <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-amber-500/20 text-amber-400">⏳ Pending Approval</span>
+                      ) : deal.status === 'Rejected' ? (
+                        <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-red-500/20 text-red-400">✗ Rejected</span>
+                      ) : deal.status === 'Approved' ? (
+                        <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-[#00D47E]/20 text-[#00D47E]">✓ Approved</span>
+                      ) : isDead ? (
                         <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-red-500/20 text-red-500">Expired</span>
                       ) : (
-                        <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-[#00D47E]/20 text-[#00D47E]">{deal.status || 'Active'}</span>
+                        <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-white/10 text-white/60">{deal.status || 'Draft'}</span>
                       )}
                       {deal.priority === 'High' && <span className="rounded px-1.5 py-0.5 text-[9px] font-bold text-amber-500 bg-amber-500/20">High Priority</span>}
+                      {deal.rejectionReason && <span className="text-[9px] text-red-400/70 max-w-[120px] truncate" title={deal.rejectionReason}>Reason: {deal.rejectionReason}</span>}
                     </div>
                   </td>
                   <td className="px-5 py-4 font-bold" style={{ color: isDead ? 'rgba(255,255,255,0.3)' : G }}>{deal.price}</td>
@@ -570,7 +635,22 @@ export default function AdminDeals() {
                     </div>
                   </td>
                   <td className="px-5 py-4">
-                    <div className="flex items-center justify-end gap-2">
+                    <div className="flex items-center justify-end gap-2 flex-wrap">
+                      {/* Accept / Reject — only for Pending Approval deals, only Managers/Owners */}
+                      {canApprove && deal.status === 'Pending Approval' && (
+                        <>
+                          <button
+                            onClick={() => approveDeal(deal.slug)}
+                            className="rounded-lg px-3 py-1.5 text-xs font-black text-white transition-all hover:opacity-90"
+                            style={{ background: '#00D47E' }}
+                          >✓ Accept</button>
+                          <button
+                            onClick={() => setRejectModal({ slug: deal.slug, reason: '' })}
+                            className="rounded-lg px-3 py-1.5 text-xs font-black text-white transition-all hover:bg-red-600"
+                            style={{ background: '#EF4444' }}
+                          >✗ Reject</button>
+                        </>
+                      )}
                       {canEdit && (
                         <button onClick={() => { setEditing(deal); setMode('edit') }} className={editBtnCls} style={editBtnStyle}>Edit</button>
                       )}
