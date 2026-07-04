@@ -248,6 +248,14 @@ export function DataProvider({ children }) {
                 const local = merged[localIdx]
                 const result = { ...dbItem }
                 Object.entries(local).forEach(([k, v]) => { if (v != null && v !== '') result[k] = v })
+                
+                // Force database timestamps for default template items so they don't block new user deals
+                const isDefault = dbItem.id && (String(dbItem.id).startsWith('ld') || String(dbItem.id).startsWith('d'))
+                if (isDefault) {
+                  result.createdAt = dbItem.createdAt || '2026-01-01T00:00:00.000Z'
+                  result.publishAt = dbItem.publishAt || '2026-01-01T00:00:00.000Z'
+                }
+
                 merged[localIdx] = result
               }
             })
