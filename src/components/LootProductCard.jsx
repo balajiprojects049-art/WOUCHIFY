@@ -57,7 +57,6 @@ export default function LootProductCard({ item }) {
   const price    = item.newPrice || item.price || null
   const slug     = item.slug || item.id
 
-  if (isExpired) return null;
 
   return (
     <article className={`group flex flex-col overflow-hidden rounded-2xl border bg-white transition-all duration-300 ${

@@ -170,8 +170,19 @@ export function DataProvider({ children }) {
     try {
       const stored = localStorage.getItem('wouchify_loot_deals')
       const cached = stored ? JSON.parse(stored) : null
-      // Trust localStorage even if empty — admin may have deleted all loot deals intentionally
-      if (cached && Array.isArray(cached)) return cached
+      if (cached && Array.isArray(cached)) {
+        // Refresh default hardcoded items so they do not expire during local testing
+        return cached.map(item => {
+          if (item.id && String(item.id).startsWith('ld')) {
+            return {
+              ...item,
+              createdAt: new Date().toISOString(),
+              publishAt: new Date().toISOString()
+            }
+          }
+          return item
+        })
+      }
       return lootDealsData
     } catch { return lootDealsData }
   })
