@@ -161,29 +161,34 @@ export function DataProvider({ children }) {
     try {
       const stored = localStorage.getItem('wouchify_deals')
       const cached = stored ? JSON.parse(stored) : null
-      // Trust localStorage even if empty — admin may have deleted all deals intentionally
-      if (cached && Array.isArray(cached)) return cached
-      return dealsData
+      const list = (cached && Array.isArray(cached)) ? cached : dealsData
+      return list.map(item => {
+        if (item.id && String(item.id).startsWith('d')) {
+          return {
+            ...item,
+            createdAt: '2026-01-01T00:00:00.000Z',
+            publishAt: '2026-01-01T00:00:00.000Z'
+          }
+        }
+        return item
+      })
     } catch { return dealsData }
   })
   const [lootDeals, setLootDeals] = useState(() => {
     try {
       const stored = localStorage.getItem('wouchify_loot_deals')
       const cached = stored ? JSON.parse(stored) : null
-      if (cached && Array.isArray(cached)) {
-        // Refresh default hardcoded items so they do not expire during local testing
-        return cached.map(item => {
-          if (item.id && String(item.id).startsWith('ld')) {
-            return {
-              ...item,
-              createdAt: new Date().toISOString(),
-              publishAt: new Date().toISOString()
-            }
+      const list = (cached && Array.isArray(cached)) ? cached : lootDealsData
+      return list.map(item => {
+        if (item.id && String(item.id).startsWith('ld')) {
+          return {
+            ...item,
+            createdAt: '2026-01-01T00:00:00.000Z',
+            publishAt: '2026-01-01T00:00:00.000Z'
           }
-          return item
-        })
-      }
-      return lootDealsData
+        }
+        return item
+      })
     } catch { return lootDealsData }
   })
   const [stores, setStores] = useState(() => {

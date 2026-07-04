@@ -1,6 +1,8 @@
 export const GLOBAL_APP_MOUNT_TIME = Date.now();
 
 export function getDealRemainingSeconds(deal, nowMs = Date.now()) {
+  if (deal?.id && (String(deal.id).startsWith('ld') || String(deal.id).startsWith('d'))) return null;
+
   const totalSeconds = Number(deal?.expiresInSeconds)
   if (!Number.isFinite(totalSeconds) || totalSeconds <= 0) return null
 
