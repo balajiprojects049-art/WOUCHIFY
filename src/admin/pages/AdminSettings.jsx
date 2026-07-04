@@ -71,26 +71,6 @@ export default function AdminSettings() {
                 </span>
               </div>
             </div>
-            
-            <p className="text-xs text-white/40 mb-5 leading-relaxed">
-              If you just set up Neon Database, click "Sync" to push your current browser's local data into tables.
-            </p>
-            <button
-              onClick={async () => {
-                setSyncing(true)
-                try {
-                  await syncDataToDb()
-                  setSyncDone(true)
-                  setTimeout(() => setSyncDone(false), 3000)
-                } catch { alert('Database not configured or unreachable.') }
-                setSyncing(false)
-              }}
-              disabled={syncing || !dbConnected}
-              className="w-full rounded-xl py-3 text-sm font-black text-white hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ background: 'linear-gradient(135deg, rgba(59,130,246,0.2) 0%, rgba(59,130,246,0.05) 100%)', border: '1px solid rgba(59,130,246,0.4)' }}
-            >
-              {syncing ? 'Syncing...' : syncDone ? '✓ Sync Complete!' : 'Sync Data to Neon DB'}
-            </button>
           </div>
         </div>
       </div>
