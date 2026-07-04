@@ -42,11 +42,13 @@ export default async function handler(req, res) {
 
     // ── DELETE ──────────────────────────────────────────────────────────────
     if (req.method === 'DELETE') {
-      if (cfg.mode === 'single' || !itemId) {
+      const targetId = itemId || (req.body && req.body.id)
+      
+      if (cfg.mode === 'single' || !targetId) {
         // clear entire collection / singleton
         await pool.query(`DELETE FROM ${cfg.table}`)
       } else {
-        await pool.query(`DELETE FROM ${cfg.table} WHERE id = $1`, [itemId])
+        await pool.query(`DELETE FROM ${cfg.table} WHERE id = $1`, [targetId])
       }
       return res.json({ success: true })
     }
