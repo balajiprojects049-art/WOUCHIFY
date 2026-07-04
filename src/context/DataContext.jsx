@@ -227,7 +227,7 @@ export function DataProvider({ children }) {
   // ── 1) Connect to Neon Backend on Mount ──
   useEffect(() => {
     const syncFromDb = () => {
-      fetch('/api/data').then(r => r.json()).then(res => {
+      fetch('/api/data', { cache: 'no-store' }).then(r => r.json()).then(res => {
         if (res.isConnected) {
           setDbConnected(true)
           if (res.hasData) {
