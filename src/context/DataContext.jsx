@@ -337,7 +337,7 @@ export function DataProvider({ children }) {
     })
   }
   const removeDb = (collection, id) => {
-    const endpoint = id ? `/api/${collection}/${encodeURIComponent(id)}` : `/api/${collection}`
+    const endpoint = `/api/${collection}`
     fetch(endpoint, { 
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
