@@ -226,62 +226,72 @@ export function DataProvider({ children }) {
 
   // ── 1) Connect to Neon Backend on Mount ──
   useEffect(() => {
-    fetch('/api/data').then(r => r.json()).then(res => {
-      if (res.isConnected) {
-        setDbConnected(true)
-        if (res.hasData) {
-          const deletedIds = getDeletedIds()
+    const syncFromDb = () => {
+      fetch('/api/data').then(r => r.json()).then(res => {
+        if (res.isConnected) {
+          setDbConnected(true)
+          if (res.hasData) {
+            const deletedIds = getDeletedIds()
 
-          // ── DB IS THE SINGLE SOURCE OF TRUTH for deals & lootDeals ──────────
-          // When DB responds, fully replace local state so ALL devices/team members
-          // see exactly the same data. LocalStorage is only used as offline fallback.
-          const dbReplaceList = (dbItems, localFallback) => {
-            if (!Array.isArray(dbItems) || dbItems.length === 0) return localFallback
-            return dbItems.filter(item => {
-              const itemId = String(item.slug || item.id || '')
-              return !itemId || !deletedIds.has(itemId)
-            })
-          }
+            // ── DB IS THE SINGLE SOURCE OF TRUTH for deals & lootDeals ──────────
+            // When DB responds, fully replace local state so ALL devices/team members
+            // see exactly the same data. LocalStorage is only used as offline fallback.
+            const dbReplaceList = (dbItems, localFallback) => {
+              if (!Array.isArray(dbItems) || dbItems.length === 0) return localFallback
+              return dbItems.filter(item => {
+                const itemId = String(item.slug || item.id || '')
+                return !itemId || !deletedIds.has(itemId)
+              })
+            }
 
-          // ── For stores/coupons etc: merge (local admin edits also respected) ─
-          const mergeList = (dbItems, localItems) => {
-            if (!Array.isArray(dbItems) || !Array.isArray(localItems)) return localItems ?? dbItems
-            const merged = [...localItems]
-            dbItems.forEach(dbItem => {
-              const itemId = String(dbItem.slug || dbItem.id || '')
-              if (itemId && deletedIds.has(itemId)) return
-              const localIdx = merged.findIndex(l => l.slug === dbItem.slug || l.id === dbItem.id)
-              if (localIdx === -1) {
-                merged.push(dbItem)
-              } else {
-                const local = merged[localIdx]
-                const result = { ...dbItem }
-                Object.entries(local).forEach(([k, v]) => { if (v != null && v !== '') result[k] = v })
-                merged[localIdx] = result
-              }
-            })
-            return merged
-          }
+            // ── For stores/coupons etc: merge (local admin edits also respected) ─
+            const mergeList = (dbItems, localItems) => {
+              if (!Array.isArray(dbItems) || !Array.isArray(localItems)) return localItems ?? dbItems
+              const merged = [...localItems]
+              dbItems.forEach(dbItem => {
+                const itemId = String(dbItem.slug || dbItem.id || '')
+                if (itemId && deletedIds.has(itemId)) return
+                const localIdx = merged.findIndex(l => l.slug === dbItem.slug || l.id === dbItem.id)
+                if (localIdx === -1) {
+                  merged.push(dbItem)
+                } else {
+                  const local = merged[localIdx]
+                  const result = { ...dbItem }
+                  Object.entries(local).forEach(([k, v]) => { if (v != null && v !== '') result[k] = v })
+                  merged[localIdx] = result
+                }
+              })
+              return merged
+            }
 
-          if (res.data.deals != null)      setDeals(prev      => dbReplaceList(res.data.deals, prev))
-          if (res.data.lootDeals != null)  setLootDeals(prev  => dbReplaceList(res.data.lootDeals, prev))
-          if (res.data.stores)             setStores(prev     => mergeList(res.data.stores, prev))
-          if (res.data.coupons)            setCoupons(prev    => mergeList(res.data.coupons, prev))
-          if (res.data.giveaways)          setGiveaways(prev  => mergeList(res.data.giveaways, prev))
-          if (res.data.advertisements)     setAdvertisements(prev => mergeList(res.data.advertisements, prev))
-          if (res.data.adminMembers)       setAdminMembers(prev   => normalizeAdminMembers(mergeList(res.data.adminMembers, prev)))
-          if (res.data.creditCards && !localStorage.getItem('wouchify_credit_cards')) {
-            setCreditCards(res.data.creditCards)
+            if (res.data.deals != null)      setDeals(prev      => dbReplaceList(res.data.deals, prev))
+            if (res.data.lootDeals != null)  setLootDeals(prev  => dbReplaceList(res.data.lootDeals, prev))
+            if (res.data.stores)             setStores(prev     => mergeList(res.data.stores, prev))
+            if (res.data.coupons)            setCoupons(prev    => mergeList(res.data.coupons, prev))
+            if (res.data.giveaways)          setGiveaways(prev  => mergeList(res.data.giveaways, prev))
+            if (res.data.advertisements)     setAdvertisements(prev => mergeList(res.data.advertisements, prev))
+            if (res.data.adminMembers)       setAdminMembers(prev   => normalizeAdminMembers(mergeList(res.data.adminMembers, prev)))
+            if (res.data.creditCards && !localStorage.getItem('wouchify_credit_cards')) {
+              setCreditCards(res.data.creditCards)
+            }
+            if (res.data.banners) setBanners(prev => normalizeBanners({ ...res.data.banners, ...prev }))
+            if (res.data.adminSettings && !localStorage.getItem('wouchify_admin_settings')) {
+              setAdminSettings(res.data.adminSettings)
+            }
+            if (res.data.auditLog && auditLog.length === 0) setAuditLog(res.data.auditLog)
+            if (res.data.analytics && Object.keys(analytics.dealClicks || {}).length === 0) setAnalytics(res.data.analytics)
           }
-          if (res.data.banners) setBanners(prev => normalizeBanners({ ...res.data.banners, ...prev }))
-          if (res.data.adminSettings && !localStorage.getItem('wouchify_admin_settings')) {
-            setAdminSettings(res.data.adminSettings)
-          }
-          if (res.data.auditLog && auditLog.length === 0) setAuditLog(res.data.auditLog)
-          if (res.data.analytics && Object.keys(analytics.dealClicks || {}).length === 0) setAnalytics(res.data.analytics)
         }
-      }
-    }).catch(() => console.log('⚠️ No DB connected, falling back to pure localStorage mode.'))
+      }).catch(() => console.log('⚠️ No DB connected, falling back to pure localStorage mode.'))
+    }
+
+    // Fetch immediately on mount
+    syncFromDb()
+
+    // Auto-poll every 30 seconds so all devices automatically stay in sync
+    // (adds, deletes, and updates made on any device appear within 30s everywhere)
+    const pollInterval = setInterval(syncFromDb, 30000)
+    return () => clearInterval(pollInterval)
   }, [])
 
   // ── 2) Sync functionality (exposes to Admin Setup) ──
