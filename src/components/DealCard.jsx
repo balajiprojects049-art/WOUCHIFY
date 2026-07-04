@@ -64,10 +64,10 @@ export default function DealCard({ deal, remainingSeconds }) {
   if (isExpired) return null;
 
   return (
-    <article className={`group flex flex-col overflow-hidden rounded-2xl border bg-white transition-all duration-300 ${
+    <article className={`group flex flex-col overflow-hidden rounded-2xl border bg-white dark:bg-surface transition-all duration-300 ${
       isExpired
-        ? 'opacity-60 grayscale border-gray-200'
-        : 'border-[#E8E4DC] shadow-[0_2px_16px_rgba(0,0,0,0.07)] hover:-translate-y-1.5 hover:border-red-300/50 hover:shadow-[0_20px_50px_rgba(239,68,68,0.10)]'
+        ? 'opacity-60 grayscale border-gray-200 dark:border-line'
+        : 'border-[#E8E4DC] dark:border-line shadow-[0_2px_16px_rgba(0,0,0,0.07)] hover:-translate-y-1.5 hover:border-red-300/50 hover:shadow-[0_20px_50px_rgba(239,68,68,0.10)]'
     }`}>
 
       {/* ══ 1. IMAGE ══════════════════════════════════════════ */}
@@ -124,7 +124,7 @@ export default function DealCard({ deal, remainingSeconds }) {
         {/* ── Row A: Store logo + name + DEAL badge (fixed h-9) ── */}
         <div className="mb-2 flex h-9 items-center gap-2">
           {logoUrl ? (
-            <div className="h-8 w-8 shrink-0 overflow-hidden rounded-lg border border-[#E8E4DC] bg-white p-0.5 shadow-sm">
+            <div className="h-8 w-8 shrink-0 overflow-hidden rounded-lg border border-[#E8E4DC] dark:border-line bg-white dark:bg-surfacealt p-0.5 shadow-sm">
               <img src={logoUrl} alt={deal.store} className="h-full w-full object-contain" onError={e => e.target.style.display = 'none'} />
             </div>
           ) : (
@@ -139,7 +139,7 @@ export default function DealCard({ deal, remainingSeconds }) {
               Verified Store
             </p>
           </div>
-          <span className="shrink-0 rounded-full bg-[#121826] px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-[#C89B1E]">
+          <span className="shrink-0 rounded-full bg-[#121826] dark:bg-gold/20 dark:border dark:border-gold/40 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-[#C89B1E] dark:text-gold">
             DEAL
           </span>
         </div>
@@ -148,7 +148,7 @@ export default function DealCard({ deal, remainingSeconds }) {
         <div className="mb-2 flex h-6 items-center justify-between">
           <div className="flex items-center">
             {deal.category ? (
-              <span className="inline-block rounded-full border border-red-200 bg-red-50 px-2 py-0.5 text-[11px] font-black uppercase tracking-wider text-red-600">
+              <span className="inline-block rounded-full border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/30 px-2 py-0.5 text-[11px] font-black uppercase tracking-wider text-red-600 dark:text-red-400">
                 {deal.category}
               </span>
             ) : (
@@ -156,10 +156,10 @@ export default function DealCard({ deal, remainingSeconds }) {
             )}
           </div>
           {deal.rating && (
-            <div className="flex items-center gap-1 rounded-md bg-orange-50 px-1.5 py-0.5 border border-orange-100">
+            <div className="flex items-center gap-1 rounded-md bg-orange-50 dark:bg-orange-900/30 px-1.5 py-0.5 border border-orange-100 dark:border-orange-800">
               <span className="text-[11px]">⭐</span>
-              <span className="text-[11px] font-black text-orange-600">{deal.rating}</span>
-              {deal.reviews && <span className="text-[10px] font-bold text-orange-500">({deal.reviews})</span>}
+              <span className="text-[11px] font-black text-orange-600 dark:text-orange-400">{deal.rating}</span>
+              {deal.reviews && <span className="text-[10px] font-bold text-orange-500 dark:text-orange-400">({deal.reviews})</span>}
             </div>
           )}
         </div>
@@ -177,15 +177,15 @@ export default function DealCard({ deal, remainingSeconds }) {
             <span className="text-[20px] font-extrabold leading-none text-ink">{price}</span>
           )}
           {originalPrice && (
-            <span className="text-[13px] font-medium text-[#6B7280] line-through">{originalPrice}</span>
+            <span className="text-[13px] font-medium text-muted line-through">{originalPrice}</span>
           )}
           {savings && (
-            <span className="rounded-md border border-emerald-200 bg-emerald-50 px-1.5 py-0.5 text-[11px] font-black text-emerald-700">
+            <span className="rounded-md border border-emerald-200 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/30 px-1.5 py-0.5 text-[11px] font-black text-emerald-700 dark:text-emerald-400">
               {savings}
             </span>
           )}
           {deal.isFreeShipping && (
-            <span className="flex items-center gap-1 rounded-md bg-blue-50 px-1.5 py-0.5 border border-blue-100 text-[11px] font-black text-blue-700">
+            <span className="flex items-center gap-1 rounded-md bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 border border-blue-100 dark:border-blue-800 text-[11px] font-black text-blue-700 dark:text-blue-400">
               🚚 Free
             </span>
           )}
@@ -235,9 +235,9 @@ export default function DealCard({ deal, remainingSeconds }) {
               </div>
             </div>
           ) : deal.code ? (
-            <div className="flex w-full items-center justify-between rounded-xl border-2 border-dashed border-emerald-300 bg-emerald-50 px-3 hover:bg-emerald-100 transition-colors">
-              <span className="text-[11px] font-black uppercase text-emerald-700">Promo</span>
-              <span className="rounded-md bg-white px-2 py-1 text-[12px] font-mono font-black tracking-widest text-emerald-700 shadow-sm">{deal.code}</span>
+            <div className="flex w-full items-center justify-between rounded-xl border-2 border-dashed border-emerald-300 dark:border-emerald-700 bg-emerald-50 dark:bg-emerald-900/20 px-3 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-colors">
+              <span className="text-[11px] font-black uppercase text-emerald-700 dark:text-emerald-400">Promo</span>
+              <span className="rounded-md bg-white dark:bg-surfacealt px-2 py-1 text-[12px] font-mono font-black tracking-widest text-emerald-700 dark:text-emerald-400 shadow-sm">{deal.code}</span>
             </div>
           ) : (
             <div className="flex w-full items-center justify-center rounded-xl border border-emerald-100 bg-emerald-50/50 dark:border-[#D4A820]/30 dark:bg-[#D4A820]/15">
