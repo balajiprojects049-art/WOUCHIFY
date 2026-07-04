@@ -288,9 +288,22 @@ export function DataProvider({ children }) {
     // Fetch immediately on mount
     syncFromDb()
 
-    // Auto-poll every 30 seconds so all devices automatically stay in sync
-    // (adds, deletes, and updates made on any device appear within 30s everywhere)
-    const pollInterval = setInterval(syncFromDb, 30000)
+    // ── Instant Real-Time Sync (Lightweight Polling for Vercel) ──
+    // Vercel serverless doesn't support long-running SSE well. 
+    // Instead, we ping /api/poll every 3 seconds. It returns a lightweight timestamp.
+    // If the database has newer data, we trigger a full sync instantly.
+    let lastVersion = 0
+    const checkUpdates = async () => {
+      try {
+        const res = await fetch('/api/poll').then(r => r.json())
+        if (res.version && res.version > lastVersion) {
+          lastVersion = res.version
+          syncFromDb()
+        }
+      } catch (err) {}
+    }
+
+    const pollInterval = setInterval(checkUpdates, 3000)
     return () => clearInterval(pollInterval)
   }, [])
 
