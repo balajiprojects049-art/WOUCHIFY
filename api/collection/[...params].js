@@ -12,8 +12,11 @@ export default async function handler(req, res) {
   const urlParts = urlPath.split('/').filter(Boolean) // ['api', 'collection', 'deals', ...] or ['api', 'deals', ...]
   
   const isServerlessRewritten = urlParts[1] === 'collection'
-  const collection = isServerlessRewritten ? (urlParts[2] || null) : (urlParts[1] || null)
-  const itemId = isServerlessRewritten ? (urlParts[3] || null) : (urlParts[2] || null)
+  const rawCollection = isServerlessRewritten ? (urlParts[2] || null) : (urlParts[1] || null)
+  const rawItemId = isServerlessRewritten ? (urlParts[3] || null) : (urlParts[2] || null)
+
+  const collection = rawCollection ? decodeURIComponent(rawCollection) : null
+  const itemId = rawItemId ? decodeURIComponent(rawItemId) : null
 
   const pool = getPool()
   if (!pool) return res.json({ skip: true })
