@@ -166,7 +166,7 @@ export default function DealCard({ deal, remainingSeconds }) {
 
         {/* ── Row C: Title (fixed 2-line height) ── */}
         <Link to={isExpired ? '#' : `/deal/${slug}`} className={`mb-2.5 block ${isExpired ? 'cursor-not-allowed pointer-events-none' : ''}`}>
-          <h3 className="line-clamp-2 min-h-[2.8rem] text-[14px] font-bold leading-snug text-ink transition-colors hover:text-red-500">
+          <h3 className="line-clamp-2 min-h-[2.8rem] text-[14px] font-bold leading-snug text-ink dark:text-white transition-colors hover:text-red-500">
             {deal.title}
           </h3>
         </Link>
@@ -174,7 +174,7 @@ export default function DealCard({ deal, remainingSeconds }) {
         {/* ── Row D: Price (fixed h-8) ── */}
         <div className="mb-2 flex h-8 flex-wrap items-baseline gap-x-2 gap-y-0 overflow-hidden">
           {price && (
-            <span className="text-[20px] font-extrabold leading-none text-ink">{price}</span>
+            <span className="text-[20px] font-extrabold leading-none text-ink dark:text-white">{price}</span>
           )}
           {originalPrice && (
             <span className="text-[13px] font-medium text-muted line-through">{originalPrice}</span>

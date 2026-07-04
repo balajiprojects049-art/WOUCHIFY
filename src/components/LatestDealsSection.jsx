@@ -113,8 +113,8 @@ export default function LatestDealsSection() {
             </svg>
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#C89B1E]">Just Added</p>
-            <h2 className="text-xl font-extrabold tracking-tight text-[#121826]">Latest Deals</h2>
+            <span className="text-[10px] font-black uppercase tracking-widest text-gold dark:text-gold/80 mb-1 block">JUST ADDED</span>
+            <h2 className="text-xl font-extrabold tracking-tight text-[#121826] dark:text-white">Latest Deals</h2>
           </div>
         </div>
 
