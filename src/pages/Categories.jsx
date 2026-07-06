@@ -146,7 +146,7 @@ export default function Categories() {
     }
 
     return result
-  }, [activeTab, activeLetter, search, deals, lootDeals, coupons])
+  }, [activeTab, activeTravelSub, activeLetter, search, deals, lootDeals, coupons, stores])
 
   // Quick stats
   const totalCategories = useMemo(() => {
