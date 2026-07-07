@@ -635,27 +635,35 @@ export default function AdminDeals() {
                     </div>
                   </td>
                   <td className="px-5 py-4">
-                    <div className="flex items-center justify-end gap-2 flex-wrap">
+                    <div className="grid grid-cols-2 gap-1.5 w-[140px] ml-auto">
                       {/* Accept / Reject — only for Pending Approval deals, only Managers/Owners */}
                       {canApprove && deal.status === 'Pending Approval' && (
                         <>
                           <button
                             onClick={() => approveDeal(deal.slug)}
-                            className="rounded-lg px-3 py-1.5 text-xs font-black text-white transition-all hover:opacity-90"
-                            style={{ background: '#00D47E' }}
+                            className="rounded-lg py-1.5 text-[10px] font-black transition-all hover:opacity-90 text-center w-full flex items-center justify-center border border-transparent"
+                            style={{ background: '#00D47E', color: '#070B12' }}
                           >✓ Accept</button>
                           <button
                             onClick={() => setRejectModal({ slug: deal.slug, reason: '' })}
-                            className="rounded-lg px-3 py-1.5 text-xs font-black text-white transition-all hover:bg-red-600"
+                            className="rounded-lg py-1.5 text-[10px] font-black text-white transition-all hover:bg-red-600 text-center w-full flex items-center justify-center border border-transparent"
                             style={{ background: '#EF4444' }}
                           >✗ Reject</button>
                         </>
                       )}
                       {canEdit && (
-                        <button onClick={() => { setEditing(deal); setMode('edit') }} className={editBtnCls} style={editBtnStyle}>Edit</button>
+                        <button
+                          onClick={() => { setEditing(deal); setMode('edit') }}
+                          className="rounded-lg py-1.5 text-[10px] font-black text-white/70 hover:text-white transition-all text-center w-full flex items-center justify-center border border-white/10"
+                          style={{ background: 'rgba(255,255,255,0.06)' }}
+                        >Edit</button>
                       )}
                       {canDelete && (
-                        <button onClick={() => setConfirm(deal.slug)} className={delBtnCls} style={delBtnStyle}>Delete</button>
+                        <button
+                          onClick={() => setConfirm(deal.slug)}
+                          className="rounded-lg py-1.5 text-[10px] font-black text-red-400 hover:bg-red-500/15 transition-all text-center w-full flex items-center justify-center border border-transparent"
+                          style={{ background: 'rgba(239,68,68,0.08)' }}
+                        >Delete</button>
                       )}
                     </div>
                   </td>
