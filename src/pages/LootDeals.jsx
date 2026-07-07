@@ -110,8 +110,8 @@ function LootDeals() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <p className="text-base font-bold text-[#121826]">No loot deals found</p>
-              <p className="mt-1 text-sm text-[#667085]">Try adjusting your filters</p>
+              <p className="text-base font-bold text-ink">No loot deals found</p>
+              <p className="mt-1 text-sm text-muted">Try adjusting your filters</p>
             </div>
           )}
         </div>

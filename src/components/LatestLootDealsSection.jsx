@@ -28,7 +28,7 @@ export default function LatestLootDealsSection() {
           </div>
           <div>
             <p className="text-[10px] font-black uppercase tracking-[0.25em] text-red-500">Grab Before Gone</p>
-            <h2 className="text-xl font-extrabold tracking-tight text-[#121826]">Flash Loot Offers</h2>
+            <h2 className="text-xl font-extrabold tracking-tight text-[#121826] dark:text-white">Flash Loot Offers</h2>
           </div>
         </div>
 

@@ -18,7 +18,7 @@ function DealCard({ deal }) {
   return (
     <article
       onClick={() => navigate(`/deal/${deal.slug}`)}
-      className="group flex cursor-pointer flex-col overflow-hidden rounded-2xl border border-[#EEEBE5] bg-white shadow-[0_2px_12px_rgba(0,0,0,0.06)] transition-all duration-300 hover:-translate-y-1.5 hover:border-[#C89B1E]/40 hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)]"
+      className="group flex cursor-pointer flex-col overflow-hidden rounded-2xl border border-[#EEEBE5] dark:border-line bg-white shadow-[0_2px_12px_rgba(0,0,0,0.06)] transition-all duration-300 hover:-translate-y-1.5 hover:border-[#C89B1E]/40 hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)]"
     >
       {/* ── Fixed-height Image Block ── */}
       <div className="relative h-[160px] shrink-0 overflow-hidden bg-gray-100">
@@ -57,23 +57,23 @@ function DealCard({ deal }) {
       {/* ── Content Block (equal height via flex-1) ── */}
       <div className="flex flex-1 flex-col p-3.5">
         {/* Title */}
-        <h3 className="mb-auto line-clamp-2 text-[12.5px] font-bold leading-snug text-[#121826] transition-colors group-hover:text-[#C89B1E]">
+        <h3 className="mb-auto line-clamp-2 text-[12.5px] font-bold leading-snug text-ink transition-colors group-hover:text-[#C89B1E]">
           {deal.title}
         </h3>
 
         {/* Divider */}
-        <div className="my-3 h-px bg-[#E6E2DA]" />
+        <div className="my-3 h-px bg-[#E6E2DA] dark:bg-line" />
 
         {/* Price + Button */}
         <div className="flex items-center justify-between gap-2">
           <div className="flex flex-col">
             {price && (
-              <span className="text-base font-extrabold leading-none text-[#121826]">
+              <span className="text-base font-extrabold leading-none text-ink">
                 {price}
               </span>
             )}
             {oldPrice && (
-              <span className="mt-0.5 text-[10px] text-[#667085] line-through">
+              <span className="mt-0.5 text-[10px] text-[#667085] dark:text-[#8A95A8] line-through">
                 {oldPrice}
               </span>
             )}
