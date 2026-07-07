@@ -613,17 +613,17 @@ export default function AdminDeals() {
                   <td className="px-5 py-4">
                     <div className="flex flex-col gap-1 items-start">
                       {deal.status === 'Pending Approval' ? (
-                        <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-amber-500/20 text-amber-400">⏳ Pending Approval</span>
+                        <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-amber-500/20 text-amber-400 whitespace-nowrap">⏳ Pending Approval</span>
                       ) : deal.status === 'Rejected' ? (
-                        <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-red-500/20 text-red-400">✗ Rejected</span>
+                        <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-red-500/20 text-red-400 whitespace-nowrap">✗ Rejected</span>
                       ) : deal.status === 'Approved' ? (
-                        <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-[#00D47E]/20 text-[#00D47E]">✓ Approved</span>
+                        <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-[#00D47E]/20 text-[#00D47E] whitespace-nowrap">✓ Approved</span>
                       ) : isDead ? (
-                        <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-red-500/20 text-red-500">Expired</span>
+                        <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-red-500/20 text-red-500 whitespace-nowrap">Expired</span>
                       ) : (
-                        <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-white/10 text-white/60">{deal.status || 'Draft'}</span>
+                        <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-white/10 text-white/60 whitespace-nowrap">{deal.status || 'Draft'}</span>
                       )}
-                      {deal.priority === 'High' && <span className="rounded px-1.5 py-0.5 text-[9px] font-bold text-amber-500 bg-amber-500/20">High Priority</span>}
+                      {deal.priority === 'High' && <span className="rounded px-1.5 py-0.5 text-[9px] font-bold text-amber-500 bg-amber-500/20 whitespace-nowrap">High Priority</span>}
                       {deal.rejectionReason && <span className="text-[9px] text-red-400/70 max-w-[120px] truncate" title={deal.rejectionReason}>Reason: {deal.rejectionReason}</span>}
                     </div>
                   </td>

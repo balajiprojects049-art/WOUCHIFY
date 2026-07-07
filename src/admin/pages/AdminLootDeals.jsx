@@ -506,21 +506,21 @@ export default function AdminLootDeals() {
                   <td className="px-5 py-4">
                     <div className="flex flex-col gap-1 items-start">
                       {d.status === 'Pending Approval' ? (
-                        <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-amber-500/20 text-amber-400">⏳ Pending Approval</span>
+                        <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-amber-500/20 text-amber-400 whitespace-nowrap">⏳ Pending Approval</span>
                       ) : d.status === 'Rejected' ? (
-                        <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-red-500/20 text-red-400">✗ Rejected</span>
+                        <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-red-500/20 text-red-400 whitespace-nowrap">✗ Rejected</span>
                       ) : d.status === 'Approved' ? (
-                        <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-[#00D47E]/20 text-[#00D47E]">✓ Approved</span>
+                        <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-[#00D47E]/20 text-[#00D47E] whitespace-nowrap">✓ Approved</span>
                       ) : isDead ? (
-                        <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-red-500/20 text-red-500">Expired</span>
+                        <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-red-500/20 text-red-500 whitespace-nowrap">Expired</span>
                       ) : (
-                        <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-white/10 text-white/60">{d.status || 'Draft'}</span>
+                        <span className="rounded-full px-2 py-0.5 text-[10px] font-black bg-white/10 text-white/60 whitespace-nowrap">{d.status || 'Draft'}</span>
                       )}
                       {d.rejectionReason && <span className="text-[9px] text-red-400/70 max-w-[120px] truncate" title={d.rejectionReason}>Reason: {d.rejectionReason}</span>}
                     </div>
                   </td>
                   <td className="px-5 py-4 hidden sm:table-cell">
-                    <span className="rounded-full px-2.5 py-1 text-[10px] font-black text-red-400" style={{ background: 'rgba(239,68,68,0.12)' }}>{d.discountPercent}% OFF</span>
+                    <span className="rounded-full px-2.5 py-1 text-[10px] font-black text-red-400 whitespace-nowrap" style={{ background: 'rgba(239,68,68,0.12)' }}>{d.discountPercent}% OFF</span>
                   </td>
                   <td className="px-5 py-4 font-bold" style={{ color: G }}>{d.newPrice}</td>
                   <td className="px-5 py-4 text-xs font-semibold text-white/50">
